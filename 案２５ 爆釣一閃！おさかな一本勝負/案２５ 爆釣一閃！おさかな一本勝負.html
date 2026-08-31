@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>爆釣一閃！おさかな一本勝負</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Reggae+One&display=swap');
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: #050b14;
+            color: #fff;
+            font-family: 'DotGothic16', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100vw;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 640px;
+            background-color: #0a192f;
+            background-image: url('images/bg/bg_sea.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border: 6px double #d4af37;
+            box-shadow: 0 0 25px rgba(0, 150, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            image-rendering: pixelated;
+            overflow: hidden;
+            transition: background-image 0.3s ease;
+        }
+
+        /* 走査線・CRTフィルター */
+        #game-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 15;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* タイトル画面 */
+        #title-screen {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(10,25,47,0.9) 0%, rgba(5,10,20,0.98) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 40;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #main-logo {
+            font-family: 'Reggae One', cursive;
+            font-size: 32px;
+            color: #ffd700;
+            text-shadow: 4px 4px 0px #8b0000, -2px -2px 0px #000;
+            margin-bottom: 30px;
+            line-height: 1.3;
+            letter-spacing: 2px;
+            animation: logoPulse 1.2s infinite alternate ease-in-out;
+        }
+
+        @keyframes logoPulse {
+            0% { transform: scale(0.98); }
+            100% { transform: scale(1.03); }
+        }
+
+        .title-btn {
+            font-size: 20px;
+            padding: 12px 30px;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 280px;
+            background: #8b0000;
+            color: #ffd700;
+            border: 3px double #ffd700;
+            box-shadow: 0 4px 0 #000;
+        }
+
+        /* ヘッダー UI */
+        .ui-header {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.85);
+            border-bottom: 4px solid #d4af37;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+        }
+
+        .ui-header-right {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn {
+            background: #8b0000;
+            color: #fff;
+            border: 2px solid #d4af37;
+            padding: 6px 8px;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .btn:disabled {
+            background: #444;
+            color: #888;
+            border-color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .btn:active:not(:disabled) {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px #000;
+        }
+
+        .btn-reset {
+            background: #440000;
+            border-color: #ff4444;
+            color: #ffaaaa;
+            font-size: 12px;
+            padding: 4px 8px;
+        }
+
+        #game-screen {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        #fish-shadow {
+            position: absolute;
+            top: 70%;
+            left: -150px;
+            width: 80px;
+            height: 40px;
+            pointer-events: none;
+            display: none;
+            z-index: 2;
+            image-rendering: pixelated;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.6));
+        }
+
+        .ripple {
+            position: absolute;
+            border: 3px dotted rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: rippleAnim 1.4s infinite ease-out;
+            pointer-events: none;
+            display: none;
+            z-index: 1;
+        }
+
+        @keyframes rippleAnim {
+            0% { width: 10px; height: 5px; opacity: 1; }
+            100% { width: 130px; height: 65px; opacity: 0; }
+        }
+
+        #exclamation {
+            font-family: 'Reggae One', cursive;
+            font-size: 90px;
+            color: #ff2200;
+            text-shadow: 4px 4px 0px #ffd700, -3px -3px 0px #000;
+            display: none;
+            z-index: 10;
+            animation: pulse 0.08s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.98) rotate(-2deg); }
+            100% { transform: scale(1.15) rotate(2deg); }
+        }
+
+        #status-text {
+            font-size: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 0px #000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 18px;
+            border: 2px dotted #d4af37;
+            margin-top: 20px;
+            z-index: 10;
+        }
+
+        #mash-container {
+            position: absolute;
+            top: 55%;
+            width: 80%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 12;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 15px;
+            border: 3px double #ff2200;
+            box-shadow: 0 0 15px #ff2200;
+        }
+
+        #mash-title {
+            font-family: 'Reggae One', cursive;
+            color: #ffcc00;
+            font-size: 20px;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px #000;
+        }
+
+        #gauge-outer {
+            width: 100%;
+            height: 24px;
+            background: #222;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #gauge-inner {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff9900, #ff0000);
+            transition: width 0.05s linear;
+        }
+
+        /* マップ選択モーダル（スクロール対応） */
+        #map-modal {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 88%;
+            max-height: 85%;
+            background: #0d1520;
+            border: 4px double #d4af37;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 55;
+            box-shadow: 0 0 25px rgba(0,0,0,0.9);
+            overflow-y: auto;
+        }
+
+        .map-grid {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .map-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 15px;
+            background: #112233;
+            color: #fff;
+            border: 2px solid #d4af37;
+            text-align: center;
+            cursor: pointer;
+        }
+        .map-btn.active {
+            background: #8b0000;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* リザルト画面 */
+        #result-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            background: radial-gradient(circle, #2a2a00 0%, #000000 100%);
+            border: 6px double #ffd700;
+            padding: 20px;
+            text-align: center;
+            display: none;
+            z-index: 25;
+            box-shadow: 0 0 30px #ffd700;
+        }
+
+        #result-title {
+            font-family: 'Reggae One', cursive;
+            color: #ffd700;
+            font-size: 28px;
+            text-shadow: 3px 3px 0px #8b0000;
+            margin-bottom: 5px;
+        }
+
+        #result-modal img.clickable-fish {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            margin: 10px 0;
+            cursor: zoom-in;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+            animation: fishJump 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes fishJump {
+            0% { transform: scale(0.1) rotate(-30deg); opacity: 0; }
+            50% { transform: scale(1.3) rotate(10deg); }
+            70% { transform: scale(0.9) rotate(-5deg); }
+            100% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+        }
+
+        /* 図鑑画面 */
+        #zukan-modal {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(5, 10, 20, 0.98);
+            border: 4px solid #d4af37;
+            display: none;
+            flex-direction: column;
+            z-index: 50;
+            padding: 12px;
+        }
+
+        .zukan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .zukan-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            font-size: 11px;
+            padding: 4px 6px;
+            background: #112233;
+            border: 1px solid #d4af37;
+            color: #aaa;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: #8b0000;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .zukan-grid {
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding-right: 4px;
+        }
+
+        .zukan-card {
+            background: #111a24;
+            border: 2px dotted #334455;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.1s, border-color 0.1s;
+        }
+
+        .zukan-card.discovered {
+            border-color: #d4af37;
+            background: #182218;
+        }
+        .zukan-card.discovered:active {
+            transform: scale(0.95);
+        }
+
+        .zukan-card img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            margin-bottom: 6px;
+        }
+
+        .zukan-card-name {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            color: #ffd700;
+            word-break: break-all;
+            line-height: 1.2;
+        }
+
+        /* 図鑑詳細モーダル */
+        #zukan-detail-modal {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-height: 85%;
+            background: #0d1520;
+            border: 4px double #d4af37;
+            padding: 18px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 60;
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
+            overflow-y: auto;
+        }
+
+        #zukan-detail-img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            cursor: zoom-in;
+            margin: 10px 0;
+            background: #050a10;
+            border: 2px dotted #d4af37;
+            padding: 5px;
+        }
+
+        #zukan-detail-title {
+            font-family: 'Reggae One', cursive;
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        #zukan-detail-desc {
+            font-size: 15px;
+            line-height: 1.6;
+            text-align: left;
+            margin-bottom: 12px;
+            color: #eee;
+        }
+
+        #zukan-detail-time {
+            font-size: 15px;
+            color: #00ffcc;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        #zoom-modal {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 80;
+            cursor: zoom-out;
+        }
+
+        #zoom-img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+        }
+    </style>
+</head>
+<body>
+
+<audio id="title-bgm" src="sounds/title.mp3" loop preload="auto"></audio>
+<audio id="game-bgm" src="sounds/bg_sound.mp3" loop preload="auto"></audio>
+
+<div id="game-container">
+    <!-- タイトル画面 -->
+    <div id="title-screen">
+        <div id="main-logo">爆釣一閃！<br>おさかな一本勝負</div>
+        <button class="btn title-btn" onclick="startGameFromTitle()">一戦交える</button>
+    </div>
+
+    <!-- UI Header -->
+    <div class="ui-header">
+        <button class="btn" id="sound-btn" onclick="toggleSound()">音: ON</button>
+        <span id="current-location-text" style="color:#ffd700; font-weight:bold;">【海】</span>
+        <div class="ui-header-right">
+            <button class="btn" onclick="openMapModal()">場所移動</button>
+            <button class="btn" onclick="openZukan()">図鑑</button>
+        </div>
+    </div>
+
+    <!-- ゲームエリア -->
+    <div id="game-screen" onclick="handleAction()">
+        <div id="ripple-effect" class="ripple"></div>
+        <div id="fish-shadow"></div>
+
+        <div id="mash-container">
+            <div id="mash-title">これはかなりの大物だ！</div>
+            <div style="font-size: 15px; color: #fff; margin-bottom: 6px;">画面を連打して釣り上げろ！</div>
+            <div id="gauge-outer">
+                <div id="gauge-inner"></div>
+            </div>
+        </div>
+
+        <div id="exclamation">一閃！</div>
+        <div id="status-text">画面を叩いて竿を振れ！</div>
+    </div>
+
+    <!-- マップ選択 modal -->
+    <div id="map-modal">
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 12px;">釣り場を選択</div>
+        <div class="map-grid">
+            <button class="map-btn" id="map-btn-sea" onclick="selectLocation('sea')">🌊 海 (大海原)</button>
+            <button class="map-btn" id="map-btn-river" onclick="selectLocation('river')">🏞️ 川 (清流)</button>
+            <button class="map-btn" id="map-btn-swamp" onclick="selectLocation('swamp')">🌾 沼地 (秘境)</button>
+            <button class="map-btn" id="map-btn-lake" onclick="selectLocation('lake')">🚣 湖 (大湖畔)</button>
+            <button class="map-btn" id="map-btn-snow" onclick="selectLocation('snow')">❄️ 雪山 (氷穴)</button>
+            <button class="map-btn" id="map-btn-underground" onclick="selectLocation('underground')">🕳️ 地底湖 (洞窟)</button>
+            <button class="map-btn" id="map-btn-deepsea" onclick="selectLocation('deepsea')">⚓ 深海 (暗黒水域)</button>
+        </div>
+        <button class="btn" style="margin-top: 12px; padding: 6px 20px;" onclick="closeMapModal()">閉じる</button>
+    </div>
+
+    <!-- リザルト modal -->
+    <div id="result-modal">
+        <h3 id="result-title">大物 GET!!</h3>
+        <img id="result-img" class="clickable-fish" src="" alt="Fish" onclick="zoomImage(this.src)">
+        <div style="font-size: 12px; color: #aaa;">(タップで魚を拡大表示)</div>
+        <div id="result-name" style="font-size: 24px; font-weight: bold; color:#fff; margin-top: 4px; margin-bottom: 6px;">---</div>
+        <div id="result-time" style="font-size: 16px; color: #00ffcc; margin-bottom: 15px;">反応速度: 0.000秒</div>
+        <button class="btn" id="next-btn" style="font-size: 16px; padding: 8px 20px;" onclick="closeResult()">次へ進む</button>
+    </div>
+
+    <!-- 図鑑 modal -->
+    <div id="zukan-modal">
+        <div class="zukan-header">
+            <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">おさかな絵巻</span>
+            <div>
+                <button class="btn btn-reset" onclick="resetZukanData()">図鑑初期化</button>
+                <button class="btn" onclick="closeZukan()">閉じる</button>
+            </div>
+        </div>
+        <!-- カテゴリフィルター -->
+        <div class="zukan-filter">
+            <button class="filter-btn active" id="filter-all" onclick="filterZukan('all')">すべて</button>
+            <button class="filter-btn" id="filter-sea" onclick="filterZukan('sea')">海</button>
+            <button class="filter-btn" id="filter-river" onclick="filterZukan('river')">川</button>
+            <button class="filter-btn" id="filter-swamp" onclick="filterZukan('swamp')">沼地</button>
+            <button class="filter-btn" id="filter-lake" onclick="filterZukan('lake')">湖</button>
+            <button class="filter-btn" id="filter-snow" onclick="filterZukan('snow')">雪山</button>
+            <button class="filter-btn" id="filter-underground" onclick="filterZukan('underground')">地底湖</button>
+            <button class="filter-btn" id="filter-deepsea" onclick="filterZukan('deepsea')">深海</button>
+        </div>
+        <div class="zukan-grid" id="zukan-grid"></div>
+    </div>
+
+    <!-- 図鑑詳細 modal -->
+    <div id="zukan-detail-modal">
+        <div id="zukan-detail-title">---</div>
+        <img id="zukan-detail-img" src="" alt="Fish Detail" onclick="zoomImage(this.src)">
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">(タップで大画面表示)</div>
+        <div id="zukan-detail-desc">---</div>
+        <div id="zukan-detail-time">最速記録: ---秒</div>
+        <button class="btn" style="padding: 8px 20px; font-size: 15px;" onclick="closeZukanDetail()">閉じる</button>
+    </div>
+
+    <!-- 画像単体拡大 modal -->
+    <div id="zoom-modal" onclick="closeZoomModal()">
+        <img id="zoom-img" src="" alt="Zoomed Fish">
+    </div>
+</div>
+
+<script>
+    /* ===================================================
+       マップ（釣り場）設定
+       =================================================== */
+    const MAP_DATA = {
+        sea: { name: "海", bg: "images/bg/bg_sea.png" },
+        river: { name: "川", bg: "images/bg/bg_river.png" },
+        swamp: { name: "沼地", bg: "images/bg/bg_swamp.png" },
+        lake: { name: "湖", bg: "images/bg/bg_lake.png" },
+        snow: { name: "雪山", bg: "images/bg/bg_snow.png" },
+        underground: { name: "地底湖", bg: "images/bg/bg_underground.png" },
+        deepsea: { name: "深海", bg: "images/bg/bg_deepsea.png" }
+    };
+
+    let currentLocation = "sea";
+
+    /* ===================================================
+       魚データ
+       =================================================== */
+    const FISH_DATA = [
+        // --- 海の生物 ---
+        {
+            id: 1,
+            name: "マアジ",
+            location: "sea",
+            image: "images/fish_aji.png",
+            shadowImage: "images/shadow_small.png",
+            desc: "沿岸部に生息するおなじみの魚。体側にある「ゼイゴ」と呼ばれる硬いウロコが特徴。刺身やアジフライなど食卓の強い味方。",
+            reqTime: 1.000,
+            shadowWidth: 70, shadowHeight: 30,
+            isBig: false,
+            weight: 25,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='40' width='60' height='20' fill='silver'/><polygon points='80,50 95,35 95,65' fill='gray'/><circle cx='30' cy='45' r='3' fill='black'/></svg>"
+        },
+        {
+            id: 2,
+            name: "マダイ",
+            location: "sea",
+            image: "images/fish_tai.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "「魚の王様」と称されるめでたい高級魚。鮮やかな赤い魚体と鋭い背ビレを持つ。頑丈なアゴで海老やカニを噛み砕いて食べる。",
+            reqTime: 0.800,
+            shadowWidth: 100, shadowHeight: 45,
+            isBig: false,
+            weight: 50,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='35' width='60' height='30' fill='crimson'/><polygon points='80,50 95,30 95,70' fill='darkred'/><circle cx='30' cy='45' r='3' fill='yellow'/></svg>"
+        },
+        {
+            id: 3,
+            name: "クロマグロ",
+            location: "sea",
+            image: "images/fish_maguro.png",
+            shadowImage: "images/shadow_big.png",
+            desc: "「黒いダイヤ」と呼ばれる大海原の最速ランナー。時速80km以上で泳ぎ続け、泳ぎを止めると窒息してしまう体構造をしている。",
+            reqTime: 0.600,
+            shadowWidth: 140, shadowHeight: 55,
+            isBig: true,
+            weight: 15,
+            tapPower: 11,
+            decaySpeed: 1.2,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ellipse cx='50' cy='50' rx='40' ry='20' fill='navy'/><polygon points='90,50 100,35 100,65' fill='blue'/><circle cx='25' cy='45' r='3' fill='white'/></svg>"
+        },
+        {
+            id: 4,
+            name: "ハリセンボン",
+            location: "sea",
+            image: "images/fish_harisenbon.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "体表に鋭い針を持つフグの仲間。危険を察知すると大量の水を飲み込んで体を丸く膨らませる。",
+            reqTime: 0.700,
+            shadowWidth: 100, shadowHeight: 45,
+            isBig: false,
+            weight: 20,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='30' fill='sandybrown'/></svg>"
+        },
+        {
+            id: 5,
+            name: "クマノミ",
+            location: "sea",
+            image: "images/fish_kumanomi.png",
+            shadowImage: "images/shadow_small.png",
+            desc: "イソギンチャクと共生する鮮やかなオレンジ色の小魚。毒針に耐性があり、身を守りながら生活する。",
+            reqTime: 0.800,
+            shadowWidth: 60, shadowHeight: 25,
+            isBig: false,
+            weight: 20,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='25' fill='orange'/></svg>"
+        },
+        {
+            id: 6,
+            name: "タツノオトシゴ",
+            location: "sea",
+            image: "images/fish_tatsu.png",
+            shadowImage: "images/shadow_small.png",
+            desc: "",
+            reqTime: 0.600,
+            shadowWidth: 30, shadowHeight: 100,
+            isBig: false,
+            weight: 10,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='25' fill='orange'/></svg>"
+        },
+        {
+            id: 7,
+            name: "ホオジロザメ",
+            location: "sea",
+            image: "images/fish_same1.png",
+            shadowImage: "images/shadow_biggest.png",
+            desc: "テスト",
+            reqTime: 0.450,
+            shadowWidth: 150, shadowHeight: 30,
+            isBig: true,
+            weight: 5,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='25' fill='orange'/></svg>"
+        },
+
+        // --- 川の生物 ---
+        {
+            id: 8,
+            name: "ヤマメ",
+            location: "river",
+            image: "images/fish_yamame.png",
+            shadowImage: "images/shadow_small.png",
+            desc: "「渓流の女王」と称される美しい川魚。体にパーマークと呼ばれる独特の楕円模様が並ぶのが特徴。",
+            reqTime: 0.850,
+            shadowWidth: 65, shadowHeight: 25,
+            isBig: false,
+            weight: 40,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='40' width='60' height='20' fill='olive'/></svg>"
+        },
+        {
+            id: 9,
+            name: "アユ",
+            location: "river",
+            image: "images/fish_ayu.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "清流に生息し、石についたコケを食べて育つ魚。スイカのような独特の爽やかな香りがすることから香魚とも呼ばれる。",
+            reqTime: 0.750,
+            shadowWidth: 80, shadowHeight: 30,
+            isBig: false,
+            weight: 50,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='40' width='60' height='20' fill='yellowgreen'/></svg>"
+        },
+
+        // --- 沼地の生物 ---
+        {
+            id: 10,
+            name: "ナマズ",
+            location: "swamp",
+            image: "images/fish_namazu.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "立派なヒゲを持つ夜行性の底生魚。濁った水底でもヒゲを使って獲物を感じ取り素早く捕食する。",
+            reqTime: 0.800,
+            shadowWidth: 100, shadowHeight: 40,
+            isBig: false,
+            weight: 50,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='40' width='60' height='20' fill='darkslategrey'/></svg>"
+        },
+        {
+            id: 11,
+            name: "ライギョ",
+            location: "swamp",
+            image: "images/fish_raigyo.png",
+            shadowImage: "images/shadow_big.png",
+            desc: "泥の深い沼地にひそむ凶暴な肉食魚。空気呼吸ができる特殊なエラを持ち、水中の酸素が薄い環境でも生きられる。",
+            reqTime: 0.600,
+            shadowWidth: 130, shadowHeight: 50,
+            isBig: true,
+            weight: 25,
+            tapPower: 10,
+            decaySpeed: 1.2,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ellipse cx='50' cy='50' rx='40' ry='20' fill='darkgreen'/></svg>"
+        },
+
+        // --- 湖の生物 ---
+        {
+            id: 12,
+            name: "ブラックバス",
+            location: "lake",
+            image: "images/fish_blackbass.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "ルアーフィッシングで大人気の外来肉食魚。大きな口で小魚や水生昆虫に豪快に襲いかかる。",
+            reqTime: 0.750,
+            shadowWidth: 100, shadowHeight: 45,
+            isBig: false,
+            weight: 50,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='35' width='60' height='30' fill='darkolivegreen'/></svg>"
+        },
+        {
+            id: 13,
+            name: "ニジマス",
+            location: "lake",
+            image: "images/fish_nijimasu.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "体側に鮮やかな虹色の帯を持つ美しいサケ科の魚。冷たく清らかな大湖畔や川を好んで泳ぐ。",
+            reqTime: 0.800,
+            shadowWidth: 90, shadowHeight: 35,
+            isBig: false,
+            weight: 40,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='20' y='40' width='60' height='20' fill='magenta'/></svg>"
+        },
+
+        // --- 雪山の生物 ---
+        {
+            id: 14,
+            name: "イトウ",
+            location: "snow",
+            image: "images/fish_itou.png",
+            shadowImage: "images/shadow_big.png",
+            desc: "「日本最大の淡水魚」と称される幻の魚。極寒の北部水域に生息し、体長1メートルを超える大物に育つこともある。",
+            reqTime: 0.550,
+            shadowWidth: 140, shadowHeight: 45,
+            isBig: true,
+            weight: 20,
+            tapPower: 9,
+            decaySpeed: 1.3,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='15' y='40' width='70' height='20' fill='brown'/></svg>"
+        },
+        {
+            id: 15,
+            name: "クリオネ",
+            location: "snow",
+            image: "images/fish_clione.png",
+            shadowImage: "images/shadow_small.png",
+            desc: "「流氷の天使」と呼ばれる浮遊性の翼足類。透明な体でかわいらしく泳ぐが、捕食時には頭部が割れてバッカルコーンを出す。",
+            reqTime: 0.900,
+            shadowWidth: 40, shadowHeight: 25,
+            isBig: false,
+            weight: 50,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='20' fill='lightcyan'/></svg>"
+        },
+
+        // --- 地底湖の生物 ---
+        {
+            id: 16,
+            name: "シーラカンス",
+            location: "underground",
+            image: "images/fish_coelacanth.png",
+            shadowImage: "images/shadow_biggest.png",
+            desc: "数億年前から姿を変えずに生き残ってきた「生きた化石」。肢のような丈夫なヒレを持ち、暗い地底の水底を漂う。",
+            reqTime: 0.450,
+            shadowWidth: 160, shadowHeight: 35,
+            isBig: true,
+            weight: 15,
+            tapPower: 6,
+            decaySpeed: 1.5,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='15' y='35' width='70' height='30' fill='darkblue'/></svg>"
+        },
+        {
+            id: 17,
+            name: "ホラアナゴ",
+            location: "underground",
+            image: "images/fish_horaanago.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "日光が届かない極闇の地底洞窟に適応した魚。視力が退化しており、皮膚の触覚で暗闇の獲物を捕らえる。",
+            reqTime: 0.700,
+            shadowWidth: 100, shadowHeight: 25,
+            isBig: false,
+            weight: 50,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='45' width='80' height='10' fill='purple'/></svg>"
+        },
+
+        // --- 深海の生物 ---
+        {
+            id: 18,
+            name: "リュウグウノツカイ",
+            location: "deepsea",
+            image: "images/fish_ryugu.png",
+            shadowImage: "images/shadow_biggest.png",
+            desc: "外洋の深海に生息する神秘的な巨大魚。タテガミのような鮮やかな赤い背ビレを持ち、体を垂直に立てて泳ぐと言われている。",
+            reqTime: 0.450,
+            shadowWidth: 180, shadowHeight: 15,
+            isBig: true,
+            weight: 15,
+            tapPower: 6,
+            decaySpeed: 1.5,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='10' y='45' width='75' height='10' fill='lightcyan'/><polygon points='85,50 95,40 95,60' fill='red'/><circle cx='20' cy='48' r='2' fill='red'/></svg>"
+        },
+        {
+            id: 19,
+            name: "メンダコ",
+            location: "deepsea",
+            image: "images/fish_mendako.png",
+            shadowImage: "images/shadow_small.png",
+            desc: "深海にすむ耳のようなヒレを持つお椀型のタコ。ふわふわと水中で平たく泳ぐ姿がかわいらしい。",
+            reqTime: 0.850,
+            shadowWidth: 60, shadowHeight: 30,
+            isBig: false,
+            weight: 45,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='25' fill='coral'/></svg>"
+        },
+        {
+            id: 20,
+            name: "チョウチンアンコウ",
+            location: "deepsea",
+            image: "images/fish_chouchin.png",
+            shadowImage: "images/shadow_midi.png",
+            desc: "頭部にルアーのような発光器官を持つ深海魚。光に引き寄せられて近づいてきた獲物を一気に呑み込む。",
+            reqTime: 0.650,
+            shadowWidth: 100, shadowHeight: 45,
+            isBig: false,
+            weight: 35,
+            fallbackSvg: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='30' fill='darkgray'/></svg>"
+        }
+    ];
+
+    let gameState = 'TITLE';
+    let isZukanOpen = false;
+    let currentFilter = 'all';
+    let timerId = null;
+    let timeoutTimerId = null;
+    let shadowAnimId = null;
+    let battleIntervalId = null;
+    let startTime = 0;
+    let reactionTime = 0;
+    let soundEnabled = true;
+    let currentTargetFish = null;
+    let battleGauge = 0;
+
+    let caughtFish = JSON.parse(localStorage.getItem('retro_fishing_zukan_v4')) || {};
+
+    let audioCtx = null;
+    let titleBgm = null;
+    let gameBgm = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (!titleBgm) {
+            titleBgm = document.getElementById('title-bgm');
+            titleBgm.volume = 0.02;
+        }
+        if (!gameBgm) {
+            gameBgm = document.getElementById('game-bgm');
+            gameBgm.volume = 0.05;
+        }
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('sound-btn');
+        btn.innerText = soundEnabled ? "音: ON" : "音: OFF";
+        initAudio();
+
+        if (soundEnabled) {
+            if (isZukanOpen) {
+                titleBgm.play().catch(() => {});
+            } else if (gameState !== 'TITLE') {
+                gameBgm.play().catch(() => {});
+            }
+            playWaterPlop();
+        } else {
+            if (titleBgm) titleBgm.pause();
+            if (gameBgm) gameBgm.pause();
+        }
+    }
+
+    function startGameFromTitle() {
+        initAudio();
+        document.getElementById('title-screen').style.display = "none";
+        gameState = 'READY';
+        if (soundEnabled) {
+            if (titleBgm) titleBgm.pause();
+            if (gameBgm) gameBgm.play().catch(() => {});
+        }
+        playWaterPlop();
+    }
+
+    function openMapModal() {
+        initAudio();
+        resetGameStateToReady();
+        updateMapButtonsUI();
+        document.getElementById('map-modal').style.display = "flex";
+    }
+
+    function closeMapModal() {
+        document.getElementById('map-modal').style.display = "none";
+    }
+
+    function selectLocation(locKey) {
+        if (!MAP_DATA[locKey]) return;
+        currentLocation = locKey;
+
+        const container = document.getElementById('game-container');
+        container.style.backgroundImage = `url('${MAP_DATA[locKey].bg}')`;
+
+        document.getElementById('current-location-text').innerText = `【${MAP_DATA[locKey].name}】`;
+
+        closeMapModal();
+        playWaterPlop();
+    }
+
+    function updateMapButtonsUI() {
+        ['sea', 'river', 'swamp', 'lake', 'snow', 'underground', 'deepsea'].forEach(loc => {
+            const btn = document.getElementById(`map-btn-${loc}`);
+            if (btn) {
+                if (loc === currentLocation) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            }
+        });
+    }
+
+    function getRandomFish() {
+        const availableFish = FISH_DATA.filter(fish => fish.location === currentLocation);
+        if (availableFish.length === 0) return FISH_DATA[0];
+
+        const totalWeight = availableFish.reduce((sum, fish) => sum + fish.weight, 0);
+        let randomVal = Math.floor(Math.random() * totalWeight);
+        
+        for (const fish of availableFish) {
+            if (randomVal < fish.weight) {
+                return fish;
+            }
+            randomVal -= fish.weight;
+        }
+        return availableFish[0];
+    }
+
+    function zoomImage(src) {
+        if (!src) return;
+        const modal = document.getElementById('zoom-modal');
+        const img = document.getElementById('zoom-img');
+        img.src = src;
+        modal.style.display = "flex";
+    }
+
+    function closeZoomModal() {
+        document.getElementById('zoom-modal').style.display = "none";
+    }
+
+    function resetZukanData() {
+        const confirmReset = window.confirm("本当に図鑑データを破棄しますか？\n（これまで釣った魚の記録が消去されます）");
+        if (confirmReset) {
+            localStorage.removeItem('retro_fishing_zukan_v4');
+            caughtFish = {};
+            renderZukanGrid();
+            alert("図鑑データを消去しました。");
+        }
+    }
+
+    function openZukan() {
+        initAudio();
+        isZukanOpen = true;
+
+        resetGameStateToReady();
+
+        if (soundEnabled) {
+            if (gameBgm) gameBgm.pause();
+            if (titleBgm) titleBgm.play().catch(() => {});
+        }
+
+        renderZukanGrid();
+        document.getElementById('zukan-modal').style.display = "flex";
+    }
+
+    function filterZukan(locKey) {
+        currentFilter = locKey;
+        
+        ['all', 'sea', 'river', 'swamp', 'lake', 'snow', 'underground', 'deepsea'].forEach(k => {
+            const btn = document.getElementById(`filter-${k}`);
+            if (btn) {
+                if (k === locKey) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            }
+        });
+
+        renderZukanGrid();
+    }
+
+    function resetGameStateToReady() {
+        clearTimeout(timerId);
+        clearTimeout(timeoutTimerId);
+        clearInterval(battleIntervalId);
+        hideFishShadow();
+        
+        document.getElementById('ripple-effect').style.display = "none";
+        document.getElementById('exclamation').style.display = "none";
+        document.getElementById('mash-container').style.display = "none";
+        
+        if (gameState !== 'TITLE') {
+            gameState = 'READY';
+            document.getElementById('status-text').innerText = "画面を叩いて竿を振れ！";
+            document.getElementById('status-text').style.color = "#fff";
+        }
+    }
+
+    function renderZukanGrid() {
+        const gridContainer = document.getElementById('zukan-grid');
+        gridContainer.innerHTML = "";
+
+        const listToDisplay = FISH_DATA.filter(fish => {
+            if (currentFilter === 'all') return true;
+            return fish.location === currentFilter;
+        });
+
+        listToDisplay.forEach(fish => {
+            const isUnlocked = caughtFish[fish.id] && caughtFish[fish.id].unlocked;
+            const card = document.createElement('div');
+            card.className = `zukan-card ${isUnlocked ? 'discovered' : ''}`;
+
+            const img = document.createElement('img');
+            if (isUnlocked) {
+                img.src = fish.image;
+                img.onerror = () => { img.src = fish.fallbackSvg; };
+            } else {
+                img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='35' y='65' font-size='40' fill='gray'>？</text></svg>";
+            }
+
+            const name = document.createElement('div');
+            name.className = "zukan-card-name";
+            name.innerText = isUnlocked ? fish.name : "？？？？";
+
+            card.appendChild(img);
+            card.appendChild(name);
+
+            if (isUnlocked) {
+                card.onclick = () => openZukanDetail(fish);
+            }
+
+            gridContainer.appendChild(card);
+        });
+    }
+
+    function openZukanDetail(fish) {
+        const modal = document.getElementById('zukan-detail-modal');
+        const title = document.getElementById('zukan-detail-title');
+        const img = document.getElementById('zukan-detail-img');
+        const desc = document.getElementById('zukan-detail-desc');
+        const time = document.getElementById('zukan-detail-time');
+
+        const locName = MAP_DATA[fish.location] ? MAP_DATA[fish.location].name : "不明";
+
+        title.innerText = `【${fish.name}】`;
+        img.src = fish.image;
+        img.onerror = () => { img.src = fish.fallbackSvg; };
+        desc.innerText = `[生息地: ${locName}]\n` + fish.desc;
+
+        const best = caughtFish[fish.id].bestTime.toFixed(3);
+        time.innerText = `最速記録: ${best}秒`;
+
+        modal.style.display = "flex";
+    }
+
+    function closeZukanDetail() {
+        document.getElementById('zukan-detail-modal').style.display = "none";
+    }
+
+    function closeZukan() {
+        isZukanOpen = false;
+        closeZukanDetail();
+        document.getElementById('zukan-modal').style.display = "none";
+
+        if (soundEnabled) {
+            if (titleBgm) titleBgm.pause();
+            if (gameState !== 'TITLE' && gameBgm) {
+                gameBgm.play().catch(() => {});
+            }
+        }
+    }
+
+    /* SE */
+    function playWaterPlop() {
+        if (!soundEnabled || !audioCtx) return;
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e) {}
+    }
+
+    function playSplashSE() {
+        if (!soundEnabled || !audioCtx) return;
+        try {
+            const bufferSize = audioCtx.sampleRate * 0.2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+        } catch(e) {}
+    }
+
+    function playSE(type) {
+        if (!soundEnabled || !audioCtx) return;
+        if (type === 'signal') {
+            playSplashSE();
+            playTone(880, 0.15, 'sawtooth');
+            setTimeout(() => playTone(1760, 0.25, 'sawtooth'), 60);
+        } else if (type === 'success') {
+            const notes = [523, 659, 783, 1046];
+            notes.forEach((f, i) => setTimeout(() => playTone(f, 0.12, 'square'), i * 80));
+        } else if (type === 'foul') {
+            playTone(130, 0.35, 'sawtooth');
+        } else if (type === 'tap') {
+            playTone(400, 0.05, 'square');
+        }
+    }
+
+    function playTone(freq, duration, type = 'square') {
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function handleAction() {
+        initAudio();
+
+        if (gameState === 'READY') {
+            startWaiting();
+        } else if (gameState === 'WAITING') {
+            foulAction();
+        } else if (gameState === 'SIGNAL') {
+            hitAction();
+        } else if (gameState === 'BATTLE') {
+            battleTap();
+        }
+    }
+
+    window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            if (document.getElementById('result-modal').style.display !== 'block' &&
+                document.getElementById('zukan-modal').style.display !== 'flex' &&
+                document.getElementById('map-modal').style.display !== 'flex' &&
+                document.getElementById('zoom-modal').style.display !== 'flex') {
+                if (gameState === 'TITLE') {
+                    startGameFromTitle();
+                } else {
+                    handleAction();
+                }
+            }
+        }
+    });
+
+    function setupFishShadow(fish) {
+        const shadow = document.getElementById('fish-shadow');
+        shadow.style.display = "block";
+        shadow.style.width = `${fish.shadowWidth}px`;
+        shadow.style.height = `${fish.shadowHeight}px`;
+
+        if (fish.shadowImage) {
+            shadow.style.backgroundImage = `url('${fish.shadowImage}')`;
+            shadow.style.backgroundColor = "transparent";
+        } else {
+            shadow.style.backgroundImage = "none";
+            shadow.style.backgroundColor = "rgba(0,0,0,0.7)";
+            shadow.style.borderRadius = "50%";
+        }
+
+        let posX = -180;
+        let posY = Math.random() * 80 + 360; 
+        shadow.style.top = `${posY}px`;
+
+        cancelAnimationFrame(shadowAnimId);
+        
+        function animateShadow() {
+            posX += 2.2;
+            if (posX > 500) posX = -180;
+            const waveY = Math.sin(posX * 0.04) * 6;
+            shadow.style.left = `${posX}px`;
+            shadow.style.transform = `translateY(${waveY}px)`;
+
+            if (gameState === 'WAITING' || gameState === 'SIGNAL') {
+                shadowAnimId = requestAnimationFrame(animateShadow);
+            }
+        }
+        shadowAnimId = requestAnimationFrame(animateShadow);
+    }
+
+    function hideFishShadow() {
+        document.getElementById('fish-shadow').style.display = "none";
+        cancelAnimationFrame(shadowAnimId);
+    }
+
+    function startWaiting() {
+        gameState = 'WAITING';
+        
+        currentTargetFish = getRandomFish();
+
+        document.getElementById('status-text').innerText = "じっと待て……";
+        document.getElementById('status-text').style.color = "#fff";
+        document.getElementById('exclamation').style.display = "none";
+
+        const ripple = document.getElementById('ripple-effect');
+        ripple.style.display = "block";
+        ripple.style.left = "40%";
+        ripple.style.top = "70%";
+
+        playWaterPlop();
+        setupFishShadow(currentTargetFish);
+
+        const randomDelay = Math.floor(Math.random() * 2000) + 1500;
+
+        timerId = setTimeout(() => {
+            gameState = 'SIGNAL';
+            startTime = Date.now();
+            document.getElementById('exclamation').style.display = "block";
+            document.getElementById('status-text').innerText = "今だ！合わせろ！";
+            document.getElementById('status-text').style.color = "#ffd700";
+            playSE('signal');
+
+            clearTimeout(timeoutTimerId);
+            timeoutTimerId = setTimeout(() => {
+                if (gameState === 'SIGNAL') {
+                    hideFishShadow();
+                    document.getElementById('ripple-effect').style.display = "none";
+                    document.getElementById('exclamation').style.display = "none";
+                    playSE('foul');
+                    showResult(false, currentTargetFish, currentTargetFish.reqTime + 0.1);
+                }
+            }, currentTargetFish.reqTime * 1000);
+
+        }, randomDelay);
+    }
+
+    function foulAction() {
+        clearTimeout(timerId);
+        clearTimeout(timeoutTimerId);
+        hideFishShadow();
+        document.getElementById('ripple-effect').style.display = "none";
+        gameState = 'READY';
+        playSE('foul');
+        document.getElementById('status-text').innerText = "早合わせ！魚が逃げた！";
+        document.getElementById('status-text').style.color = "#ff3333";
+    }
+
+    function hitAction() {
+        clearTimeout(timeoutTimerId);
+        const endTime = Date.now();
+        reactionTime = (endTime - startTime) / 1000;
+        hideFishShadow();
+        document.getElementById('ripple-effect').style.display = "none";
+        document.getElementById('exclamation').style.display = "none";
+
+        if (reactionTime <= currentTargetFish.reqTime) {
+            if (currentTargetFish.isBig) {
+                startBattle();
+            } else {
+                finishCatch(true);
+            }
+        } else {
+            playSE('foul');
+            showResult(false, currentTargetFish, reactionTime);
+        }
+    }
+
+    function startBattle() {
+        gameState = 'BATTLE';
+        battleGauge = 30;
+        document.getElementById('status-text').innerText = "叩け！叩け！叩け！";
+        document.getElementById('status-text').style.color = "#ff2200";
+        document.getElementById('mash-container').style.display = "flex";
+        updateGaugeUI();
+
+        playSE('signal');
+
+        const decay = currentTargetFish.decaySpeed || 1.2;
+
+        clearInterval(battleIntervalId);
+        battleIntervalId = setInterval(() => {
+            if (gameState !== 'BATTLE') return;
+            
+            battleGauge -= decay;
+            if (battleGauge <= 0) {
+                battleGauge = 0;
+                clearInterval(battleIntervalId);
+                document.getElementById('mash-container').style.display = "none";
+                playSE('foul');
+                showResult(false, currentTargetFish, reactionTime);
+            }
+            updateGaugeUI();
+        }, 100);
+    }
+
+    function battleTap() {
+        if (gameState !== 'BATTLE') return;
+        
+        playSE('tap');
+        const power = currentTargetFish.tapPower || 11;
+        battleGauge += power;
+        
+        if (battleGauge >= 100) {
+            battleGauge = 100;
+            clearInterval(battleIntervalId);
+            document.getElementById('mash-container').style.display = "none";
+            finishCatch(true);
+        }
+        updateGaugeUI();
+    }
+
+    function updateGaugeUI() {
+        document.getElementById('gauge-inner').style.width = `${battleGauge}%`;
+    }
+
+    function finishCatch(isSuccess) {
+        if (isSuccess) {
+            playSE('success');
+            if (!caughtFish[currentTargetFish.id] || reactionTime < caughtFish[currentTargetFish.id].bestTime) {
+                caughtFish[currentTargetFish.id] = {
+                    unlocked: true,
+                    bestTime: reactionTime
+                };
+                localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
+            }
+            showResult(true, currentTargetFish, reactionTime);
+        }
+    }
+
+    function showResult(isSuccess, fish, time) {
+        gameState = 'RESULT';
+        const modal = document.getElementById('result-modal');
+        const title = document.getElementById('result-title');
+        const img = document.getElementById('result-img');
+        const name = document.getElementById('result-name');
+        const timeText = document.getElementById('result-time');
+        const nextBtn = document.getElementById('next-btn');
+
+        img.style.animation = 'none';
+        img.offsetHeight; 
+        img.style.animation = null;
+
+        if (isSuccess) {
+            title.innerText = fish.isBig ? "超大物 GET!!" : "一本釣り成功！";
+            title.style.color = "#ffd700";
+            name.innerText = fish.name;
+            img.style.display = "inline-block";
+            
+            img.src = fish.image;
+            img.onerror = () => { img.src = fish.fallbackSvg; };
+
+            timeText.innerText = `反応速度: ${time.toFixed(3)}秒 (目標: ${fish.reqTime.toFixed(3)}秒以内)`;
+        } else {
+            title.innerText = "逃げられた…";
+            title.style.color = "#ff3333";
+            name.innerText = "";
+            img.style.display = "none";
+            timeText.innerText = `反応速度: ${time.toFixed(3)}秒`;
+        }
+
+        modal.style.display = "block";
+
+        nextBtn.disabled = true;
+        let count = 1.5;
+        nextBtn.innerText = `待機中 (${Math.ceil(count)}s)`;
+
+        const countdownInterval = setInterval(() => {
+            count -= 0.5;
+            if (count <= 0) {
+                clearInterval(countdownInterval);
+                nextBtn.disabled = false;
+                nextBtn.innerText = "次へ進む";
+            } else {
+                nextBtn.innerText = `待機中 (${Math.ceil(count)}s)`;
+            }
+        }, 500);
+    }
+
+    function closeResult() {
+        document.getElementById('result-modal').style.display = "none";
+        gameState = 'READY';
+        document.getElementById('status-text').innerText = "画面を叩いて竿を振れ！";
+        document.getElementById('status-text').style.color = "#fff";
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        initAudio();
+    });
+</script>
+</body>
+</html>
