@@ -1,0 +1,1254 @@
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Reggae+One&display=swap');
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    margin: 0;
+    padding: 0;
+    touch-action: manipulation;
+}
+
+body {
+    background-color: #050b14;
+    color: #fff;
+    font-family: 'DotGothic16', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+#game-container {
+    width: 100vw;
+    max-width: 480px;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 800px;
+    background-color: #0a192f;
+    background-image: url('images/bg/bg_sea.png');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    border: 4px double #d4af37;
+    box-shadow: 0 0 25px rgba(0, 150, 255, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    image-rendering: pixelated;
+    overflow: hidden;
+    transition: background-image 0.3s ease;
+}
+
+@media screen and (min-width: 768px) {
+    #game-container {
+        height: 90vh;
+        max-height: 720px;
+        border-width: 6px;
+        border-radius: 12px;
+    }
+}
+
+#game-container::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    z-index: 15;
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+}
+
+/* スクロールバー設定 */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+    background: #d4af37;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #ffd700;
+}
+
+/* 共通ボタン */
+.btn {
+    background: #8b0000;
+    color: #fff;
+    border: 2px solid #d4af37;
+    padding: 4px 6px;
+    font-family: 'DotGothic16', sans-serif;
+    font-size: clamp(10px, 3vw, 12px);
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #000;
+    border-radius: 4px;
+    transition: transform 0.05s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.btn:disabled {
+    background: #444;
+    color: #888;
+    border-color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px #000;
+}
+
+.btn-reset {
+    background: #440000;
+    border-color: #ff4444;
+    color: #ffaaaa;
+    font-size: 11px;
+    padding: 4px 8px;
+}
+
+/* ヘッダーUI */
+.ui-header {
+    width: 100%;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.9);
+    border-bottom: 3px solid #d4af37;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 20;
+}
+
+.ui-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 4px;
+}
+
+.header-level-box {
+    display: flex;
+    flex-direction: column;
+    width: 75px;
+    font-size: 10px;
+    color: #ffd700;
+    flex-shrink: 0;
+}
+
+.header-gold-box {
+    font-size: 11px;
+    color: #00ffcc;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.header-location-text {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.ui-header-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.ui-header-btns {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.ui-header-btns .btn {
+    flex: 1;
+    text-align: center;
+}
+
+/* 実績解除ポップアップ (トースト) */
+#achievement-toast {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: rgba(13, 21, 32, 0.95);
+    border: 3px double #ffd700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    border-radius: 8px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 100;
+    transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+#achievement-toast.show {
+    top: 15px;
+}
+
+.toast-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.toast-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.toast-title {
+    font-size: 11px;
+    color: #ffd700;
+    letter-spacing: 1px;
+}
+
+.toast-name {
+    font-family: 'Reggae One', cursive;
+    font-size: clamp(14px, 4vw, 16px);
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* タイトル画面 */
+#title-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('images/bg/bg_title.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 40;
+    padding: 20px;
+    text-align: center;
+}
+
+#main-logo {
+    font-family: 'Reggae One', cursive;
+    font-size: clamp(26px, 7vw, 36px);
+    color: #ffd700;
+    text-shadow: 
+        3px 3px 0 #000, -3px -3px 0 #000,
+        3px -3px 0 #000, -3px 3px 0 #000,
+        0px 4px 10px #8b0000, 0px 0px 15px #000;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    letter-spacing: 2px;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 15px 20px;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 215, 0, 0.6);
+    animation: logoPulse 1.2s infinite alternate ease-in-out;
+}
+
+.version-text {
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #00ffcc;
+    background: rgba(0, 0, 0, 0.75);
+    border: 1.5px solid #00ffcc;
+    padding: 4px 16px;
+    border-radius: 16px;
+    text-shadow: 1px 1px 3px #000;
+    margin-bottom: 25px;
+    letter-spacing: 1.5px;
+    box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);
+}
+
+@keyframes logoPulse {
+    0% { transform: scale(0.98); }
+    100% { transform: scale(1.03); }
+}
+
+.title-btn {
+    font-size: clamp(16px, 4.5vw, 20px);
+    padding: 12px 30px;
+    margin: 10px 0;
+    width: 80%;
+    max-width: 280px;
+    background: #8b0000;
+    color: #ffd700;
+    border: 3px double #ffd700;
+    box-shadow: 0 4px 0 #000;
+}
+
+/* メインメニュー画面 */
+#menu-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('images/bg/bg_menu.png');
+    background-size: cover;
+    background-position: center;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 35;
+    padding: 20px;
+}
+
+.config-icon-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #d4af37;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+    z-index: 36;
+}
+
+.config-icon-btn img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.config-icon-btn:active {
+    transform: scale(0.95);
+}
+
+.menu-status-box {
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid #d4af37;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    width: 88%;
+    max-width: 320px;
+    text-align: left;
+    font-size: clamp(11px, 3.2vw, 13px);
+    line-height: 1.6;
+    border-radius: 6px;
+}
+
+.level-bar-outer {
+    width: 100%;
+    height: 10px;
+    background: #222;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.level-bar-inner {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffcc00, #ff6600);
+    transition: width 0.3s ease;
+}
+
+.menu-title {
+    font-family: 'Reggae One', cursive;
+    font-size: clamp(20px, 5.5vw, 28px);
+    color: #ffd700;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 0 #000, -2px -2px 0 #000;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 20px;
+    border-radius: 8px;
+    border: 1px solid #d4af37;
+}
+
+.menu-btn {
+    font-size: clamp(13px, 3.8vw, 15px);
+    padding: 8px 18px;
+    margin: 3px 0;
+    width: 85%;
+    max-width: 280px;
+    background: rgba(139, 0, 0, 0.9);
+    color: #ffd700;
+    border: 3px double #ffd700;
+    box-shadow: 0 4px 0 #000;
+    cursor: pointer;
+    font-family: 'DotGothic16', sans-serif;
+    border-radius: 4px;
+}
+
+.menu-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 2px 0 #000;
+}
+
+/* ガチャ画面 */
+#gacha-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('images/bg/bg_gacha.png');
+    background-size: cover;
+    background-position: center;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 38;
+    padding: 16px;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.gacha-title {
+    font-family: 'Reggae One', cursive;
+    font-size: clamp(20px, 5.5vw, 26px);
+    color: #ff88ff;
+    text-shadow: 
+        2px 2px 0 #000, -2px -2px 0 #000,
+        2px -2px 0 #000, -2px 2px 0 #000,
+        0 0 10px #ff00ff;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 6px 20px;
+    border-radius: 8px;
+    border: 2px solid #ff66ff;
+    margin-top: 5px;
+}
+
+.gacha-gold-text {
+    font-size: 14px;
+    color: #00ffcc;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid #00ffcc;
+    margin: 8px 0;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.gacha-box-ui {
+    width: 100%;
+    max-width: 340px;
+    background: rgba(5, 10, 20, 0.9);
+    border: 2px solid #d4af37;
+    padding: 12px;
+    margin: 6px 0 12px 0;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+.gacha-result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+    max-width: 340px;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding-right: 4px;
+}
+
+.gacha-result-card {
+    background: rgba(17, 26, 36, 0.95);
+    border: 2px solid #ffd700;
+    padding: 6px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-shadow: 1px 1px 2px #000;
+    border-radius: 4px;
+}
+
+.gacha-result-card.trash {
+    border-color: #778899;
+    color: #aaa;
+}
+
+.gacha-result-card img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    cursor: zoom-in;
+}
+
+/* モーダル枠・オーバーレイ (絶対高さと配置固定) */
+#gacha-list-modal,
+#achievement-modal,
+#config-modal,
+#map-modal,
+#howto-modal,
+#zukan-detail-modal {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 410px;
+    height: 78%;
+    max-height: 540px;
+    background: #09111c;
+    border: 4px double #d4af37;
+    border-radius: 8px;
+    padding: 14px 0px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 65;
+    box-shadow: 0 0 30px rgba(0,0,0,0.95);
+    overflow: hidden;
+}
+
+/* ガチャ景品一覧専用のスクロール領域 */
+.gacha-list-scroll-area {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 0 12px;
+    margin-bottom: 8px;
+}
+
+.gacha-list-section {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #334455;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.gacha-list-sec-title {
+    font-family: 'Reggae One', cursive;
+    font-size: 14px;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+    padding-bottom: 4px;
+}
+
+.gacha-list-item-group {
+    font-size: 12px;
+    line-height: 1.7;
+    color: #ddd;
+}
+
+/* 実績画面 */
+.achievement-progress-container {
+    width: 92%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #d4af37;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.achievement-progress-text {
+    font-size: 12px;
+    color: #ffd700;
+    display: flex;
+    justify-content: space-between;
+}
+
+.achievement-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 2px;
+    margin-bottom: 8px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 0 12px;
+}
+
+.achievement-item {
+    background: rgba(20, 30, 45, 0.9);
+    border: 2px solid #334455;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    opacity: 0.65;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.achievement-item.unlocked {
+    border-color: #ffd700;
+    background: rgba(35, 45, 20, 0.95);
+    opacity: 1.0;
+    box-shadow: 0 0 6px rgba(255, 215, 0, 0.25);
+}
+
+.achievement-icon {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.achievement-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+
+.achievement-name {
+    font-family: 'Reggae One', cursive;
+    font-size: 13px;
+    color: #ffd700;
+    word-break: break-all;
+    line-height: 1.3;
+}
+
+.achievement-desc {
+    font-size: 11px;
+    color: #ccc;
+    word-break: break-all;
+    line-height: 1.3;
+}
+
+/* ショップ画面 */
+#shop-screen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-image: url('images/bg/bg_shop.png');
+    background-size: cover;
+    background-position: center;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 38;
+    padding: 12px;
+}
+
+.shop-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.85);
+    border-bottom: 2px solid #d4af37;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.shop-tab-group {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.shop-tab-btn {
+    flex: 1;
+    padding: 6px;
+    font-size: 13px;
+    background: #112233;
+    color: #aaa;
+    border: 2px solid #d4af37;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'DotGothic16', sans-serif;
+    border-radius: 4px;
+}
+
+.shop-tab-btn.active {
+    background: #8b0000;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.shop-list {
+    flex: 1;
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.shop-item {
+    background: rgba(13, 21, 32, 0.92);
+    border: 2px solid #334455;
+    padding: 8px 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    text-align: left;
+    border-radius: 6px;
+}
+
+.shop-item.equipped {
+    border-color: #00ffcc;
+    background: rgba(10, 40, 30, 0.92);
+}
+
+.shop-item-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #d4af37;
+    padding: 3px;
+    flex-shrink: 0;
+    cursor: zoom-in;
+    border-radius: 4px;
+}
+
+.shop-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.shop-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.shop-item-name {
+    font-family: 'Reggae One', cursive;
+    font-size: 14px;
+    color: #ffd700;
+}
+
+.shop-item-desc {
+    font-size: 11px;
+    color: #ccc;
+    line-height: 1.3;
+}
+
+/* 竿/網モード切替トグル */
+.tool-mode-toggle {
+    position: absolute;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    background: rgba(0,0,0,0.85);
+    border: 2px solid #d4af37;
+    border-radius: 20px;
+    overflow: hidden;
+    z-index: 22;
+}
+
+.tool-mode-btn {
+    padding: 4px 12px;
+    font-size: 11px;
+    color: #aaa;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: 'DotGothic16', sans-serif;
+}
+
+.tool-mode-btn.active {
+    background: #8b0000;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+#game-screen {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+}
+
+#fish-shadow {
+    position: absolute;
+    top: 70%;
+    left: -150px;
+    width: 80px;
+    height: 40px;
+    pointer-events: none;
+    display: none;
+    z-index: 2;
+    image-rendering: pixelated;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.6));
+}
+
+.ripple {
+    position: absolute;
+    border: 3px dotted rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: rippleAnim 1.4s infinite ease-out;
+    pointer-events: none;
+    display: none;
+    z-index: 1;
+}
+
+@keyframes rippleAnim {
+    0% { width: 10px; height: 5px; opacity: 1; }
+    100% { width: 130px; height: 65px; opacity: 0; }
+}
+
+#exclamation {
+    font-family: 'Reggae One', cursive;
+    font-size: clamp(65px, 18vw, 90px);
+    color: #ff2200;
+    text-shadow: 4px 4px 0px #ffd700, -3px -3px 0px #000;
+    display: none;
+    z-index: 10;
+    animation: pulse 0.08s infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.98) rotate(-2deg); }
+    100% { transform: scale(1.15) rotate(2deg); }
+}
+
+#status-text {
+    font-size: clamp(14px, 4vw, 18px);
+    color: #fff;
+    text-shadow: 2px 2px 0px #000;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 8px 18px;
+    border: 2px dotted #d4af37;
+    margin-top: 20px;
+    z-index: 10;
+    border-radius: 6px;
+}
+
+#mash-container {
+    position: absolute;
+    top: 55%;
+    width: 85%;
+    max-width: 360px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 12;
+    background: rgba(0, 0, 0, 0.88);
+    padding: 15px;
+    border: 3px double #ff2200;
+    box-shadow: 0 0 15px #ff2200;
+    border-radius: 8px;
+}
+
+#mash-title {
+    font-family: 'Reggae One', cursive;
+    color: #ffcc00;
+    font-size: clamp(16px, 4.5vw, 20px);
+    margin-bottom: 8px;
+    text-shadow: 2px 2px #000;
+}
+
+#gauge-outer {
+    width: 100%;
+    height: 24px;
+    background: #222;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+#gauge-inner {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #ff9900, #ff0000);
+    transition: width 0.05s linear;
+}
+
+/* モーダル（レベルアップ・設定・マップなど） */
+#levelup-modal {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 88%;
+    max-width: 380px;
+    background: radial-gradient(circle, #332200 0%, #000 100%);
+    border: 6px double #ffd700;
+    padding: 20px;
+    text-align: center;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    z-index: 70;
+    box-shadow: 0 0 35px #ffd700;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 8px;
+}
+
+@keyframes popIn {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.config-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dotted #334455;
+    font-size: 14px;
+}
+
+.update-box {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #d4af37;
+    padding: 10px;
+    margin-top: 10px;
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #ddd;
+    border-radius: 4px;
+}
+
+.update-box-title {
+    color: #ffd700;
+    font-family: 'Reggae One', cursive;
+    font-size: 13px;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed #d4af37;
+    padding-bottom: 4px;
+}
+
+/* ★場所移動（マップ選択）画面のスクロールバー追加修正★ */
+.map-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 8px;
+}
+
+.map-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+    background: #112233;
+    color: #fff;
+    border: 2px solid #d4af37;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'DotGothic16', sans-serif;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.map-btn.active {
+    background: #8b0000;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.map-btn.locked {
+    background: #222;
+    color: #666;
+    border-color: #444;
+    cursor: not-allowed;
+}
+
+/* リザルト画面 */
+#result-modal {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 380px;
+    background: radial-gradient(circle, #2a2a00 0%, #000000 100%);
+    border: 6px double #ffd700;
+    padding: 18px;
+    text-align: center;
+    display: none;
+    z-index: 25;
+    box-shadow: 0 0 30px #ffd700;
+    border-radius: 8px;
+}
+
+#result-title {
+    font-family: 'Reggae One', cursive;
+    color: #ffd700;
+    font-size: clamp(22px, 6vw, 28px);
+    text-shadow: 3px 3px 0px #8b0000;
+    margin-bottom: 5px;
+}
+
+#result-modal img.clickable-fish {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    margin: 8px 0;
+    cursor: zoom-in;
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+    animation: fishJump 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes fishJump {
+    0% { transform: scale(0.1) rotate(-30deg); opacity: 0; }
+    50% { transform: scale(1.3) rotate(10deg); }
+    70% { transform: scale(0.9) rotate(-5deg); }
+    100% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+}
+
+/* 図鑑画面 */
+#zukan-modal {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(5, 10, 20, 0.98);
+    border: 4px solid #d4af37;
+    display: none;
+    flex-direction: column;
+    z-index: 50;
+    padding: 10px;
+}
+
+.zukan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #d4af37;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+
+.zukan-main-tabs {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.zukan-main-tab {
+    flex: 1;
+    padding: 6px;
+    font-size: 12px;
+    background: #112233;
+    color: #aaa;
+    border: 2px solid #d4af37;
+    cursor: pointer;
+    text-align: center;
+    font-family: 'DotGothic16', sans-serif;
+    border-radius: 4px;
+}
+
+.zukan-main-tab.active {
+    background: #8b0000;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.zukan-progress-container {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #d4af37;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 4px;
+}
+
+.zukan-progress-text {
+    font-size: 11px;
+    color: #ffd700;
+    display: flex;
+    justify-content: space-between;
+}
+
+.zukan-progress-bar-outer {
+    width: 100%;
+    height: 10px;
+    background: #222;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.zukan-progress-bar-inner {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00ffcc, #00ff66);
+    transition: width 0.3s ease;
+}
+
+.zukan-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+    justify-content: center;
+}
+
+.filter-btn {
+    font-size: 10px;
+    padding: 3px 6px;
+    background: #112233;
+    border: 1px solid #d4af37;
+    color: #aaa;
+    cursor: pointer;
+    font-family: 'DotGothic16', sans-serif;
+    border-radius: 3px;
+}
+
+.filter-btn.active {
+    background: #8b0000;
+    color: #ffd700;
+    font-weight: bold;
+}
+
+.zukan-grid {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-right: 2px;
+}
+
+.zukan-card {
+    background: #111a24;
+    border: 2px dotted #334455;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    border-radius: 4px;
+}
+
+.zukan-card.discovered {
+    border-color: #d4af37;
+    background: #182218;
+}
+
+.zukan-card.discovered:active {
+    transform: scale(0.95);
+}
+
+.zukan-card img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    margin-bottom: 4px;
+}
+
+.zukan-card-name {
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffd700;
+    word-break: break-all;
+    line-height: 1.2;
+}
+
+#zukan-detail-img {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    cursor: zoom-in;
+    margin: 8px 0;
+    background: #050a10;
+    border: 2px dotted #d4af37;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+#zukan-detail-title {
+    font-family: 'Reggae One', cursive;
+    font-size: 20px;
+    color: #ffd700;
+    margin-bottom: 6px;
+}
+
+#zukan-detail-desc {
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+    margin-bottom: 10px;
+    color: #eee;
+}
+
+#zukan-detail-time {
+    font-size: 13px;
+    color: #00ffcc;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+#zoom-modal {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 80;
+    cursor: zoom-out;
+}
+
+#zoom-img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+}
