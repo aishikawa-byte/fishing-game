@@ -497,7 +497,7 @@ body {
     cursor: zoom-in;
 }
 
-/* モーダル枠・オーバーレイ (絶対高さと配置固定) */
+/* モーダル枠・オーバーレイ */
 #gacha-list-modal,
 #achievement-modal,
 #config-modal,
@@ -524,7 +524,38 @@ body {
     overflow: hidden;
 }
 
-/* ガチャ景品一覧専用のスクロール領域 */
+/* ★遊び方（#howto-modal）のスクロールバー追加修正★ */
+#howto-modal > div:first-child {
+    flex-shrink: 0;
+    margin-bottom: 6px;
+}
+
+#howto-modal > div:nth-child(2) {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 6px;
+    padding-left: 10px;
+    margin-bottom: 10px;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+}
+
+#howto-modal > div:nth-child(2)::-webkit-scrollbar {
+    width: 6px;
+}
+
+#howto-modal > div:nth-child(2)::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+#howto-modal > div:nth-child(2)::-webkit-scrollbar-thumb {
+    background: #d4af37;
+    border-radius: 3px;
+}
+
 .gacha-list-scroll-area {
     width: 100%;
     flex: 1 1 auto;
@@ -558,7 +589,7 @@ body {
     color: #ddd;
 }
 
-/* 実績画面 */
+/* 実績画面のレイアウト */
 .achievement-progress-container {
     width: 92%;
     background: rgba(0, 0, 0, 0.6);
@@ -959,7 +990,6 @@ body {
     padding-bottom: 4px;
 }
 
-/* ★場所移動（マップ選択）画面のスクロールバー追加修正★ */
 .map-grid {
     width: 100%;
     display: flex;
