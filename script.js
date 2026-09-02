@@ -239,7 +239,7 @@ const FISH_DATA = [
     { id: 104, name: "ミミズハゼ", location: "underground", toolType: "net", netSize: "small", price: 220, image: "images/fish/mimizuhaze.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】地下水系に生息するミミズのような細長いハゼ。", reqTime: 0.850, shadowWidth: 50, shadowHeight: 20, isBig: false, weight: 25 },
     { id: 105, name: "サンショウウオ", location: "underground", toolType: "net", netSize: "midi", price: 450, image: "images/fish/sanshouuo.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】冷たい暗所に潜む日本固有の両生類。", reqTime: 0.750, shadowWidth: 65, shadowHeight: 30, isBig: false, weight: 20 },
     { id: 74, name: "ホライモリ", location: "underground", toolType: "net", netSize: "big", price: 800, image: "images/fish/net_horaimori.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】光の届かない暗黒の洞窟に棲む色のない両生類。", reqTime: 0.600, shadowWidth: 90, shadowHeight: 30, isBig: true, weight: 20, tapPower: 10, decaySpeed: 1.1 },
-    { id: 162, name: "キタユウレイクラゲ", location: "underground", toolType: "net", netSize: "biggest", price: 1100, image: "images/fish/kitayoureikurage.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】無数の触手を棚引かせて漂う、世界最大級のクラゲ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 65, isBig: true, weight: 8, tapPower: 7, decaySpeed: 1.4 },
+    { id: 162, name: "キタユウレイクラゲ", location: "underground", toolType: "net", netSize: "biggest", price: 1100, image: "images/fish/kitayuureikurage.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】無数の触手を棚引かせて漂う、世界最大級のクラゲ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 65, isBig: true, weight: 8, tapPower: 7, decaySpeed: 1.4 },
 
     // 7. 深海 (deepsea) - 竿/網
     { id: 75, name: "チョウチンアンコウ", location: "deepsea", toolType: "rod", price: 600, image: "images/fish/fish_chouchin.png", shadowImage: "images/shadows/shadow_big.png", desc: "頭の発光器で獲物を誘い込んで捕食する深海魚。", reqTime: 0.550, shadowWidth: 120, shadowHeight: 55, isBig: false, weight: 10, tapPower: 9, decaySpeed: 1.3 },
@@ -675,7 +675,7 @@ function renderGachaListModal() {
 
     scrollArea.innerHTML = `
         <div class="gacha-list-section">
-            <div class="gacha-list-sec-title" style="color:#ff66ff;">【限定解放エリア】(確率: 2%)</div>
+            <div class="gacha-list-sec-title" style="color:#ff66ff;">【限定解放エリア】(確率: 5%)</div>
             <div class="gacha-list-item-group">
                 ・${currentSeries.mapName}
             </div>
@@ -703,7 +703,7 @@ function renderGachaListModal() {
         </div>
 
         <div class="gacha-list-section">
-            <div class="gacha-list-sec-title" style="color:#ffd700;">【その他補填】(確率: 合計11%)</div>
+            <div class="gacha-list-sec-title" style="color:#ffd700;">【その他補填】(確率: 合計10%)</div>
             <div class="gacha-list-item-group">
                 ・💰 少額ゴールド (30 G / 50 G)<br>
                 <span style="font-size:11px; color:#ccc;">※獲得済みの竿やエリアが重複した場合は150 Gが補填されます。</span>
@@ -743,7 +743,7 @@ function spinGacha(count) {
         key: currentSeries.mapKey, 
         name: currentSeries.mapName, 
         icon: MAP_DATA[currentSeries.mapKey].bg, 
-        weight: 2 
+        weight: 5 
     };
     
     const seriesRod = { 
