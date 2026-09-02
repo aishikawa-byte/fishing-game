@@ -1282,3 +1282,61 @@ body {
     image-rendering: pixelated;
     filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
 }
+
+/* ガチャバナー画像スタイル */
+.gacha-banner-img {
+    width: 100%;
+    max-height: 140px;
+    object-fit: cover;
+    border: 2px solid #ffd700;
+    border-radius: 6px;
+    cursor: zoom-in;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    display: block;
+    margin: 0 auto;
+    image-rendering: pixelated;
+}
+
+/* ガチャ矢印セレクター */
+.gacha-arrow-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 340px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffd700;
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin-bottom: 8px;
+}
+
+.gacha-arrow-btn {
+    background: #8b0000;
+    color: #ffd700;
+    border: 1.5px solid #ffd700;
+    font-size: 18px;
+    font-weight: bold;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gacha-arrow-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: none;
+}
+
+.gacha-series-title-text {
+    font-family: 'Reggae One', cursive;
+    font-size: clamp(14px, 4vw, 18px);
+    color: #ffd700;
+    text-shadow: 1px 1px 2px #000;
+    text-align: center;
+    flex: 1;
+}

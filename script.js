@@ -12,12 +12,32 @@ const MAP_DATA = {
 
     volcano: { name: "火山", bg: "images/bg/bg_volcano.png", reqLevel: 1, gacha: true, matchRod: "lava_rod", sound: "sounds/volcano.mp3" },
     honey: { name: "はちみつ", bg: "images/bg/bg_honey.png", reqLevel: 1, gacha: true, matchRod: "jungle_rod", sound: "sounds/honey.mp3" },
-    holy: { name: "聖なる泉", bg: "images/bg/bg_holy.png", reqLevel: 1, gacha: true, matchRod: "holy_rod", sound: "sounds/holy.mp3" }
+    holy: { name: "聖なる泉", bg: "images/bg/bg_holy.png", reqLevel: 1, gacha: true, matchRod: "holy_rod", sound: "sounds/holy.mp3" },
+    ryugu: { name: "竜宮城", bg: "images/bg/bg_ryugu.png", reqLevel: 1, gacha: true, matchRod: "ryugu_rod", sound: "sounds/ryugu.mp3" },
+    ruins: { name: "古代遺跡", bg: "images/bg/bg_ruins.png", reqLevel: 1, gacha: true, matchRod: "ruins_rod", sound: "sounds/ruins.mp3" },
+    poison: { name: "毒沼", bg: "images/bg/bg_poison.png", reqLevel: 1, gacha: true, matchRod: "poison_rod", sound: "sounds/poison.mp3" },
+    milkyway: { name: "天の川", bg: "images/bg/bg_milkyway.png", reqLevel: 1, gacha: true, matchRod: "galaxy_rod", sound: "sounds/milkyway.mp3" }
 };
 
 let currentLocation = "sea";
 let currentToolMode = "rod"; // "rod" or "net"
 let currentShopTab = "rod";  // "rod" or "net"
+let currentGachaSeries = "volcano"; // 現在選択中のガチャキー
+
+/* ===================================================
+   ガチャシリーズ定義（全7種）
+   =================================================== */
+const GACHA_SERIES_LIST = [
+    { key: "volcano", title: "🌋 火山ガチャ", mapKey: "volcano", mapName: "🌋 火山エリア解放", rodKey: "lava_rod", rodName: "🔥 耐溶岩釣り竿", banner: "images/banner/banner_volcano.png", color: "#ff4444" },
+    { key: "honey", title: "🍯 はちみつガチャ", mapKey: "honey", mapName: "🍯 はちみつエリア解放", rodKey: "jungle_rod", rodName: "🌿 ジャングルの釣り竿", banner: "images/banner/banner_honey.png", color: "#ffcc00" },
+    { key: "holy", title: "✨ 聖なる泉ガチャ", mapKey: "holy", mapName: "✨ 聖なる泉エリア解放", rodKey: "holy_rod", rodName: "⭐ 聖なる釣り竿", banner: "images/banner/banner_holy.png", color: "#00ffcc" },
+    { key: "ryugu", title: "⛩️ 竜宮城ガチャ", mapKey: "ryugu", mapName: "⛩️ 竜宮城エリア解放", rodKey: "ryugu_rod", rodName: "👑 乙姫の釣り竿", banner: "images/banner/banner_ryugu.png", color: "#ff66cc" },
+    { key: "ruins", title: "🏛️ 古代遺跡ガチャ", mapKey: "ruins", mapName: "🏛️ 古代遺跡エリア解放", rodKey: "ruins_rod", rodName: "🗿 古代の発掘竿", banner: "images/banner/banner_ruins.png", color: "#d2b48c" },
+    { key: "poison", title: "☠️ 毒沼ガチャ", mapKey: "poison", mapName: "☠️ 毒沼エリア解放", rodKey: "poison_rod", rodName: "🧪 解毒の釣り竿", banner: "images/banner/banner_poison.png", color: "#a020f0" },
+    { key: "milkyway", title: "🌌 天の川ガチャ", mapKey: "milkyway", mapName: "🌌 天の川エリア解放", rodKey: "galaxy_rod", rodName: "🌌 銀河の釣り竿", banner: "images/banner/banner_milkyway.png", color: "#1e90ff" }
+];
+
+let currentGachaIndex = 0;
 
 /* ===================================================
    釣り竿データ
@@ -32,7 +52,11 @@ const ROD_DATA = {
     lava_rod: { id: "lava_rod", name: "耐溶岩釣り竿", icon: "images/fishingrod/lava_fishing_rod.png", price: 0, gacha: true, desc: "火山エリア特化。溶岩の熱に耐え、通常通りの待ち時間で釣りが可能！" },
     jungle_rod: { id: "jungle_rod", name: "ジャングルの釣り竿", icon: "images/fishingrod/jungle_fishing_rod.png", price: 0, gacha: true, desc: "はちみつエリア特化。粘り気のあるはちみつでもスムーズに釣りが可能！" },
     holy_rod: { id: "holy_rod", name: "聖なる釣り竿", icon: "images/fishingrod/holy_fishing_rod.png", price: 0, gacha: true, desc: "聖なる泉エリア特化。聖なる力を宿し、通常通りの待ち時間で釣りが可能！" },
-    dragon_rod: { id: "dragon_rod", name: "龍神の竿", icon: "images/fishingrod/dragon_fishing_rod.png", price: 0, gacha: true, desc: "龍神の加護を受けた究極の秘竿。全特殊エリアで待ち時間なし＋レア大物超大幅UP！" }
+    dragon_rod: { id: "dragon_rod", name: "龍神の竿", icon: "images/fishingrod/dragon_fishing_rod.png", price: 0, gacha: true, desc: "龍神の加護を受けた究極の秘竿。全特殊エリアで待ち時間なし＋レア大物超大幅UP！" },
+    ryugu_rod: { id: "ryugu_rod", name: "乙姫の釣り竿", icon: "images/fishingrod/ryugu_rod.png", price: 0, gacha: true, desc: "竜宮城エリア特化。海底の海底神殿でも安定して釣りが可能！" },
+    ruins_rod: { id: "ruins_rod", name: "古代の発掘竿", icon: "images/fishingrod/ruins_rod.png", price: 0, gacha: true, desc: "古代遺跡エリア特化。太古の呪いを無効化して釣りが可能！" },
+    poison_rod: { id: "poison_rod", name: "解毒の釣り竿", icon: "images/fishingrod/poison_rod.png", price: 0, gacha: true, desc: "毒沼エリア特化。強力な毒素を浄化し、安全に釣りが可能！" },
+    galaxy_rod: { id: "galaxy_rod", name: "銀河の釣り竿", icon: "images/fishingrod/galaxy_rod.png", price: 0, gacha: true, desc: "天の川エリア特化。星々の輝きで宇宙生物を引き寄せる！" }
 };
 
 /* ===================================================
@@ -71,6 +95,10 @@ const ACHIEVEMENT_DATA = {
     comp_volcano: { id: "comp_volcano", name: "ドラゴン誕生", icon: "images/trophy/trophy_silver.png", desc: "火山の生き物をすべて図鑑に登録した" },
     comp_honey: { id: "comp_honey", name: "ハチミツ食べる？", icon: "images/trophy/trophy_silver.png", desc: "はちみつの生き物をすべて図鑑に登録した" },
     comp_holy: { id: "comp_holy", name: "妖精の導き", icon: "images/trophy/trophy_silver.png", desc: "聖なる泉の生き物をすべて図鑑に登録した" },
+    comp_ryugu: { id: "comp_ryugu", name: "竜宮の賓客", icon: "images/trophy/trophy_silver.png", desc: "竜宮城の生き物をすべて図鑑に登録した" },
+    comp_ruins: { id: "comp_ruins", name: "太古の解明者", icon: "images/trophy/trophy_silver.png", desc: "古代遺跡の生き物をすべて図鑑に登録した" },
+    comp_poison: { id: "comp_poison", name: "毒耐性皆伝", icon: "images/trophy/trophy_silver.png", desc: "毒沼の生き物をすべて図鑑に登録した" },
+    comp_milkyway: { id: "comp_milkyway", name: "銀河の旅行者", icon: "images/trophy/trophy_silver.png", desc: "天の川の生き物をすべて図鑑に登録した" },
     
     buy_all_shop: { id: "buy_all_shop", name: "ぜ～んぶください！", icon: "images/trophy/trophy_gold.png", desc: "ショップのすべてのアイテム（竿）を購入した" },
     rich_man: { id: "rich_man", name: "大金持ち", icon: "images/trophy/trophy_silver.png", desc: "所持金が10,000ゴールドに達した" },
@@ -79,7 +107,7 @@ const ACHIEVEMENT_DATA = {
 };
 
 /* ===================================================
-   魚・水生生物データ (新規追加24種含む全109件)
+   魚・水生生物データ (全162件)
    =================================================== */
 const FISH_DATA = [
     // 1. 海 (sea) - 竿
@@ -91,6 +119,8 @@ const FISH_DATA = [
     { id: 6, name: "サンマ", location: "sea", toolType: "rod", price: 100, image: "images/fish/sanma.png", shadowImage: "images/shadows/shadow_small.png", desc: "秋の味覚の代表格。刀のような細長い魚体。", reqTime: 0.900, shadowWidth: 80, shadowHeight: 20, isBig: false, weight: 25 },
     { id: 7, name: "マサバ", location: "sea", toolType: "rod", price: 110, image: "images/fish/saba.png", shadowImage: "images/shadows/shadow_midi.png", desc: "背中のサバ折り模様が特徴。味噌煮やしめさばに。", reqTime: 0.850, shadowWidth: 85, shadowHeight: 30, isBig: false, weight: 25 },
     { id: 8, name: "クマノミ", location: "sea", toolType: "rod", price: 150, image: "images/fish/fish_kumanomi.png", shadowImage: "images/shadows/shadow_small.png", desc: "イソギンチャクと共生する鮮やかなオレンジ色の魚。", reqTime: 0.900, shadowWidth: 60, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 145, name: "ナンヨウハギ", location: "sea", toolType: "rod", price: 160, image: "images/fish/nanyouhagi.png", shadowImage: "images/shadows/shadow_small.png", desc: "鮮やかなブルーの体色と黄色の尾ビレが人気の熱帯魚。", reqTime: 0.850, shadowWidth: 65, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 86, name: "チンアナゴ", location: "sea", toolType: "rod", price: 130, image: "images/fish/chinanago.png", shadowImage: "images/shadows/shadow_small.png", desc: "砂底から顔をひょっこり出す姿が人気の細長い魚。", reqTime: 0.900, shadowWidth: 50, shadowHeight: 25, isBig: false, weight: 20 },
     { id: 9, name: "カレイ", location: "sea", toolType: "rod", price: 130, image: "images/fish/karei.png", shadowImage: "images/shadows/shadow_midi.png", desc: "ヒラメに似ているが右側に目が寄っている煮付けの定番。", reqTime: 0.850, shadowWidth: 95, shadowHeight: 40, isBig: false, weight: 25 },
     { id: 10, name: "カサゴ", location: "sea", toolType: "rod", price: 160, image: "images/fish/kasago.png", shadowImage: "images/shadows/shadow_midi.png", desc: "大きな頭と棘を持つ根魚。唐揚げが美味しい。", reqTime: 0.800, shadowWidth: 85, shadowHeight: 40, isBig: false, weight: 25 },
     { id: 11, name: "ニシン", location: "sea", toolType: "rod", price: 90, image: "images/fish/nisin.png", shadowImage: "images/shadows/shadow_midi.png", desc: "「春を告げる魚」として知られる回遊魚。", reqTime: 0.900, shadowWidth: 80, shadowHeight: 30, isBig: false, weight: 25 },
@@ -99,28 +129,32 @@ const FISH_DATA = [
     { id: 14, name: "ハリセンボン", location: "sea", toolType: "rod", price: 120, image: "images/fish/fish_harisenbon.png", shadowImage: "images/shadows/shadow_midi.png", desc: "危険を感じると体を丸く膨らませ針を立てる。", reqTime: 0.850, shadowWidth: 80, shadowHeight: 40, isBig: false, weight: 20 },
     { id: 15, name: "トビウオ", location: "sea", toolType: "rod", price: 140, image: "images/fish/tobiuo.png", shadowImage: "images/shadows/shadow_midi.png", desc: "大きな胸ビレを広げて水面を数百度滑空する。", reqTime: 0.800, shadowWidth: 80, shadowHeight: 35, isBig: false, weight: 20 },
     { id: 16, name: "ヤリイカ", location: "sea", toolType: "rod", price: 160, image: "images/fish/yariika.png", shadowImage: "images/shadows/shadow_midi.png", desc: "槍のように細長い先端を持つ透明感のあるイカ。", reqTime: 0.800, shadowWidth: 85, shadowHeight: 30, isBig: false, weight: 20 },
+    { id: 19, name: "フグ", location: "sea", toolType: "rod", price: 300, image: "images/fish/hugu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "高級食材だがテトロドトキシンという猛毒を持つ。", reqTime: 0.700, shadowWidth: 90, shadowHeight: 45, isBig: false, weight: 15 },
     { id: 17, name: "カツオ", location: "sea", toolType: "rod", price: 350, image: "images/fish/katuo.png", shadowImage: "images/shadows/shadow_big.png", desc: "たたきで有名な回遊魚。鋭い引きを見せる。", reqTime: 0.650, shadowWidth: 120, shadowHeight: 45, isBig: true, weight: 15, tapPower: 10, decaySpeed: 1.2 },
     { id: 18, name: "エイ", location: "sea", toolType: "rod", price: 200, image: "images/fish/fish_ei.png", shadowImage: "images/shadows/shadow_big.png", desc: "大きなひれを羽ばたかせるように泳ぐ巨大魚。", reqTime: 0.700, shadowWidth: 120, shadowHeight: 50, isBig: true, weight: 15, tapPower: 10, decaySpeed: 1.1 },
-    { id: 19, name: "フグ", location: "sea", toolType: "rod", price: 300, image: "images/fish/hugu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "高級食材だがテトロドトキシンという猛毒を持つ。", reqTime: 0.700, shadowWidth: 90, shadowHeight: 45, isBig: false, weight: 15 },
     { id: 20, name: "ホラアナゴ", location: "sea", toolType: "rod", price: 250, image: "images/fish/fish_horaanago.png", shadowImage: "images/shadows/shadow_midi.png", desc: "海底の岩陰などにひっそりと生息する深海性アナゴ。", reqTime: 0.750, shadowWidth: 90, shadowHeight: 30, isBig: false, weight: 15 },
+    { id: 146, name: "イシダイ", location: "sea", toolType: "rod", price: 280, image: "images/fish/isidai.png", shadowImage: "images/shadows/shadow_midi.png", desc: "黒と白の縞模様が特徴。強靭なアゴで貝をも噛み砕く磯の王者。", reqTime: 0.700, shadowWidth: 90, shadowHeight: 40, isBig: false, weight: 20 },
     { id: 21, name: "ウツボ", location: "sea", toolType: "rod", price: 350, image: "images/fish/utubo.png", shadowImage: "images/shadows/shadow_big.png", desc: "海のギャングと呼ばれる鋭い歯を持った気荒な魚。", reqTime: 0.650, shadowWidth: 130, shadowHeight: 35, isBig: true, weight: 15, tapPower: 9, decaySpeed: 1.2 },
     { id: 22, name: "クロマグロ", location: "sea", toolType: "rod", price: 500, image: "images/fish/fish_maguro.png", shadowImage: "images/shadows/shadow_big.png", desc: "大海原の最速ランナー。「黒いダイヤ」と呼ばれる最高級魚。", reqTime: 0.600, shadowWidth: 140, shadowHeight: 55, isBig: true, weight: 12, tapPower: 11, decaySpeed: 1.2 },
     { id: 23, name: "マダラ", location: "sea", toolType: "rod", price: 400, image: "images/fish/tara.png", shadowImage: "images/shadows/shadow_big.png", desc: "寒冷な海に棲む大食漢の深場魚。鍋物に最適。", reqTime: 0.600, shadowWidth: 130, shadowHeight: 45, isBig: true, weight: 12, tapPower: 9, decaySpeed: 1.3 },
+    { id: 147, name: "コブダイ", location: "sea", toolType: "rod", price: 420, image: "images/fish/kobudi.png", shadowImage: "images/shadows/shadow_big.png", desc: "成長すると頭部に大きなコブが発達する貫録ある大型魚。", reqTime: 0.600, shadowWidth: 120, shadowHeight: 45, isBig: true, weight: 12, tapPower: 10, decaySpeed: 1.2 },
     { id: 24, name: "サメ", location: "sea", toolType: "rod", price: 600, image: "images/fish/fish_same1.png", shadowImage: "images/shadows/shadow_big.png", desc: "鋭い歯と優れた嗅覚を持つ海のハンター。", reqTime: 0.550, shadowWidth: 150, shadowHeight: 50, isBig: true, weight: 10, tapPower: 10, decaySpeed: 1.3 },
     { id: 25, name: "シュモクザメ", location: "sea", toolType: "rod", price: 700, image: "images/fish/hammer.png", shadowImage: "images/shadows/shadow_big.png", desc: "T字型の頭部が特徴的なインパクトあるサメ。", reqTime: 0.500, shadowWidth: 150, shadowHeight: 55, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.4 },
     { id: 26, name: "イルカ", location: "sea", toolType: "rod", price: 800, image: "images/fish/iruka.png", shadowImage: "images/shadows/shadow_big.png", desc: "知能が高くジャンプが得意な海のアイドル。", reqTime: 0.500, shadowWidth: 140, shadowHeight: 50, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.3 },
+    { id: 144, name: "マンタ", location: "sea", toolType: "rod", price: 850, image: "images/fish/manta.png", shadowImage: "images/shadows/shadow_big.png", desc: "大きな胸ビレを羽ばたかせて海を舞う世界最大のエイ。", reqTime: 0.500, shadowWidth: 140, shadowHeight: 55, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.3 },
     { id: 27, name: "カジキ", location: "sea", toolType: "rod", price: 900, image: "images/fish/kaziki.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "槍のように鋭い上アゴを持つ巨大トローリング対象魚。", reqTime: 0.450, shadowWidth: 170, shadowHeight: 50, isBig: true, weight: 5, tapPower: 8, decaySpeed: 1.5 },
+    { id: 148, name: "マンボウ", location: "sea", toolType: "rod", price: 1100, image: "images/fish/manbou.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "独特な丸い体で海面近くをゆったりと漂う巨大魚。", reqTime: 0.450, shadowWidth: 160, shadowHeight: 60, isBig: true, weight: 6, tapPower: 7, decaySpeed: 1.4 },
     { id: 28, name: "チョウザメ", location: "sea", toolType: "rod", price: 1200, image: "images/fish/tyouzame.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "キャビアを生む古代魚の生き残り。", reqTime: 0.450, shadowWidth: 160, shadowHeight: 45, isBig: true, weight: 5, tapPower: 7, decaySpeed: 1.4 },
     { id: 29, name: "シャチ", location: "sea", toolType: "rod", price: 1500, image: "images/fish/syati.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "「海のハンター」と呼ばれる高い知能を持つ大型海獣。", reqTime: 0.400, shadowWidth: 180, shadowHeight: 55, isBig: true, weight: 4, tapPower: 6, decaySpeed: 1.5 },
-    { id: 30, name: "クジラ", location: "sea", toolType: "rod", price: 2000, image: "images/fish/kuzira.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "大海原をゆったりと泳ぐ地球上最大級の哺乳類。", reqTime: 0.350, shadowWidth: 200, shadowHeight: 60, isBig: true, weight: 3, tapPower: 5, decaySpeed: 1.6 },
-    { id: 31, name: "ジンベエザメ", location: "sea", toolType: "rod", price: 3000, image: "images/fish/zinbei.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "世界最大の魚類。温厚でプランクトンを食べる。", reqTime: 0.300, shadowWidth: 220, shadowHeight: 65, isBig: true, weight: 2, tapPower: 5, decaySpeed: 1.7 },
-    { id: 86, name: "チンアナゴ", location: "sea", toolType: "rod", price: 130, image: "images/fish/chinanago.png", shadowImage: "images/shadows/shadow_small.png", desc: "砂底から顔をひょっこり出す姿が人気の細長い魚。", reqTime: 0.900, shadowWidth: 50, shadowHeight: 25, isBig: false, weight: 20 },
+    { id: 149, name: "マッコウクジラ", location: "sea", toolType: "rod", price: 2500, image: "images/fish/kuzira.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "巨大な頭部を持ち、深海まで潜水してダイオウイカを狩るマッコウクジラ。", reqTime: 0.380, shadowWidth: 210, shadowHeight: 60, isBig: true, weight: 3, tapPower: 5, decaySpeed: 1.6 },
+    { id: 31, name: "ジンベエザメ", location: "sea", toolType: "rod", price: 3000, image: "images/fish/zinbei.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "世界最大の魚類。温厚でプランクトンを食べる。", reqTime: 0.350, shadowWidth: 220, shadowHeight: 65, isBig: true, weight: 2, tapPower: 5, decaySpeed: 1.7 },
+    { id: 150, name: "シロナガスクジラ", location: "sea", toolType: "rod", price: 4000, image: "images/fish/sironagasukujira.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "地球の歴史上で最大の体長を誇る大海原の超巨大哺乳類。", reqTime: 0.350, shadowWidth: 230, shadowHeight: 70, isBig: true, weight: 1, tapPower: 4, decaySpeed: 1.8 },
 
-    // 1. 海 (sea) - 網
     { id: 32, name: "ヒトデ", location: "sea", toolType: "net", netSize: "small", price: 20, image: "images/fish/hitode.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】星の形をした棘皮動物。磯でよく見かける。", reqTime: 1.200, shadowWidth: 45, shadowHeight: 45, isBig: false, weight: 45 },
     { id: 33, name: "ヤドカリ", location: "sea", toolType: "net", netSize: "small", price: 40, image: "images/fish/yadokari.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】貝殻を背負ってトコトコ歩く浅瀬のアイドル。", reqTime: 1.200, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 40 },
     { id: 34, name: "アサリ", location: "sea", toolType: "net", netSize: "small", price: 30, image: "images/fish/fish_asari.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】潮干狩りでおなじみの二枚貝。味噌汁にぴったり。", reqTime: 1.200, shadowWidth: 40, shadowHeight: 30, isBig: false, weight: 40 },
     { id: 35, name: "クラゲ", location: "sea", toolType: "net", netSize: "midi", price: 60, image: "images/fish/kurage.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】ゆらゆらと海を漂う刺胞動物。", reqTime: 1.100, shadowWidth: 65, shadowHeight: 50, isBig: false, weight: 35 },
+    { id: 151, name: "ウミウシ", location: "sea", toolType: "net", netSize: "small", price: 80, image: "images/fish/umiusi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】「海の宝石」と呼ばれる色鮮やかでカラフルな軟体生物。", reqTime: 1.100, shadowWidth: 40, shadowHeight: 25, isBig: false, weight: 35 },
     { id: 36, name: "ナマコ", location: "sea", toolType: "net", netSize: "small", price: 90, image: "images/fish/namako.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】海底に転がっているグロテスクだが美味しい生き物。", reqTime: 1.100, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 30 },
     { id: 37, name: "ハマグリ", location: "sea", toolType: "net", netSize: "small", price: 120, image: "images/fish/fish_hamaguri.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】ひな祭りや祝い事に使われる大きな二枚貝。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 35, isBig: false, weight: 25 },
     { id: 38, name: "カキ", location: "sea", toolType: "net", netSize: "small", price: 180, image: "images/fish/kaki.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】「海のミルク」と呼ばれる栄養満点の二枚貝。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 35, isBig: false, weight: 25 },
@@ -130,14 +164,18 @@ const FISH_DATA = [
     { id: 42, name: "ウニ", location: "sea", toolType: "net", netSize: "small", price: 250, image: "images/fish/uni.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】全身が鋭いトゲで覆われた高級食材。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 45, isBig: false, weight: 20 },
     { id: 43, name: "アワビ", location: "sea", toolType: "net", netSize: "midi", price: 300, image: "images/fish/fish_awabi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】コリコリとした食感が最高の高級一枚貝。", reqTime: 0.850, shadowWidth: 50, shadowHeight: 35, isBig: false, weight: 15 },
     { id: 44, name: "ウミヘビ", location: "sea", toolType: "net", netSize: "midi", price: 300, image: "images/fish/umihebi.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】強力な毒を持つ海生の爬虫類。", reqTime: 0.700, shadowWidth: 90, shadowHeight: 25, isBig: false, weight: 15 },
-    { id: 45, name: "イセエビ", location: "sea", toolType: "net", netSize: "midi", price: 500, image: "images/fish/iseebi.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】立派な髭と硬い甲羅を持つ最高級エビ。", reqTime: 0.700, shadowWidth: 75, shadowHeight: 40, isBig: false, weight: 12 },
-    { id: 46, name: "ウミガメ", location: "sea", toolType: "net", netSize: "big", price: 700, image: "images/fish/umigame.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】砂浜で産卵する優雅に泳ぐ大きなカメ。", reqTime: 0.600, shadowWidth: 110, shadowHeight: 60, isBig: true, weight: 8, tapPower: 10, decaySpeed: 1.1 },
     { id: 87, name: "トビハゼ", location: "sea", toolType: "net", netSize: "small", price: 50, image: "images/fish/tobihaze.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】干潟をピョンピョンと跳ね回る可愛らしいハゼ。", reqTime: 1.100, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 35 },
     { id: 88, name: "アメフラシ", location: "sea", toolType: "net", netSize: "small", price: 45, image: "images/fish/amefurashi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】紫色の液を出す軟体生物。磯のあちこちにいる。", reqTime: 1.150, shadowWidth: 50, shadowHeight: 30, isBig: false, weight: 35 },
     { id: 89, name: "テッポウエビ", location: "sea", toolType: "net", netSize: "small", price: 75, image: "images/fish/teppouebi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】大きなハサミを鳴らして衝撃波を繰り出すエビ。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 45, name: "イセエビ", location: "sea", toolType: "net", netSize: "midi", price: 500, image: "images/fish/iseebi.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】立派な髭と硬い甲羅を持つ最高級エビ。", reqTime: 0.700, shadowWidth: 75, shadowHeight: 40, isBig: false, weight: 12 },
+    { id: 46, name: "ウミガメ", location: "sea", toolType: "net", netSize: "big", price: 700, image: "images/fish/umigame.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】砂浜で産卵する優雅に泳ぐ大きなカメ。", reqTime: 0.600, shadowWidth: 110, shadowHeight: 60, isBig: true, weight: 8, tapPower: 10, decaySpeed: 1.1 },
+    { id: 152, name: "タカアシガニ", location: "sea", toolType: "net", netSize: "biggest", price: 900, image: "images/fish/takaasigani.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】世界最大の脚の長さを誇る深海に生息する巨大なカニ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 55, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 },
 
     // 2. 川 (river) - 竿/網
     { id: 47, name: "メダカ", location: "river", toolType: "rod", price: 20, image: "images/fish/medaka.png", shadowImage: "images/shadows/shadow_small.png", desc: "日本の小川や田んぼで見られる最小級の淡水魚。", reqTime: 1.200, shadowWidth: 35, shadowHeight: 15, isBig: false, weight: 40 },
+    { id: 153, name: "ネオンテトラ", location: "river", toolType: "rod", price: 30, image: "images/fish/neontetora.png", shadowImage: "images/shadows/shadow_small.png", desc: "青と赤のラインがネオンのように輝く綺麗で小さな熱帯魚。", reqTime: 1.150, shadowWidth: 35, shadowHeight: 15, isBig: false, weight: 40 },
+    { id: 154, name: "赤ベタ", location: "river", toolType: "rod", price: 90, image: "images/fish/akabeta.png", shadowImage: "images/shadows/shadow_small.png", desc: "優雅で大きなヒレと真っ赤な体色が美しい闘魚（ベタ）。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 155, name: "青ベタ", location: "river", toolType: "rod", price: 90, image: "images/fish/aobeta.png", shadowImage: "images/shadows/shadow_small.png", desc: "深みのある鮮やかな青色のヒレをなびかせて泳ぐベタ。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
     { id: 48, name: "アユ", location: "river", toolType: "rod", price: 100, image: "images/fish/fish_ayu.png", shadowImage: "images/shadows/shadow_small.png", desc: "「香魚」とも呼ばれる清流のシンボル。塩焼きが最高。", reqTime: 0.900, shadowWidth: 65, shadowHeight: 25, isBig: false, weight: 30 },
     { id: 49, name: "ヤマメ", location: "river", toolType: "rod", price: 120, image: "images/fish/fish_yamame.png", shadowImage: "images/shadows/shadow_small.png", desc: "「渓流の女王」と称されるパーマークが美しい魚。", reqTime: 0.850, shadowWidth: 65, shadowHeight: 25, isBig: false, weight: 30 },
     { id: 50, name: "ドジョウ", location: "river", toolType: "rod", price: 60, image: "images/fish/fish_dozyou.png", shadowImage: "images/shadows/shadow_small.png", desc: "田んぼや小川の泥底に生息するヒゲのある魚。", reqTime: 1.000, shadowWidth: 55, shadowHeight: 20, isBig: false, weight: 35 },
@@ -151,67 +189,184 @@ const FISH_DATA = [
     { id: 58, name: "サワガニ", location: "river", toolType: "net", netSize: "midi", price: 90, image: "images/fish/net_sawagani.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】きれいな渓流の石の下に潜む小さなカニ。", reqTime: 0.900, shadowWidth: 55, shadowHeight: 30, isBig: false, weight: 35 },
 
     // 3. 沼地 (swamp) - 竿/網
-    { id: 59, name: "ナマズ", location: "swamp", toolType: "rod", price: 180, image: "images/fish/fish_namazu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "夜行性で立派なヒゲを持つ泥底の主。", reqTime: 0.800, shadowWidth: 100, shadowHeight: 40, isBig: false, weight: 25 },
-    { id: 60, name: "ライギョ", location: "swamp", toolType: "rod", price: 300, image: "images/fish/fish_raigyo.png", shadowImage: "images/shadows/shadow_big.png", desc: "蛇のような頭部を持つスネークヘッド。強力な引き。", reqTime: 0.650, shadowWidth: 120, shadowHeight: 40, isBig: true, weight: 15, tapPower: 10, decaySpeed: 1.2 },
-    { id: 61, name: "ピラニア", location: "swamp", toolType: "rod", price: 280, image: "images/fish/pirania.png", shadowImage: "images/shadows/shadow_small.png", desc: "アマゾン川に棲む鋭い歯を持った危険な肉食魚。", reqTime: 0.700, shadowWidth: 70, shadowHeight: 35, isBig: false, weight: 15 },
-    { id: 62, name: "スッポン", location: "swamp", toolType: "rod", price: 450, image: "images/fish/suppon.png", shadowImage: "images/shadows/shadow_midi.png", desc: "噛みついたら離さない甲羅が柔らかいカメ。", reqTime: 0.650, shadowWidth: 85, shadowHeight: 45, isBig: false, weight: 12 },
-    { id: 63, name: "ピラルク", location: "swamp", toolType: "rod", price: 1800, image: "images/fish/piraruku.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "世界最大級の淡水魚。赤いグラデーションのウロコが特徴。", reqTime: 0.400, shadowWidth: 180, shadowHeight: 50, isBig: true, weight: 3, tapPower: 6, decaySpeed: 1.5 },
-    { id: 64, name: "タガメ", location: "swamp", toolType: "net", netSize: "midi", price: 250, image: "images/fish/net_tagame.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】水生昆虫の王様。大きな鋭い前脚で獲物を捕らえる。", reqTime: 0.750, shadowWidth: 70, shadowHeight: 35, isBig: false, weight: 30 },
     { id: 90, name: "フナ", location: "swamp", toolType: "rod", price: 90, image: "images/fish/huna.png", shadowImage: "images/shadows/shadow_small.png", desc: "「釣りはフナに始まりフナに終わる」と言われる身近な川魚。", reqTime: 1.000, shadowWidth: 60, shadowHeight: 25, isBig: false, weight: 30 },
-    { id: 91, name: "ブルーギル", location: "swamp", toolType: "rod", price: 110, image: "images/fish/bluegill.png", shadowImage: "images/shadows/shadow_small.png", desc: "青いエラが特徴の貪欲な外来魚。", reqTime: 0.950, shadowWidth: 65, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 91, name: "ブルーギル", location: "swamp", toolType: "rod", price: 110, image: "images/fish/bluegill.png", shadowImage: "images/shadows/shadow_small.png", desc: "青いエラが特徴の外来魚。", reqTime: 0.950, shadowWidth: 65, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 61, name: "ピラニア", location: "swamp", toolType: "rod", price: 280, image: "images/fish/pirania.png", shadowImage: "images/shadows/shadow_small.png", desc: "アマゾン川に棲む鋭い歯を持った危険な肉食魚。", reqTime: 0.700, shadowWidth: 70, shadowHeight: 35, isBig: false, weight: 15 },
+    { id: 59, name: "ナマズ", location: "swamp", toolType: "rod", price: 180, image: "images/fish/fish_namazu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "夜行性で立派なヒゲを持つ泥底の主。", reqTime: 0.800, shadowWidth: 100, shadowHeight: 40, isBig: false, weight: 25 },
+    { id: 62, name: "スッポン", location: "swamp", toolType: "rod", price: 450, image: "images/fish/suppon.png", shadowImage: "images/shadows/shadow_midi.png", desc: "噛みついたら離さない甲羅が柔らかいカメ。", reqTime: 0.650, shadowWidth: 85, shadowHeight: 45, isBig: false, weight: 12 },
+    { id: 60, name: "ライギョ", location: "swamp", toolType: "rod", price: 300, image: "images/fish/fish_raigyo.png", shadowImage: "images/shadows/shadow_big.png", desc: "蛇のような頭部を持つスネークヘッド。強力な引き。", reqTime: 0.650, shadowWidth: 120, shadowHeight: 40, isBig: true, weight: 15, tapPower: 10, decaySpeed: 1.2 },
+    { id: 63, name: "ピラルク", location: "swamp", toolType: "rod", price: 1800, image: "images/fish/piraruku.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "世界最大級の淡水魚。赤いグラデーションのウロコが特徴。", reqTime: 0.400, shadowWidth: 180, shadowHeight: 50, isBig: true, weight: 3, tapPower: 6, decaySpeed: 1.5 },
     { id: 92, name: "オタマジャクシ", location: "swamp", toolType: "net", netSize: "small", price: 15, image: "images/fish/otamajakushi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】やがてカエルになる丸くて可愛い幼生。", reqTime: 1.250, shadowWidth: 35, shadowHeight: 20, isBig: false, weight: 45 },
+    { id: 64, name: "タガメ", location: "swamp", toolType: "net", netSize: "midi", price: 250, image: "images/fish/net_tagame.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】水生昆虫の王様。大きな鋭い前脚で獲物を捕らえる。", reqTime: 0.750, shadowWidth: 70, shadowHeight: 35, isBig: false, weight: 30 },
     { id: 93, name: "トノサマガエル", location: "swamp", toolType: "net", netSize: "small", price: 80, image: "images/fish/tonosamagaeru.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】立派な模様と跳躍力を持つ田んぼや沼の定番カエル。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 35 },
     { id: 94, name: "アカハライモリ", location: "swamp", toolType: "net", netSize: "small", price: 100, image: "images/fish/akaharaimori.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】お腹が赤く黒い斑点模様を持つ可愛らしい両生類。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
     { id: 95, name: "クサガメ", location: "swamp", toolType: "net", netSize: "midi", price: 160, image: "images/fish/kusagame.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】甲羅に3本のすじを持つ身近な淡水ガメ。", reqTime: 0.900, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 156, name: "ワニガメ", location: "swamp", toolType: "net", netSize: "big", price: 650, image: "images/fish/wanigame.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】怪獣のような甲羅と強力なアゴを持つ超大型淡水ガメ。", reqTime: 0.600, shadowWidth: 100, shadowHeight: 50, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.2 },
 
     // 4. 湖 (lake) - 竿/網
+    { id: 96, name: "ワカサギ", location: "lake", toolType: "rod", price: 60, image: "images/fish/wakasagi.png", shadowImage: "images/shadows/shadow_small.png", desc: "氷上の穴釣りで有名な小型淡水魚。天ぷらにすると絶品。", reqTime: 1.100, shadowWidth: 40, shadowHeight: 15, isBig: false, weight: 35 },
     { id: 65, name: "キンギョ", location: "lake", toolType: "rod", price: 50, image: "images/fish/kingyo.png", shadowImage: "images/shadows/shadow_small.png", desc: "観賞魚として古くから親しまれている赤い魚。", reqTime: 1.100, shadowWidth: 50, shadowHeight: 30, isBig: false, weight: 30 },
     { id: 66, name: "バス", location: "lake", toolType: "rod", price: 150, image: "images/fish/fish_basu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "ルアーフィッシングでお馴染みの積極的な肉食魚。", reqTime: 0.800, shadowWidth: 90, shadowHeight: 40, isBig: false, weight: 30 },
     { id: 67, name: "ブラックバス", location: "lake", toolType: "rod", price: 220, image: "images/fish/fish_blackbass.png", shadowImage: "images/shadows/shadow_midi.png", desc: "大きな口で何でも呑み込むパワーファイター。", reqTime: 0.750, shadowWidth: 100, shadowHeight: 45, isBig: false, weight: 25 },
+    { id: 157, name: "アロワナ", location: "lake", toolType: "rod", price: 800, image: "images/fish/arowana.png", shadowImage: "images/shadows/shadow_big.png", desc: "「龍魚」とも呼ばれ珍重される、金属光沢の美しい大型古代魚。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 40, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.3 },
+    { id: 97, name: "ヤゴ", location: "lake", toolType: "net", netSize: "small", price: 40, image: "images/fish/yago.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】トンボの水中での幼虫。水草の陰に潜む。", reqTime: 1.150, shadowWidth: 40, shadowHeight: 20, isBig: false, weight: 40 },
+    { id: 99, name: "タニシ", location: "lake", toolType: "net", netSize: "small", price: 25, image: "images/fish/tanishi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】石や泥にくっついている巻貝。", reqTime: 1.250, shadowWidth: 35, shadowHeight: 25, isBig: false, weight: 45 },
+    { id: 98, name: "ゲンゴロウ", location: "lake", toolType: "net", netSize: "small", price: 120, image: "images/fish/gengorou.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】泳ぎが得意な水生甲虫。黒く美しい体を持つ。", reqTime: 0.950, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
     { id: 68, name: "アメリカザリガニ", location: "lake", toolType: "net", netSize: "small", price: 80, image: "images/fish/zarigani.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】大きな赤いハサミがかっこいい池の定番人気者。", reqTime: 1.000, shadowWidth: 60, shadowHeight: 30, isBig: false, weight: 35 },
     { id: 69, name: "ウーパールーパー", location: "lake", toolType: "net", netSize: "small", price: 400, image: "images/fish/uparupa.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】ピンクの体とエラがチャーミングなメキシコサンショウウオ。", reqTime: 0.850, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 15 },
-    { id: 96, name: "ワカサギ", location: "lake", toolType: "rod", price: 60, image: "images/fish/wakasagi.png", shadowImage: "images/shadows/shadow_small.png", desc: "氷上の穴釣りで有名な小型淡水魚。天ぷらにすると絶品。", reqTime: 1.100, shadowWidth: 40, shadowHeight: 15, isBig: false, weight: 35 },
-    { id: 97, name: "ヤゴ", location: "lake", toolType: "net", netSize: "small", price: 40, image: "images/fish/yago.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】トンボの水中での幼虫。水草の陰に潜む。", reqTime: 1.150, shadowWidth: 40, shadowHeight: 20, isBig: false, weight: 40 },
-    { id: 98, name: "ゲンゴロウ", location: "lake", toolType: "net", netSize: "small", price: 120, image: "images/fish/gengorou.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】泳ぎが得意な水生甲虫。黒く美しい体を持つ。", reqTime: 0.950, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
-    { id: 99, name: "タニシ", location: "lake", toolType: "net", netSize: "small", price: 25, image: "images/fish/tanishi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】石や泥にくっついている巻貝。", reqTime: 1.250, shadowWidth: 35, shadowHeight: 25, isBig: false, weight: 45 },
-
+    
     // 5. 雪山 (snow) - 竿/網
-    { id: 70, name: "イワナ", location: "snow", toolType: "rod", price: 160, image: "images/fish/iwana.png", shadowImage: "images/shadows/shadow_small.png", desc: "最源流域の冷たい澄んだ水に生息する渓流魚。", reqTime: 0.800, shadowWidth: 70, shadowHeight: 25, isBig: false, weight: 25 },
-    { id: 71, name: "イトウ", location: "snow", toolType: "rod", price: 700, image: "images/fish/fish_itou.png", shadowImage: "images/shadows/shadow_big.png", desc: "「日本最大の淡水魚」と称される湿原の幻の魚。", reqTime: 0.550, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.3 },
-    { id: 72, name: "クリオネ", location: "snow", toolType: "net", netSize: "small", price: 350, image: "images/fish/fish_clione.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】「流氷の天使」と呼ばれる半透明の美しい翼足類。", reqTime: 0.800, shadowWidth: 40, shadowHeight: 25, isBig: false, weight: 20 },
     { id: 100, name: "コオリウオ", location: "snow", toolType: "rod", price: 280, image: "images/fish/kooriuo.png", shadowImage: "images/shadows/shadow_midi.png", desc: "極寒の海に生息する、血液が透明な不思議な魚。", reqTime: 0.750, shadowWidth: 75, shadowHeight: 25, isBig: false, weight: 20 },
-    { id: 101, name: "ガガンボ", location: "snow", toolType: "net", netSize: "small", price: 50, image: "images/fish/gaganbo.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】足が長くて頼りない見た目の大型昆虫。", reqTime: 1.100, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 35 },
+    { id: 70, name: "イワナ", location: "snow", toolType: "rod", price: 160, image: "images/fish/iwana.png", shadowImage: "images/shadows/shadow_small.png", desc: "最源流域の冷たい澄んだ水に生息する渓流魚。", reqTime: 0.800, shadowWidth: 70, shadowHeight: 25, isBig: false, weight: 25 },
+    { id: 138, name: "ナンキョクカジカ", location: "snow", toolType: "rod", price: 320, image: "images/fish/nankyokukajika.png", shadowImage: "images/shadows/shadow_midi.png", desc: "極寒の南極海に生息する、凍らない血液を持つ不思議な魚。", reqTime: 0.700, shadowWidth: 70, shadowHeight: 25, isBig: false, weight: 20 },
+    { id: 71, name: "イトウ", location: "snow", toolType: "rod", price: 700, image: "images/fish/fish_itou.png", shadowImage: "images/shadows/shadow_big.png", desc: "「日本最大の淡水魚」と称される湿原の幻の魚。", reqTime: 0.550, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.3 },
+    { id: 158, name: "キングサーモン", location: "snow", toolType: "rod", price: 950, image: "images/fish/kingusamon.png", shadowImage: "images/shadows/shadow_big.png", desc: "サケ科の中で最大級の大きさを誇る「マス・サケの王様」。", reqTime: 0.480, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 8, tapPower: 8, decaySpeed: 1.4 },
     { id: 102, name: "ミジンコ", location: "snow", toolType: "net", netSize: "small", price: 10, image: "images/fish/mijinko.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】水中をパタパタと浮遊する微小なプランクトン。", reqTime: 1.300, shadowWidth: 25, shadowHeight: 15, isBig: false, weight: 50 },
-
+    { id: 139, name: "ナンキョクオキアミ", location: "snow", toolType: "net", netSize: "small", price: 30, image: "images/fish/nankyokuokiami.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】極地の生態系を支える小型のエビに似た甲殻類。", reqTime: 1.200, shadowWidth: 30, shadowHeight: 15, isBig: false, weight: 40 },
+    { id: 101, name: "ガガンボ", location: "snow", toolType: "net", netSize: "small", price: 50, image: "images/fish/gaganbo.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】足が長くて頼りない見た目の大型昆虫。", reqTime: 1.100, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 35 },
+    { id: 72, name: "クリオネ", location: "snow", toolType: "net", netSize: "small", price: 350, image: "images/fish/fish_clione.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】「流氷の天使」と呼ばれる半透明の美しい翼足類。", reqTime: 0.800, shadowWidth: 40, shadowHeight: 25, isBig: false, weight: 20 },
+    { id: 140, name: "ズワイガニ", location: "snow", toolType: "net", netSize: "midi", price: 450, image: "images/fish/zuwaigani.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】冷たい深海に棲む細長い脚が特徴の高級カニ。", reqTime: 0.750, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 20 },
+    { id: 141, name: "タラバガニ", location: "snow", toolType: "net", netSize: "big", price: 850, image: "images/fish/tarabagani.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】トゲだらけの巨大な体を持つ極寒の海の味覚王。", reqTime: 0.550, shadowWidth: 110, shadowHeight: 50, isBig: true, weight: 12, tapPower: 9, decaySpeed: 1.2 },
+    
     // 6. 地底湖 (underground) - 竿/網
-    { id: 73, name: "シーラカンス", location: "underground", toolType: "rod", price: 1500, image: "images/fish/fish_coelacanth.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "「生きた化石」と呼ばれる太古の姿を残す深海古代魚。", reqTime: 0.450, shadowWidth: 160, shadowHeight: 35, isBig: true, weight: 5, tapPower: 6, decaySpeed: 1.5 },
-    { id: 74, name: "ホライモリ", location: "underground", toolType: "net", netSize: "big", price: 800, image: "images/fish/net_horaimori.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】光の届かない暗黒の洞窟に棲む色のない両生類。", reqTime: 0.600, shadowWidth: 90, shadowHeight: 30, isBig: true, weight: 20, tapPower: 10, decaySpeed: 1.1 },
+    { id: 159, name: "エンゼルフィッシュ", location: "underground", toolType: "rod", price: 200, image: "images/fish/enzerufish.png", shadowImage: "images/shadows/shadow_small.png", desc: "菱形の体と長いヒレが特徴的な淡水熱帯魚の代表格。", reqTime: 0.850, shadowWidth: 60, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 160, name: "青ハナゴイ", location: "underground", toolType: "rod", price: 280, image: "images/fish/aohanagoi.png", shadowImage: "images/shadows/shadow_small.png", desc: "地底の水流に群れる、清涼感のある涼しげな青いハナゴイ。", reqTime: 0.750, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 20 },
+    { id: 161, name: "桃ハナゴイ", location: "underground", toolType: "rod", price: 280, image: "images/fish/momohanagoi.png", shadowImage: "images/shadows/shadow_small.png", desc: "華やかなピンク色の体色を持つ、群れで泳ぐ美しい魚。", reqTime: 0.750, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 20 },
+    { id: 142, name: "メクラウオ", location: "underground", toolType: "rod", price: 500, image: "images/fish/mekurauo.png", shadowImage: "images/shadows/shadow_midi.png", desc: "暗黒の地底湖に適応し、目が完全に退化した珍しい淡水魚。", reqTime: 0.600, shadowWidth: 75, shadowHeight: 25, isBig: false, weight: 20 },
     { id: 103, name: "ドウクツギョ", location: "underground", toolType: "rod", price: 650, image: "images/fish/doukutsugyo.png", shadowImage: "images/shadows/shadow_midi.png", desc: "暗闇に適応し、目が退化した洞窟固有の魚。", reqTime: 0.650, shadowWidth: 80, shadowHeight: 30, isBig: false, weight: 15 },
+    { id: 73, name: "シーラカンス", location: "underground", toolType: "rod", price: 1500, image: "images/fish/fish_coelacanth.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "「生きた化石」と呼ばれる太古の姿を残す深海古代魚。", reqTime: 0.450, shadowWidth: 160, shadowHeight: 35, isBig: true, weight: 5, tapPower: 6, decaySpeed: 1.5 },
+    { id: 143, name: "プラナリア", location: "underground", toolType: "net", netSize: "small", price: 180, image: "images/fish/puranaria.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】驚異的な再生能力を持つ、綺麗な冷水に棲む扁形動物。", reqTime: 1.000, shadowWidth: 35, shadowHeight: 20, isBig: false, weight: 35 },
     { id: 104, name: "ミミズハゼ", location: "underground", toolType: "net", netSize: "small", price: 220, image: "images/fish/mimizuhaze.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】地下水系に生息するミミズのような細長いハゼ。", reqTime: 0.850, shadowWidth: 50, shadowHeight: 20, isBig: false, weight: 25 },
     { id: 105, name: "サンショウウオ", location: "underground", toolType: "net", netSize: "midi", price: 450, image: "images/fish/sanshouuo.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】冷たい暗所に潜む日本固有の両生類。", reqTime: 0.750, shadowWidth: 65, shadowHeight: 30, isBig: false, weight: 20 },
+    { id: 74, name: "ホライモリ", location: "underground", toolType: "net", netSize: "big", price: 800, image: "images/fish/net_horaimori.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】光の届かない暗黒の洞窟に棲む色のない両生類。", reqTime: 0.600, shadowWidth: 90, shadowHeight: 30, isBig: true, weight: 20, tapPower: 10, decaySpeed: 1.1 },
+    { id: 162, name: "キタユウレイクラゲ", location: "underground", toolType: "net", netSize: "biggest", price: 1100, image: "images/fish/kitayoureikurage.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】無数の触手を棚引かせて漂う、世界最大級のクラゲ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 65, isBig: true, weight: 8, tapPower: 7, decaySpeed: 1.4 },
 
     // 7. 深海 (deepsea) - 竿/網
-    { id: 75, name: "チョウチンアンコウ", location: "deepsea", toolType: "rod", price: 600, image: "images/fish/fish_chouchin.png", shadowImage: "images/shadows/shadow_big.png", desc: "頭の発光器で獲物を誘い込んで捕食する深海魚。", reqTime: 0.550, shadowWidth: 120, shadowHeight: 55, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.3 },
+    { id: 75, name: "チョウチンアンコウ", location: "deepsea", toolType: "rod", price: 600, image: "images/fish/fish_chouchin.png", shadowImage: "images/shadows/shadow_big.png", desc: "頭の発光器で獲物を誘い込んで捕食する深海魚。", reqTime: 0.550, shadowWidth: 120, shadowHeight: 55, isBig: false, weight: 10, tapPower: 9, decaySpeed: 1.3 },
+    { id: 109, name: "コウモリダコ", location: "deepsea", toolType: "rod", price: 750, image: "images/fish/koumoridako.png", shadowImage: "images/shadows/shadow_midi.png", desc: "マントのような膜を持つ、タコとイカの原始的な祖先。", reqTime: 0.650, shadowWidth: 80, shadowHeight: 45, isBig: false, weight: 15 },
+    { id: 106, name: "デメニギス", location: "deepsea", toolType: "rod", price: 850, image: "images/fish/demenigisu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "頭部が透明で、緑色の球状の目が内部にある不思議な深海魚。", reqTime: 0.600, shadowWidth: 85, shadowHeight: 40, isBig: false, weight: 12 },
+    { id: 108, name: "サカバンバスピス", location: "deepsea", toolType: "rod", price: 1100, image: "images/fish/sacabambaspis.png", shadowImage: "images/shadows/shadow_midi.png", desc: "間抜けな表情が魅力的な太古の無顎類。", reqTime: 0.550, shadowWidth: 90, shadowHeight: 35, isBig: false, weight: 10 },
     { id: 76, name: "リュウグウノツカイ", location: "deepsea", toolType: "rod", price: 2000, image: "images/fish/fish_ryugu.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "赤い背ビレとながーい帯状の魚体を持つ神秘の巨大魚。", reqTime: 0.450, shadowWidth: 180, shadowHeight: 15, isBig: true, weight: 4, tapPower: 6, decaySpeed: 1.5 },
+    { id: 107, name: "ダイオウイカ", location: "deepsea", toolType: "rod", price: 2500, image: "images/fish/daiouika.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "深海の暗闇に潜む超巨大なイカ。伝説の怪物のモデル。", reqTime: 0.350, shadowWidth: 200, shadowHeight: 55, isBig: true, weight: 3, tapPower: 5, decaySpeed: 1.6 },
     { id: 77, name: "ホタルイカ", location: "deepsea", toolType: "net", netSize: "small", price: 150, image: "images/fish/hotaruika.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】青白く光る小さなイカ。酢味噌和えが絶品。", reqTime: 0.900, shadowWidth: 40, shadowHeight: 25, isBig: false, weight: 25 },
     { id: 78, name: "メンダコ", location: "deepsea", toolType: "net", netSize: "midi", price: 400, image: "images/fish/fish_mendako.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】耳のようなヒレをパタパタさせる可愛い深海タコ。", reqTime: 0.700, shadowWidth: 70, shadowHeight: 40, isBig: false, weight: 15 },
     { id: 79, name: "ダイオウグソクムシ", location: "deepsea", toolType: "net", netSize: "biggest", price: 1200, image: "images/fish/net_gusokumushi.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】「深海の掃除屋」と呼ばれる鎧を纏った超巨大甲殻類。", reqTime: 0.500, shadowWidth: 120, shadowHeight: 50, isBig: true, weight: 15, tapPower: 7, decaySpeed: 1.4 },
-    { id: 106, name: "デメニギス", location: "deepsea", toolType: "rod", price: 850, image: "images/fish/demenigisu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "頭部が透明で、緑色の球状の目が内部にある不思議な深海魚。", reqTime: 0.600, shadowWidth: 85, shadowHeight: 40, isBig: false, weight: 12 },
-    { id: 107, name: "ダイオウイカ", location: "deepsea", toolType: "rod", price: 2500, image: "images/fish/daiouika.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "深海の暗闇に潜む超巨大なイカ。伝説の怪物のモデル。", reqTime: 0.350, shadowWidth: 200, shadowHeight: 55, isBig: true, weight: 3, tapPower: 5, decaySpeed: 1.6 },
-    { id: 108, name: "サカバンバスピス", location: "deepsea", toolType: "rod", price: 1100, image: "images/fish/sacabambaspis.png", shadowImage: "images/shadows/shadow_midi.png", desc: "間抜けな表情が魅力的な太古の無顎類。", reqTime: 0.550, shadowWidth: 90, shadowHeight: 35, isBig: false, weight: 10 },
-    { id: 109, name: "コウモリダコ", location: "deepsea", toolType: "rod", price: 750, image: "images/fish/koumoridako.png", shadowImage: "images/shadows/shadow_midi.png", desc: "マントのような膜を持つ、タコとイカの原始的な祖先。", reqTime: 0.650, shadowWidth: 80, shadowHeight: 45, isBig: false, weight: 15 },
 
     // 8. 火山 (volcano) - 竿/網
-    { id: 80, name: "マグマサラマンダー", location: "volcano", toolType: "rod", price: 400, image: "images/fish/fish_magma.png", shadowImage: "images/shadows/shadow_big.png", desc: "火山の溶岩の中を自在に泳ぐ伝説の灼熱蜥蜴。", reqTime: 0.500, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.4 },
-    { id: 81, name: "ヒノコカゲロウ", location: "volcano", toolType: "net", netSize: "small", price: 200, image: "images/fish/net_hinoko.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】溶岩の熱気の中に発生する高熱の水生昆虫の成虫。", reqTime: 0.750, shadowWidth: 40, shadowHeight: 20, isBig: false, weight: 30 },
+    { id: 163, name: "マグマアナゴ", location: "volcano", toolType: "rod", price: 300, image: "images/fish/volcano/magumaanago.png", shadowImage: "images/shadows/shadow_midi.png", desc: "灼熱の溶岩の隙間をヌルヌルとすり抜ける赤熱したアナゴ。", reqTime: 0.600, shadowWidth: 80, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 164, name: "ヴォルカニックバス", location: "volcano", toolType: "rod", price: 350, image: "images/fish/volcano/volcanicbass.png", shadowImage: "images/shadows/shadow_midi.png", desc: "岩石のような硬いウロコで身を守る、溶岩湖の肉食魚。", reqTime: 0.550, shadowWidth: 95, shadowHeight: 40, isBig: false, weight: 25 },
+    { id: 80, name: "マグマサラマンダー", location: "volcano", toolType: "rod", price: 400, image: "images/fish/volcano/fish_magma.png", shadowImage: "images/shadows/shadow_big.png", desc: "火山の溶岩の中を自在に泳ぐ伝説の灼熱蜥蜴。", reqTime: 0.500, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.4 },
+    { id: 165, name: "フレイムタイ", location: "volcano", toolType: "rod", price: 450, image: "images/fish/volcano/flametai.png", shadowImage: "images/shadows/shadow_midi.png", desc: "真紅の炎を背ビレから立ち上らせるめでたい？高級魚。", reqTime: 0.500, shadowWidth: 100, shadowHeight: 45, isBig: false, weight: 20 },
+    { id: 166, name: "イグニスシャーク", location: "volcano", toolType: "rod", price: 1200, image: "images/fish/volcano/igunisushark.png", shadowImage: "images/shadows/shadow_big.png", desc: "背ビレが激しく燃え盛る、火山の溶岩を泳ぐ恐ろしいサメ。", reqTime: 0.400, shadowWidth: 150, shadowHeight: 50, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.4 },
+    { id: 167, name: "マグマドラゴン", location: "volcano", toolType: "rod", price: 2500, image: "images/fish/volcano/magumadragon.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "火口の奥底から姿を現す伝説の火龍。灼熱の引きを見せる。", reqTime: 0.350, shadowWidth: 190, shadowHeight: 60, isBig: true, weight: 4, tapPower: 5, decaySpeed: 1.6 },
+    { id: 168, name: "マグマウニ", location: "volcano", toolType: "net", netSize: "small", price: 180, image: "images/fish/volcano/magmauni.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】赤く発熱するトゲを身にまとった火口底のウニ。", reqTime: 0.900, shadowWidth: 45, shadowHeight: 45, isBig: false, weight: 35 },
+    { id: 81, name: "ヒノコカゲロウ", location: "volcano", toolType: "net", netSize: "small", price: 200, image: "images/fish/volcano/net_hinoko.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】溶岩の熱気の中に発生する高熱の水生昆虫の成虫。", reqTime: 0.750, shadowWidth: 40, shadowHeight: 20, isBig: false, weight: 30 },
+    { id: 169, name: "ヒノコヤドカリ", location: "volcano", toolType: "net", netSize: "small", price: 220, image: "images/fish/volcano/hinokoyadokari.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】軽石を貝殻代わりにして火口付近をトコトコ歩く。", reqTime: 0.850, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 170, name: "カルデラクラゲ", location: "volcano", toolType: "net", netSize: "midi", price: 280, image: "images/fish/volcano/karuderakurage.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】溶岩の上昇気流に乗ってふんわり浮かぶ熱帯クラゲ。", reqTime: 0.750, shadowWidth: 65, shadowHeight: 50, isBig: false, weight: 25 },
+    { id: 171, name: "マグマエビ", location: "volcano", toolType: "net", netSize: "midi", price: 380, image: "images/fish/volcano/magmaebi.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】高熱に耐える硬い殻に覆われた、高級感漂うエビ。", reqTime: 0.650, shadowWidth: 75, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 172, name: "マグマガメ", location: "volcano", toolType: "net", netSize: "big", price: 800, image: "images/fish/volcano/magumagame.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】甲羅が小さな火山になっており、噴煙を上げる超巨大ガメ。", reqTime: 0.500, shadowWidth: 120, shadowHeight: 60, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 },
 
     // 9. はちみつ (honey) - 竿/網
-    { id: 82, name: "ハニーベアフィッシュ", location: "honey", toolType: "rod", price: 400, image: "images/fish/fish_honey.png", shadowImage: "images/shadows/shadow_midi.png", desc: "甘い甘露の沼に生息する黄金色の珍しい魚。", reqTime: 0.650, shadowWidth: 110, shadowHeight: 40, isBig: false, weight: 30 },
-    { id: 83, name: "ハチの幼虫", location: "honey", toolType: "net", netSize: "small", price: 300, image: "images/fish/net_hachi_youchu.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】濃厚なはちみつの底で育つ栄養満点の幼虫。", reqTime: 0.900, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 40 },
+    { id: 173, name: "キャンディホイップ", location: "honey", toolType: "rod", price: 280, image: "images/fish/honey/candyhoippu.png", shadowImage: "images/shadows/shadow_small.png", desc: "ホイップクリームとカラフルキャンディでできた甘い小魚。", reqTime: 0.700, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 174, name: "ドーナツアナゴ", location: "honey", toolType: "rod", price: 340, image: "images/fish/honey/donutanago.png", shadowImage: "images/shadows/shadow_midi.png", desc: "体にドーナツをいくつか通して泳ぐチョコカラーのアナゴ。", reqTime: 0.600, shadowWidth: 80, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 82, name: "ハニーベアフィッシュ", location: "honey", toolType: "rod", price: 400, image: "images/fish/honey/fish_honey.png", shadowImage: "images/shadows/shadow_midi.png", desc: "甘い甘露の沼に生息する黄金色の珍しい魚。", reqTime: 0.650, shadowWidth: 110, shadowHeight: 40, isBig: false, weight: 30 },
+    { id: 175, name: "チョコバナナフィッシュ", location: "honey", toolType: "rod", price: 420, image: "images/fish/honey/tyokobananafish.png", shadowImage: "images/shadows/shadow_midi.png", desc: "チョココーティングとスプレーチョコでおめかししたバナナ魚。", reqTime: 0.550, shadowWidth: 90, shadowHeight: 35, isBig: false, weight: 20 },
+    { id: 176, name: "ホットケーキタートル", location: "honey", toolType: "rod", price: 1100, image: "images/fish/honey/hotcaketatoru.png", shadowImage: "images/shadows/shadow_big.png", desc: "重ねたふんわりパンケーキととろけるバターを背負った大きなカメ。", reqTime: 0.420, shadowWidth: 130, shadowHeight: 55, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.3 },
+    { id: 177, name: "ハニーパフェドラゴン", location: "honey", toolType: "rod", price: 2600, image: "images/fish/honey/hanipafedragon.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "甘い蜜の沼の主。豪華なパフェのような輝きを放つスイーツの龍。", reqTime: 0.350, shadowWidth: 190, shadowHeight: 60, isBig: true, weight: 4, tapPower: 5, decaySpeed: 1.6 },
+    { id: 178, name: "マカロンウニ", location: "honey", toolType: "net", netSize: "small", price: 200, image: "images/fish/honey/makaronuni.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】カラフルなマカロンが集まったような可愛らしいウニ。", reqTime: 0.850, shadowWidth: 45, shadowHeight: 45, isBig: false, weight: 35 },
+    { id: 179, name: "グミヤドカリ", location: "honey", toolType: "net", netSize: "small", price: 240, image: "images/fish/honey/gumiyadokari.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】ぷにぷにとした透明なフルーツグミを家にするヤドカリ。", reqTime: 0.800, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 83, name: "ハチの幼虫", location: "honey", toolType: "net", netSize: "small", price: 300, image: "images/fish/honey/net_hachi_youchu.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】濃厚なはちみつの底で育つ栄養満点の幼虫。", reqTime: 0.900, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 40 },
+    { id: 180, name: "ビスケットクラブ", location: "honey", toolType: "net", netSize: "midi", price: 320, image: "images/fish/honey/bisukettokurabu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】サクサクのビスケット模様の甲羅を持った香ばしいカニ。", reqTime: 0.700, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 181, name: "イチゴショートクラゲ", location: "honey", toolType: "net", netSize: "midi", price: 400, image: "images/fish/honey/itigoshortkurage.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】イチゴとホイップフリルをなびかせて漂うケーキ風クラゲ。", reqTime: 0.650, shadowWidth: 70, shadowHeight: 50, isBig: false, weight: 20 },
+    { id: 182, name: "ゼリーロブスター", location: "honey", toolType: "net", netSize: "big", price: 850, image: "images/fish/honey/zerirobusuta.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】プルプルとした大きなハサミを持つ、透き通った巨大海老。", reqTime: 0.500, shadowWidth: 120, shadowHeight: 55, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 },
 
     // 10. 聖なる泉 (holy) - 竿/網
-    { id: 84, name: "ホーリーエンゼル", location: "holy", toolType: "rod", price: 400, image: "images/fish/fish_holy.png", shadowImage: "images/shadows/shadow_small.png", desc: "聖なる泉の浄化された水にしか現れない神聖な水生生物。", reqTime: 0.400, shadowWidth: 80, shadowHeight: 30, isBig: false, weight: 15 },
-    { id: 85, name: "ヒカリミジンコ", location: "holy", toolType: "net", netSize: "small", price: 200, image: "images/fish/net_mijinko.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】聖水の中で星のように眩しく輝く幻想的な微小生物。", reqTime: 0.650, shadowWidth: 35, shadowHeight: 20, isBig: false, weight: 20 }
+    { id: 183, name: "クリスタルフィッシュ", location: "holy", toolType: "rod", price: 320, image: "images/fish/holy/kurisutarufish.png", shadowImage: "images/shadows/shadow_small.png", desc: "水晶のように透き通り、光を受けて七色に煌めく美しい魚。", reqTime: 0.650, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 184, name: "サンクチュアリタツ", location: "holy", toolType: "rod", price: 380, image: "images/fish/holy/sankutyuaritatu.png", shadowImage: "images/shadows/shadow_small.png", desc: "聖水に咲く水草に寄り添う、王冠のような角を持つ黄金のタツノオトシゴ。", reqTime: 0.600, shadowWidth: 50, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 84, name: "ホーリーエンゼル", location: "holy", toolType: "rod", price: 400, image: "images/fish/holy/fish_holy.png", shadowImage: "images/shadows/shadow_small.png", desc: "聖なる泉の浄化された水にしか現れない神聖な水生生物。", reqTime: 0.400, shadowWidth: 80, shadowHeight: 30, isBig: false, weight: 15 },
+    { id: 185, name: "レインボーシクリッド", location: "holy", toolType: "rod", price: 460, image: "images/fish/holy/reinbosikuritto.png", shadowImage: "images/shadows/shadow_midi.png", desc: "部位ごとに異なる虹色のグラデーションをまとった輝く熱帯魚。", reqTime: 0.550, shadowWidth: 85, shadowHeight: 35, isBig: false, weight: 20 },
+    { id: 186, name: "ルミナスナイルパーチ", location: "holy", toolType: "rod", price: 1200, image: "images/fish/holy/ruminasupairupa-ti.png", shadowImage: "images/shadows/shadow_big.png", desc: "青白い聖なる光を全身から放ちながら静かに泳ぐ大型魚。", reqTime: 0.400, shadowWidth: 140, shadowHeight: 50, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.3 },
+    { id: 187, name: "プリズムペガサス", location: "holy", toolType: "rod", price: 2800, image: "images/fish/holy/purizumupegasasu.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "泉の神聖な祈りが実体化したとされる主。羽のようなヒレで水面を舞う。", reqTime: 0.350, shadowWidth: 190, shadowHeight: 60, isBig: true, weight: 4, tapPower: 5, decaySpeed: 1.6 },
+    { id: 85, name: "ヒカリミジンコ", location: "holy", toolType: "net", netSize: "small", price: 200, image: "images/fish/holy/net_mijinko.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】聖水の中で星のように眩しく輝く幻想的な微小生物。", reqTime: 0.650, shadowWidth: 35, shadowHeight: 20, isBig: false, weight: 20 },
+    { id: 188, name: "オーロラウミウシ", location: "holy", toolType: "net", netSize: "small", price: 220, image: "images/fish/holy/ororaumiusi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】夜空のオーロラをそのまま閉じ込めたような色のドレスを纏う。", reqTime: 0.850, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 35 },
+    { id: 189, name: "ステンドグラスエビ", location: "holy", toolType: "net", netSize: "small", price: 260, image: "images/fish/holy/sutendogurasuebi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】教会を飾るステンドグラスのようにカラフルな透け通る甲羅を持つ。", reqTime: 0.800, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 190, name: "ジュエルクラブ", location: "holy", toolType: "net", netSize: "midi", price: 350, image: "images/fish/holy/zyuerukurabu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】甲羅にサファイアやエメラルドのような鉱石が群生したキレイなカニ。", reqTime: 0.700, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 191, name: "シルフィードクラゲ", location: "holy", toolType: "net", netSize: "midi", price: 420, image: "images/fish/holy/sirufidokurage.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】風と水の精霊の落とし子と言われる、パステルカラーに光る美しいクラゲ。", reqTime: 0.650, shadowWidth: 70, shadowHeight: 50, isBig: false, weight: 20 },
+    { id: 192, name: "オパールナマコ", location: "holy", toolType: "net", netSize: "midi", price: 300, image: "images/fish/holy/oparunamako.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】見る角度によってピンクや青に輝く、オパールの輝きを秘めたナマコ。", reqTime: 0.750, shadowWidth: 55, shadowHeight: 25, isBig: false, weight: 25 },
+
+    // 11. 竜宮城 (ryugu) - 竿/網
+    { id: 203, name: "羊の頭蓋骨", location: "ryugu", toolType: "rod", price: 200, image: "images/fish/ryugu/sheep_skull.png", shadowImage: "images/shadows/shadow_midi.png", desc: "海底に沈んでいた角付きの珍しい骨。歴史を感じさせる。", reqTime: 0.650, shadowWidth: 70, shadowHeight: 35, isBig: false, weight: 30 },
+    { id: 204, name: "イカリ", location: "ryugu", toolType: "rod", price: 350, image: "images/fish/ryugu/anchor.png", shadowImage: "images/shadows/shadow_midi.png", desc: "古びた沈没船の大きな鉄の錨。非常にずっしりと重い。", reqTime: 0.550, shadowWidth: 90, shadowHeight: 45, isBig: false, weight: 25 },
+    { id: 195, name: "竜宮の金フラスコ", location: "ryugu", toolType: "rod", price: 500, image: "images/fish/ryugu/hurasuko.png", shadowImage: "images/shadows/shadow_small.png", desc: "不老不死の秘薬が入っていたとされる、精巧な意匠の金の壺。", reqTime: 0.550, shadowWidth: 60, shadowHeight: 30, isBig: false, weight: 20 },
+    { id: 110, name: "オトヒメエビ", location: "ryugu", toolType: "rod", price: 500, image: "images/fish/ryugu/otohimeebi.png", shadowImage: "images/shadows/shadow_small.png", desc: "海底宮殿に住まう優雅で色鮮やかな珍しいエビ。", reqTime: 0.450, shadowWidth: 70, shadowHeight: 30, isBig: false, weight: 20 },
+    { id: 193, name: "海底の財宝箱", location: "ryugu", toolType: "rod", price: 600, image: "images/fish/ryugu/takarabako.png", shadowImage: "images/shadows/shadow_midi.png", desc: "サンゴが着生した、金貨や宝石が詰まった重厚な木箱。", reqTime: 0.500, shadowWidth: 80, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 194, name: "伝説の黄金剣", location: "ryugu", toolType: "rod", price: 750, image: "images/fish/ryugu/sword.png", shadowImage: "images/shadows/shadow_midi.png", desc: "海底の岩に突き刺さっていた、錆びることのない黄金の剣。", reqTime: 0.450, shadowWidth: 90, shadowHeight: 35, isBig: false, weight: 15 },
+    { id: 196, name: "龍神の黄金冠", location: "ryugu", toolType: "rod", price: 1500, image: "images/fish/ryugu/kanmuri.png", shadowImage: "images/shadows/shadow_big.png", desc: "龍神が戴いていたとされる、巨大な宝玉が嵌め込まれた絢爛豪華な冠。", reqTime: 0.380, shadowWidth: 130, shadowHeight: 50, isBig: true, weight: 8, tapPower: 9, decaySpeed: 1.4 },
+    { id: 197, name: "ポセイドンの三叉槍", location: "ryugu", toolType: "rod", price: 3000, image: "images/fish/ryugu/pose_yari.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "海を統べる神の力が宿る黄金の槍。波を割るほどの猛烈な引き。", reqTime: 0.350, shadowWidth: 180, shadowHeight: 50, isBig: true, weight: 4, tapPower: 5, decaySpeed: 1.6 },
+    { id: 205, name: "貝殻", location: "ryugu", toolType: "net", netSize: "small", price: 50, image: "images/fish/ryugu/shell.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】海辺や海底で取れるきれいな模様の貝殻。", reqTime: 1.000, shadowWidth: 35, shadowHeight: 25, isBig: false, weight: 45 },
+    { id: 208, name: "サンゴ", location: "ryugu", toolType: "net", netSize: "midi", price: 280, image: "images/fish/ryugu/coral.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】海底に生息する色鮮やかで美しい枝状のサンゴ。", reqTime: 0.850, shadowWidth: 60, shadowHeight: 45, isBig: false, weight: 35 },
+    { id: 206, name: "琥珀", location: "ryugu", toolType: "net", netSize: "small", price: 300, image: "images/fish/ryugu/amber.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】太古の樹脂が化石化した、温かみのある黄金色の宝石。", reqTime: 0.800, shadowWidth: 40, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 207, name: "パール", location: "ryugu", toolType: "net", netSize: "small", price: 350, image: "images/fish/ryugu/pearl.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】アコヤガイから採れる、気品ある美しい光沢を持った真珠。", reqTime: 0.800, shadowWidth: 35, shadowHeight: 35, isBig: false, weight: 30 },
+    { id: 111, name: "タマテバコガイ", location: "ryugu", toolType: "net", netSize: "small", price: 350, image: "images/fish/ryugu/tamatebakogai.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】開けると白い煙が立ち込めるという伝説の二枚貝。", reqTime: 0.650, shadowWidth: 50, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 201, name: "クリスタルゴブレット", location: "ryugu", toolType: "net", netSize: "midi", price: 380, image: "images/fish/ryugu/goburetto.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】海底の砂の中から美しく輝く透明な水晶の盃。", reqTime: 0.800, shadowWidth: 50, shadowHeight: 40, isBig: false, weight: 30 },
+    { id: 198, name: "龍の翡翠玉", location: "ryugu", toolType: "net", netSize: "small", price: 400, image: "images/fish/ryugu/ryuuhisui.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】吸い込まれそうな深い緑の光を放つ最極上の翡翠。", reqTime: 0.750, shadowWidth: 40, shadowHeight: 40, isBig: false, weight: 25 },
+    { id: 199, name: "海賊の金貨袋", location: "ryugu", toolType: "net", netSize: "small", price: 450, image: "images/fish/ryugu/kaizokunohukuro.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】金貨がずっしりと詰まった、沈没船から流れてきた革袋。", reqTime: 0.700, shadowWidth: 45, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 200, name: "青真珠のネックレス", location: "ryugu", toolType: "net", netSize: "small", price: 500, image: "images/fish/ryugu/aosinnzyuneck.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】深海の青い輝きを秘めた大粒の青真珠の首飾り。", reqTime: 0.650, shadowWidth: 45, shadowHeight: 35, isBig: false, weight: 20 },
+    { id: 209, name: "ジュエル", location: "ryugu", toolType: "net", netSize: "small", price: 600, image: "images/fish/ryugu/jewel.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】まばゆい輝きを放つ、カットの施された最高級の宝石。", reqTime: 0.700, shadowWidth: 40, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 202, name: "古代の金の壺", location: "ryugu", toolType: "net", netSize: "big", price: 900, image: "images/fish/ryugu/kodai_tubo.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】美しい浮き彫りが施された、重みのある古代の黄金の壺。", reqTime: 0.500, shadowWidth: 100, shadowHeight: 50, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 },
+
+    // 12. 古代遺跡（竿/網）
+    { id: 118, name: "オウムガイ", location: "ruins", toolType: "rod", price: 420, image: "images/fish/ruins/oumugai.png", shadowImage: "images/shadows/shadow_midi.png", desc: "「生きた化石」と呼ばれる殻を持った頭足類。", reqTime: 0.600, shadowWidth: 80, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 121, name: "アンモナイト", location: "ruins", toolType: "rod", price: 550, image: "images/fish/ruins/ammonite.png", shadowImage: "images/shadows/shadow_midi.png", desc: "太古の遺跡の水底で生き永らえていた巻貝状の頭足類。", reqTime: 0.450, shadowWidth: 80, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 120, name: "ウミサソリ", location: "ruins", toolType: "rod", price: 680, image: "images/fish/ruins/umisagori.png", shadowImage: "images/shadows/shadow_midi.png", desc: "古生代の海に生息していた巨大な鋏角類。", reqTime: 0.550, shadowWidth: 85, shadowHeight: 35, isBig: false, weight: 20 },
+    { id: 119, name: "アノマロカリス", location: "ruins", toolType: "rod", price: 750, image: "images/fish/ruins/anomaro.png", shadowImage: "images/shadows/shadow_midi.png", desc: "カンブリア紀の海に君臨した最強の捕食者。", reqTime: 0.500, shadowWidth: 90, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 123, name: "ラブカ", location: "ruins", toolType: "rod", price: 800, image: "images/fish/ruins/rabuka.png", shadowImage: "images/shadows/shadow_big.png", desc: "原始的な面影を残す深海の「生きた化石」サメ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 40, isBig: true, weight: 15, tapPower: 9, decaySpeed: 1.2 },
+    { id: 122, name: "カメロケラス", location: "ruins", toolType: "rod", price: 1100, image: "images/fish/ruins/kamerokerasu.png", shadowImage: "images/shadows/shadow_big.png", desc: "巨大な直線状の殻を持つ太古の巨大頭足類。", reqTime: 0.450, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 12, tapPower: 8, decaySpeed: 1.3 },
+    { id: 124, name: "ダンクルオステウス", location: "ruins", toolType: "rod", price: 1600, image: "images/fish/ruins/dankuru.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "強靭な板甲で覆われた頭部を持つ古生代の巨大魚。", reqTime: 0.400, shadowWidth: 170, shadowHeight: 50, isBig: true, weight: 8, tapPower: 7, decaySpeed: 1.4 },
+    { id: 125, name: "ヘリコプリオン", location: "ruins", toolType: "rod", price: 1800, image: "images/fish/ruins/herikopurion.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "らせん状に並んだ鋭い歯を持つ奇妙な古代サメ。", reqTime: 0.380, shadowWidth: 180, shadowHeight: 50, isBig: true, weight: 6, tapPower: 6, decaySpeed: 1.5 },
+    { id: 126, name: "メガロドン", location: "ruins", toolType: "rod", price: 2800, image: "images/fish/ruins/megarodon.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "歴史上最大級の捕食者である超巨大古代サメ。", reqTime: 0.350, shadowWidth: 210, shadowHeight: 60, isBig: true, weight: 4, tapPower: 5, decaySpeed: 1.6 },
+    { id: 127, name: "ネッシー", location: "ruins", toolType: "rod", price: 3500, image: "images/fish/ruins/nessy.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "湖や水底の奥深くに潜む未確認巨大水生首長竜。", reqTime: 0.350, shadowWidth: 220, shadowHeight: 65, isBig: true, weight: 2, tapPower: 5, decaySpeed: 1.7 },
+    { id: 128, name: "イソギンチャク", location: "ruins", toolType: "net", netSize: "small", price: 120, image: "images/fish/ruins/isoginchaku.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】岩場や海底に固着して触手で獲物を捕らえる。", reqTime: 1.000, shadowWidth: 45, shadowHeight: 40, isBig: false, weight: 35 },
+    { id: 129, name: "カブトエビ", location: "ruins", toolType: "net", netSize: "small", price: 180, image: "images/fish/ruins/kabutoebi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】「生きた化石」と呼ばれる甲殻類の一種。", reqTime: 0.900, shadowWidth: 45, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 132, name: "ウミユリ", location: "ruins", toolType: "net", netSize: "small", price: 220, image: "images/fish/ruins/umiyuri.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】植物のような姿をした太古から続く棘皮動物。", reqTime: 0.850, shadowWidth: 45, shadowHeight: 45, isBig: false, weight: 30 },
+    { id: 130, name: "三葉虫", location: "ruins", toolType: "net", netSize: "small", price: 380, image: "images/fish/ruins/sanyoutyu.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】石のスキマをモゾモゾと網這い回る古代の節足動物。", reqTime: 0.700, shadowWidth: 55, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 134, name: "カブトガニ", location: "ruins", toolType: "net", netSize: "midi", price: 400, image: "images/fish/ruins/horseshoe_crab.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】ドーム状の甲羅と剣のような尾を持つ生きている化石。", reqTime: 0.750, shadowWidth: 65, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 133, name: "カブトガニの化石", location: "ruins", toolType: "net", netSize: "midi", price: 450, image: "images/fish/ruins/horseshoe_crab_fossil.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】太古の姿を綺麗に残したカブトガニの化石。", reqTime: 0.800, shadowWidth: 60, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 131, name: "オパビニア", location: "ruins", toolType: "net", netSize: "small", price: 500, image: "images/fish/ruins/opabinia.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】5つの目を持ち、長いノズルで捕食する珍妙なカンブリア生物。", reqTime: 0.650, shadowWidth: 50, shadowHeight: 25, isBig: false, weight: 20 },
+    { id: 135, name: "アンモナイトの化石", location: "ruins", toolType: "net", netSize: "midi", price: 500, image: "images/fish/ruins/ammonite_fossil.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】美しい螺旋模様がそのまま残ったアンモナイトの化石。", reqTime: 0.750, shadowWidth: 65, shadowHeight: 45, isBig: false, weight: 15 },
+    { id: 137, name: "アーケロン", location: "ruins", toolType: "net", netSize: "biggest", price: 1200, image: "images/fish/ruins/akeron.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】全長4メートルを超える白亜紀の超巨大ウミガメ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 60, isBig: true, weight: 10, tapPower: 7, decaySpeed: 1.3 },
+    { id: 136, name: "ネッシーの化石", location: "ruins", toolType: "net", netSize: "biggest", price: 1500, image: "images/fish/ruins/nessy_fossil.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】幻の水首長竜の骨の一部と思われる超貴重な化石。", reqTime: 0.500, shadowWidth: 120, shadowHeight: 50, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 },
+
+    // 13. 毒沼 (poison) - 竿/網
+    { id: 211, name: "ゴンズイ", location: "poison", toolType: "rod", price: 220, image: "images/fish/poison/gonzui.png", shadowImage: "images/shadows/shadow_small.png", desc: "集団で固まって泳ぐ。背ビレと胸ビレに激痛を伴う毒棘を持つ。", reqTime: 0.700, shadowWidth: 60, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 210, name: "ミノカサゴ", location: "poison", toolType: "rod", price: 280, image: "images/fish/poison/minokazsago.png", shadowImage: "images/shadows/shadow_midi.png", desc: "華やかな大きなヒレの棘に強い毒を持つ優雅な危険魚。", reqTime: 0.650, shadowWidth: 80, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 114, name: "ドクナマズ", location: "poison", toolType: "rod", price: 480, image: "images/fish/poison/dokunamazu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "紫色の毒液を体表から染み出させている不気味なナマズ。", reqTime: 0.500, shadowWidth: 100, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 212, name: "アカエイ", location: "poison", toolType: "rod", price: 380, image: "images/fish/poison/akaei.png", shadowImage: "images/shadows/shadow_big.png", desc: "尻尾の付け根に鋸歯状の鋭い猛毒針を持つエイ。", reqTime: 0.550, shadowWidth: 110, shadowHeight: 45, isBig: false, weight: 20 },
+    { id: 213, name: "バラハタ", location: "poison", toolType: "rod", price: 650, image: "images/fish/poison/barahata.png", shadowImage: "images/shadows/shadow_big.png", desc: "鮮やかな赤に斑点模様を持つハタ。食物連鎖でシガテラ毒を蓄積する。", reqTime: 0.480, shadowWidth: 120, shadowHeight: 40, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.3 },
+    { id: 215, name: "トラフグ", location: "poison", toolType: "rod", price: 800, image: "images/fish/poison/torahugu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "フグの最高級品種。内臓に致死性の猛毒テトロドトキシンを持つ。", reqTime: 0.500, shadowWidth: 90, shadowHeight: 45, isBig: false, weight: 15 },
+    { id: 216, name: "オニダルマオコゼ", location: "poison", toolType: "rod", price: 950, image: "images/fish/poison/onidaruma.png", shadowImage: "images/shadows/shadow_midi.png", desc: "岩そっくりに擬態する。背ビレの毒棘は踏むと死に至ることもある最恐魚。", reqTime: 0.450, shadowWidth: 95, shadowHeight: 45, isBig: false, weight: 12 },
+    { id: 214, name: "オオウナギ（毒沼変異）", location: "poison", toolType: "rod", price: 1800, image: "images/fish/poison/oounagi.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "毒沼の環境に適応し、体内に強力な毒素を溜め込んで巨大化した主。", reqTime: 0.350, shadowWidth: 170, shadowHeight: 45, isBig: true, weight: 5, tapPower: 6, decaySpeed: 1.5 },
+    { id: 220, name: "ガンガゼ", location: "poison", toolType: "net", netSize: "small", price: 250, image: "images/fish/poison/gangaze.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】非常に長く折れやすい毒針を無数に生やした危険なウニの仲間。", reqTime: 0.850, shadowWidth: 50, shadowHeight: 50, isBig: false, weight: 30 },
+    { id: 217, name: "スベスベマンジュウガニ", location: "poison", toolType: "net", netSize: "small", price: 300, image: "images/fish/poison/manju_kani.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】滑らかな丸い甲羅が美味しそうだが、麻痺性貝毒やテトロドトキシンを持つ。", reqTime: 0.800, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 115, name: "ポイズンヤドクガエル", location: "poison", toolType: "net", netSize: "small", price: 320, image: "images/fish/poison/yadokugaeru.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】派手な毒々しい色をした毒沼固有のカエル。", reqTime: 0.750, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 221, name: "ヤドクガエル", location: "poison", toolType: "net", netSize: "small", price: 350, image: "images/fish/poison/yadokugaeru.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】派手な警戒色を持ち、皮膚から矢の毒に使われる強力な毒を出す。", reqTime: 0.750, shadowWidth: 40, shadowHeight: 25, isBig: false, weight: 25 },
+    { id: 219, name: "アンボイナガイ", location: "poison", toolType: "net", netSize: "small", price: 380, image: "images/fish/poison/anboinagai.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】「殺人貝」の異名を持つ。強力な神経毒（コノトキシン）の毒針を放つ。", reqTime: 0.750, shadowWidth: 40, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 218, name: "ハブクラゲ", location: "poison", toolType: "net", netSize: "midi", price: 420, image: "images/fish/poison/habukurage.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】透明な体に長い触手を持ち、激痛と呼吸困難を引き起こす猛毒クラゲ。", reqTime: 0.700, shadowWidth: 65, shadowHeight: 50, isBig: false, weight: 25 },
+    { id: 222, name: "ヒョウモンダコ", location: "poison", toolType: "net", netSize: "small", price: 500, image: "images/fish/poison/hyoumondako.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】刺激を受けると青いリング模様が発光する。噛まれると死亡例もある猛毒小型タコ。", reqTime: 0.650, shadowWidth: 50, shadowHeight: 35, isBig: false, weight: 20 },
+
+    // 14. 天の川 (milkyway) - 竿/網
+    { id: 223, name: "ステラエンゼル", location: "milkyway", toolType: "rod", price: 350, image: "images/fish/milkyway/suteraenzeru.png", shadowImage: "images/shadows/shadow_small.png", desc: "星座の並びのように体に星型の発光点が並ぶ優雅なエンゼルフィッシュ。", reqTime: 0.650, shadowWidth: 60, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 224, name: "コスモウナギ", location: "milkyway", toolType: "rod", price: 420, image: "images/fish/milkyway/kosumounagi.png", shadowImage: "images/shadows/shadow_midi.png", desc: "銀河のうねりのようにすばしっこく泳ぐ、光の軌跡を残す細長い魚。", reqTime: 0.550, shadowWidth: 85, shadowHeight: 30, isBig: false, weight: 25 },
+    { id: 116, name: "ギャラクシーフィッシュ", location: "milkyway", toolType: "rod", price: 600, image: "images/fish/milkyway/galaxyfish.png", shadowImage: "images/shadows/shadow_small.png", desc: "体に小さな銀河を宿したかのように輝く宇宙魚。", reqTime: 0.400, shadowWidth: 75, shadowHeight: 30, isBig: false, weight: 15 },
+    { id: 225, name: "ネブラパイレーツ", location: "milkyway", toolType: "rod", price: 850, image: "images/fish/milkyway/neburapairetu.png", shadowImage: "images/shadows/shadow_big.png", desc: "星雲の美しい色彩をその身に纏う、天の川を流浪する気荒な大型魚。", reqTime: 0.420, shadowWidth: 130, shadowHeight: 45, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.3 },
+    { id: 226, name: "メテオサーモン", location: "milkyway", toolType: "rod", price: 1100, image: "images/fish/milkyway/meteosamon.png", shadowImage: "images/shadows/shadow_big.png", desc: "隕石のような速度で天の川を遡上する、火花を散らす巨大なサケ。", reqTime: 0.380, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 8, tapPower: 8, decaySpeed: 1.4 },
+    { id: 227, name: "スターダストドラゴン", location: "milkyway", toolType: "rod", price: 3000, image: "images/fish/milkyway/star_dragon.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "無数の星くずが集まって生まれたとされる天の川の主。宇宙の輝きを放つ。", reqTime: 0.350, shadowWidth: 200, shadowHeight: 65, isBig: true, weight: 3, tapPower: 4, decaySpeed: 1.7 },
+    { id: 228, name: "ルナヒトデ", location: "milkyway", toolType: "net", netSize: "small", price: 200, image: "images/fish/milkyway/runahitode.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】満月のようにやわらかな黄色い光を一定の周期で放つヒトデ。", reqTime: 0.850, shadowWidth: 45, shadowHeight: 45, isBig: false, weight: 35 },
+    { id: 229, name: "サテライトエビ", location: "milkyway", toolType: "net", netSize: "small", price: 280, image: "images/fish/milkyway/sateraitoebi.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】人工衛星のアンテナのような長い髭を持ち、浮遊しながら電波を発する。", reqTime: 0.750, shadowWidth: 50, shadowHeight: 25, isBig: false, weight: 30 },
+    { id: 230, name: "アストロクラブ", location: "milkyway", toolType: "net", netSize: "midi", price: 380, image: "images/fish/milkyway/asutorokurabu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】甲羅に小宇宙が閉じ込められたかのような、群青色に輝く美しいカニ。", reqTime: 0.700, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 117, name: "コメットクラゲ", location: "milkyway", toolType: "net", netSize: "small", price: 400, image: "images/fish/milkyway/komettokurage.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】彗星のように長い光の尾を引きながら漂うクラゲ。", reqTime: 0.600, shadowWidth: 60, shadowHeight: 45, isBig: false, weight: 20 },
+    { id: 231, name: "プラネットウニ", location: "milkyway", toolType: "net", netSize: "midi", price: 450, image: "images/fish/milkyway/puranettouni.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】土星のような光の環を周囲に浮かべた、青く発光する神秘的なウニ。", reqTime: 0.650, shadowWidth: 55, shadowHeight: 55, isBig: false, weight: 20 },
+    { id: 232, name: "ブラックホールタコ", location: "milkyway", toolType: "net", netSize: "big", price: 950, image: "images/fish/milkyway/blaxk_tako.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】中心に光を吸い込むかのような暗黒を宿した、天の川の暗部に潜む大タコ。", reqTime: 0.480, shadowWidth: 120, shadowHeight: 60, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 }
 ];
 
 let gameState = 'TITLE';
@@ -263,7 +418,7 @@ function initAudio() {
     }
     if (!titleBgm) {
         titleBgm = document.getElementById('title-bgm');
-        titleBgm.volume = 0.02;
+        if (titleBgm) titleBgm.volume = 0.02;
     }
 }
 
@@ -278,8 +433,10 @@ function playBgm(soundPath, isTitle = false) {
         }
         currentBgm = titleBgm;
         currentBgmPath = 'title';
-        titleBgm.volume = 0.02;
-        titleBgm.play().catch(() => {});
+        if (titleBgm) {
+            titleBgm.volume = 0.02;
+            titleBgm.play().catch(() => {});
+        }
         return;
     }
 
@@ -400,16 +557,15 @@ function updateMenuUI() {
 }
 
 function closeAllModals() {
-    document.getElementById('map-modal').style.display = "none";
-    document.getElementById('zukan-modal').style.display = "none";
-    document.getElementById('howto-modal').style.display = "none";
-    document.getElementById('shop-screen').style.display = "none";
-    document.getElementById('gacha-screen').style.display = "none";
-    document.getElementById('gacha-list-modal').style.display = "none";
-    document.getElementById('config-modal').style.display = "none";
-    document.getElementById('achievement-modal').style.display = "none";
-    document.getElementById('zoom-modal').style.display = "none";
-    document.getElementById('levelup-modal').style.display = "none";
+    const ids = [
+        'map-modal', 'zukan-modal', 'howto-modal', 'shop-screen', 
+        'gacha-screen', 'gacha-list-modal', 'config-modal', 
+        'achievement-modal', 'zoom-modal', 'levelup-modal'
+    ];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "none";
+    });
     closeZukanDetail();
 }
 
@@ -446,6 +602,9 @@ function startGameFromMenu() {
     playWaterPlop();
 }
 
+/* ===================================================
+   ガチャ関連機能（矢印切替＆7種対応）
+   =================================================== */
 function openGachaScreen() {
     initAudio();
     closeAllModals();
@@ -454,6 +613,8 @@ function openGachaScreen() {
     document.getElementById('gacha-gold').innerText = playerData.gold;
     document.getElementById('gacha-result-area').style.display = "none";
     document.getElementById('gacha-screen').style.display = "flex";
+    
+    updateGachaSeriesUI();
     updateStageBgm();
     playWaterPlop();
 }
@@ -462,7 +623,43 @@ function closeGachaScreen() {
     goToMenu();
 }
 
+// 次のシリーズへ（＞）
+function nextGachaSeries() {
+    currentGachaIndex = (currentGachaIndex + 1) % GACHA_SERIES_LIST.length;
+    updateGachaSeriesUI();
+}
+
+// 前のシリーズへ（＜）
+function prevGachaSeries() {
+    currentGachaIndex = (currentGachaIndex - 1 + GACHA_SERIES_LIST.length) % GACHA_SERIES_LIST.length;
+    updateGachaSeriesUI();
+}
+
+// ガチャ画面の表示更新
+function updateGachaSeriesUI() {
+    const series = GACHA_SERIES_LIST[currentGachaIndex];
+    currentGachaSeries = series.key;
+
+    // タイトル表示更新
+    const titleElem = document.getElementById('gacha-series-title');
+    if (titleElem) {
+        titleElem.innerText = series.title;
+    }
+
+    // バナー画像更新
+    const bannerImg = document.getElementById('gacha-banner-img');
+    if (bannerImg) {
+        bannerImg.src = series.banner;
+        bannerImg.onerror = () => {
+            bannerImg.src = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 130'><rect width='300' height='130' fill='%23111827'/><text x='150' y='50' font-size='18' fill='${encodeURIComponent(series.color)}' font-weight='bold' text-anchor='middle'>${series.mapName}</text><text x='150' y='85' font-size='14' fill='%23ffffff' text-anchor='middle'>${series.rodName} / 🐉 龍神の竿</text></svg>`;
+        };
+    }
+
+    playWaterPlop();
+}
+
 function openGachaListModal() {
+    renderGachaListModal();
     document.getElementById('gacha-list-modal').style.display = "flex";
 }
 
@@ -470,7 +667,51 @@ function closeGachaListModal() {
     document.getElementById('gacha-list-modal').style.display = "none";
 }
 
-/* レア確率0.5%に調整したガチャ関数 */
+function renderGachaListModal() {
+    const scrollArea = document.querySelector('#gacha-list-modal .gacha-list-scroll-area');
+    if (!scrollArea) return;
+
+    const currentSeries = GACHA_SERIES_LIST[currentGachaIndex];
+
+    scrollArea.innerHTML = `
+        <div class="gacha-list-section">
+            <div class="gacha-list-sec-title" style="color:#ff66ff;">【限定解放エリア】(確率: 2%)</div>
+            <div class="gacha-list-item-group">
+                ・${currentSeries.mapName}
+            </div>
+        </div>
+
+        <div class="gacha-list-section">
+            <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール / レア】(確率: 各 1%)</div>
+            <div class="gacha-list-item-group">
+                ・${currentSeries.rodName}<br>
+                ・🐉 龍神の竿 <span style="font-size:11px; color:#ffd700;">(超レア)</span><br>
+                ・🔱 神獣の網 <span style="font-size:11px; color:#ffd700;">(ネット超レア)</span>
+            </div>
+        </div>
+
+        <div class="gacha-list-section">
+            <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計84%)</div>
+            <div class="gacha-list-item-group">
+                ・🥫 空き缶 (10 G)<br>
+                ・👞 長靴 (10 G)<br>
+                ・🛞 古タイヤ (20 G)<br>
+                ・🪵 流木 (10 G)<br>
+                ・🧹 ボロきれ (5 G)<br>
+                ・🌿 ワカメ (10 G)
+            </div>
+        </div>
+
+        <div class="gacha-list-section">
+            <div class="gacha-list-sec-title" style="color:#ffd700;">【その他補填】(確率: 合計11%)</div>
+            <div class="gacha-list-item-group">
+                ・💰 少額ゴールド (30 G / 50 G)<br>
+                <span style="font-size:11px; color:#ccc;">※獲得済みの竿やエリアが重複した場合は150 Gが補填されます。</span>
+            </div>
+        </div>
+    `;
+}
+
 function spinGacha(count) {
     const cost = count === 10 ? 10000 : 1000;
     if (playerData.gold < cost) {
@@ -495,20 +736,30 @@ function spinGacha(count) {
         kaisou: "images/trash/trash_kaisou.png"
     };
 
+    const currentSeries = GACHA_SERIES_LIST[currentGachaIndex];
+
+    const seriesMap = { 
+        type: "map", 
+        key: currentSeries.mapKey, 
+        name: currentSeries.mapName, 
+        icon: MAP_DATA[currentSeries.mapKey].bg, 
+        weight: 2 
+    };
+    
+    const seriesRod = { 
+        type: "rod", 
+        key: currentSeries.rodKey, 
+        name: currentSeries.rodName, 
+        icon: ROD_DATA[currentSeries.rodKey].icon, 
+        weight: 1 
+    };
+
     const pool = [
-        // --- 特別開放エリア (各 0.5%) ---
-        { type: "map", key: "volcano", name: "🌋 火山エリア解放", icon: "images/bg/bg_volcano.png", weight: 0.5 },
-        { type: "map", key: "honey", name: "🍯 はちみつエリア解放", icon: "images/bg/bg_honey.png", weight: 0.5 },
-        { type: "map", key: "holy", name: "✨ 聖なる泉エリア解放", icon: "images/bg/bg_holy.png", weight: 0.5 },
+        seriesMap,
+        seriesRod,
+        { type: "rod", key: "dragon_rod", name: "🐉 龍神の竿", icon: "images/fishingrod/dragon_fishing_rod.png", weight: 1 },
+        { type: "net", key: "divine_net", name: "🔱 神獣の網", icon: "images/net/net_divine.png", weight: 1 },
 
-        // --- 特殊ツール (各 0.5%) ---
-        { type: "rod", key: "lava_rod", name: "🔥 耐溶岩釣り竿", icon: "images/fishingrod/lava_fishing_rod.png", weight: 0.5 },
-        { type: "rod", key: "jungle_rod", name: "🌿 ジャングルの釣り竿", icon: "images/fishingrod/jungle_fishing_rod.png", weight: 0.5 },
-        { type: "rod", key: "holy_rod", name: "⭐ 聖なる釣り竿", icon: "images/fishingrod/holy_fishing_rod.png", weight: 0.5 },
-        { type: "rod", key: "dragon_rod", name: "🐉 龍神の竿", icon: "images/fishingrod/dragon_fishing_rod.png", weight: 0.5 },
-        { type: "net", key: "divine_net", name: "🔱 神獣の網", icon: "images/net/net_divine.png", weight: 0.5 },
-
-        // --- ハズレ枠 (各 14.0% / 合計84.0%) ---
         { type: "trash", name: "🥫 空き缶 (10 G)", icon: TRASH_PATHS.kan, amount: 10, weight: 14.0 },
         { type: "trash", name: "👞 長靴 (10 G)", icon: TRASH_PATHS.kutu, amount: 10, weight: 14.0 },
         { type: "trash", name: "🛞 古タイヤ (20 G)", icon: TRASH_PATHS.tire, amount: 20, weight: 14.0 },
@@ -516,9 +767,8 @@ function spinGacha(count) {
         { type: "trash", name: "🧹 ボロきれ (5 G)", icon: TRASH_PATHS.kire, amount: 5, weight: 14.0 },
         { type: "trash", name: "🌿 ワカメ (10 G)", icon: TRASH_PATHS.kaisou, amount: 10, weight: 14.0 },
 
-        // --- 微小ゴールド (各 6.0% / 合計12.0%) ---
-        { type: "gold", amount: 50, name: "💰 50 Gold", icon: "data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'gold\'/></svg>", weight: 6.0 },
-        { type: "gold", amount: 30, name: "💰 30 Gold", icon: "data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'gold\'/></svg>", weight: 6.0 }
+        { type: "gold", amount: 50, name: "💰 50 Gold", icon: "data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'gold\'/></svg>", weight: 5.5 },
+        { type: "gold", amount: 30, name: "💰 30 Gold", icon: "data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'gold\'/></svg>", weight: 5.5 }
     ];
 
     const totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
@@ -588,6 +838,9 @@ function spinGacha(count) {
     checkAchievements();
 }
 
+/* ===================================================
+   モーダル / 実績 / 設定
+   =================================================== */
 function openConfigModal() {
     initAudio();
     document.getElementById('config-modal').style.display = "flex";
@@ -678,9 +931,13 @@ function checkAchievements() {
         { id: "comp_volcano", cond: isAreaCompleted("volcano") },
         { id: "comp_honey", cond: isAreaCompleted("honey") },
         { id: "comp_holy", cond: isAreaCompleted("holy") },
+        { id: "comp_ryugu", cond: isAreaCompleted("ryugu") },
+        { id: "comp_ruins", cond: isAreaCompleted("ruins") },
+        { id: "comp_poison", cond: isAreaCompleted("poison") },
+        { id: "comp_milkyway", cond: isAreaCompleted("milkyway") },
+
         { id: "buy_all_shop", cond: isShopAllBought() },
 
-        // --- ネット限定実績 ---
         { id: "net_first", cond: netCatches >= 1 },
         { id: "net_apprentice", cond: netCatches >= 20 },
         { id: "net_master", cond: netCatches >= 100 },
@@ -736,6 +993,9 @@ function resetAllData() {
     }
 }
 
+/* ===================================================
+   ショップ関連
+   =================================================== */
 function openShop() {
     initAudio();
     closeAllModals();
@@ -834,6 +1094,9 @@ function equipItem(type, key) {
     }
 }
 
+/* ===================================================
+   遊び方 / マップ選択モーダル
+   =================================================== */
 function openHowToPlay() {
     closeAllModals();
     document.getElementById('howto-modal').style.display = "flex";
@@ -935,6 +1198,9 @@ function resetZukanData() {
     resetAllData();
 }
 
+/* ===================================================
+   おさかな絵巻（図鑑）機能
+   =================================================== */
 function openZukan() {
     initAudio();
     isZukanOpen = true;
@@ -967,7 +1233,7 @@ function renderZukanSubFilterUI() {
     if (currentZukanMainTab === 'normal') {
         locations = ['all', 'sea', 'river', 'swamp', 'lake', 'snow', 'underground', 'deepsea'];
     } else {
-        locations = ['all', 'volcano', 'honey', 'holy'];
+        locations = ['all', 'volcano', 'honey', 'holy', 'ryugu', 'ruins', 'poison', 'milkyway'];
     }
 
     locations.forEach(loc => {
@@ -1034,12 +1300,21 @@ function renderZukanGrid() {
             img.src = fish.image;
             img.onerror = () => { img.src = fish.fallbackSvg; };
         } else {
-            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='35' y='65' font-size='40' fill='gray'>？</text></svg>";
+            const isNet = fish.toolType === 'net';
+            const iconText = isNet ? "🕸" : "🎣";
+            img.src = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='45' font-size='35' text-anchor='middle' dominant-baseline='central'>${iconText}</text><text x='50' y='80' font-size='22' fill='gray' font-family='sans-serif' font-weight='bold' text-anchor='middle'>？</text></svg>`;
         }
 
         const name = document.createElement('div');
         name.className = "zukan-card-name";
-        name.innerText = isUnlocked ? fish.name : "？？？？";
+        
+        if (isUnlocked) {
+            name.innerText = fish.name;
+        } else {
+            const isNet = fish.toolType === 'net';
+            name.innerText = isNet ? "？(網で捕獲可能)" : "？(竿で捕獲可能)";
+            name.style.color = isNet ? "#ff99ff" : "#aaa";
+        }
 
         card.appendChild(img);
         card.appendChild(name);
@@ -1075,7 +1350,8 @@ function openZukanDetail(fish) {
 }
 
 function closeZukanDetail() {
-    document.getElementById('zukan-detail-modal').style.display = "none";
+    const modal = document.getElementById('zukan-detail-modal');
+    if (modal) modal.style.display = "none";
 }
 
 function closeZukan() {
@@ -1085,7 +1361,9 @@ function closeZukan() {
     updateStageBgm();
 }
 
-/* SE */
+/* ===================================================
+   効果音（SE）関連
+   =================================================== */
 function playWaterPlop() {
     if (!soundEnabled || !audioCtx) return;
     try {
@@ -1159,6 +1437,9 @@ function playTone(freq, duration, type = 'square') {
     } catch(e) {}
 }
 
+/* ===================================================
+   ゲームメインループ・アクション処理
+   =================================================== */
 function handleAction() {
     initAudio();
 

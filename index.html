@@ -24,7 +24,7 @@
     <!-- タイトル画面 -->
     <div id="title-screen">
         <div id="main-logo">爆釣一閃！<br>おさかな一本勝負</div>
-        <div class="version-text">Ver 2.0.0</div>
+        <div class="version-text">Ver 2.1.0</div>
         <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
     </div>
 
@@ -60,21 +60,22 @@
         <button class="menu-btn" onclick="openHowToPlay()">遊び方</button>
     </div>
 
-    <!-- ガチャ画面 -->
+<!-- ガチャ画面 -->
     <div id="gacha-screen">
         <div class="gacha-title">🎰 釣りガチャ 🎰</div>
         <div class="gacha-gold-text">所持金: <span id="gacha-gold">0</span> G</div>
         
+        <!-- ▼ 矢印スタイルのシリーズ切替UI ▼ -->
+        <div class="gacha-arrow-selector">
+            <button class="gacha-arrow-btn" onclick="prevGachaSeries()">＜</button>
+            <div id="gacha-series-title" class="gacha-series-title-text">🌋 火山ガチャ</div>
+            <button class="gacha-arrow-btn" onclick="nextGachaSeries()">＞</button>
+        </div>
+
         <div class="gacha-box-ui">
-            <div style="font-size: 13px; color: #ffd700; margin-bottom: 6px; font-weight: bold; text-shadow: 1px 1px 2px #000;">【超目玉景品アイテム】</div>
-            <div style="font-size: 11px; color: #eee; text-align: left; line-height: 1.5; text-shadow: 1px 1px 2px #000;">
-                ・🌋 火山エリア / 耐溶岩釣り竿<br>
-                ・🍯 はちみつエリア / ジャングルの釣り竿<br>
-                ・✨ 聖なる泉エリア / 聖なる釣り竿<br>
-                ・🐉 伝説の秘竿「龍神の竿」<br>
-                ・🔱 伝説の捕獲網「神獣の網」
-            </div>
-            <div style="font-size: 10px; color: #aaa; text-align: left; margin-top: 4px;">※ハズレ（釣りゴミ等）確率: 84%</div>
+            <!-- 目玉商品のバナー画像表示エリア -->
+            <img id="gacha-banner-img" class="gacha-banner-img" src="images/banner/banner_volcano.png" alt="ガチャバナー" onclick="zoomImage(this.src)">
+            <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 84%</div>
         </div>
 
         <div style="display:flex; gap:10px; width:100%; justify-content:center; margin-bottom:8px;">
@@ -99,7 +100,7 @@
 
         <div class="gacha-list-scroll-area">
             <div class="gacha-list-section">
-                <div class="gacha-list-sec-title" style="color:#ff66ff;">【特別開放エリア】(確率: 各 0.5%)</div>
+                <div class="gacha-list-sec-title" style="color:#ff66ff;">【特別開放エリア】(確率: 各 1%)</div>
                 <div class="gacha-list-item-group">
                     ・🌋 火山エリア解放<br>
                     ・🍯 はちみつエリア解放<br>
@@ -108,7 +109,7 @@
             </div>
 
             <div class="gacha-list-section">
-                <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール】(確率: 各 0.5%)</div>
+                <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール】(確率: 各 1%)</div>
                 <div class="gacha-list-item-group">
                     ・🔥 耐溶岩釣り竿<br>
                     ・🌿 ジャングルの釣り竿<br>
@@ -119,7 +120,7 @@
             </div>
 
             <div class="gacha-list-section">
-                <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計89%)</div>
+                <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計82%)</div>
                 <div class="gacha-list-item-group">
                     ・🥫 空き缶 (10 G)<br>
                     ・👞 長靴 (10 G)<br>
@@ -172,11 +173,12 @@
 
             <!-- アップデート情報 -->
             <div class="update-box">
-                <div class="update-box-title">📢 アプデ情報 (Ver 2.0.0)</div>
-                ・新ステージ追加！<br>
-                ・新生物追加！<br>
-                ・新アイテム追加！<br>
-                ・ガチャ機能追加！
+                <div class="update-box-title">📢 アプデ情報 (Ver 2.1.0)</div>
+                ・新ステージを追加しました。<br>
+                ・新生物を追加しました。<br>
+                ・新アイテムを追加しました。<br>
+                ・ガチャの確率を修正しました。
+
             </div>
 
             <div class="config-row" style="border-bottom: none; flex-direction: column; align-items: flex-start; gap: 8px;">
