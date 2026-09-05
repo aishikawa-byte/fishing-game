@@ -16,9 +16,19 @@ const MAP_DATA = {
     ryugu: { name: "竜宮城", bg: "images/bg/bg_ryugu.png", reqLevel: 1, gacha: true, matchRod: "ryugu_rod", sound: "sounds/ryugu.mp3" },
     ruins: { name: "古代遺跡", bg: "images/bg/bg_ruins.png", reqLevel: 1, gacha: true, matchRod: "ruins_rod", sound: "sounds/ruins.mp3" },
     poison: { name: "毒沼", bg: "images/bg/bg_poison.png", reqLevel: 1, gacha: true, matchRod: "poison_rod", sound: "sounds/poison.mp3" },
-    milkyway: { name: "天の川", bg: "images/bg/bg_milkyway.png", reqLevel: 1, gacha: true, matchRod: "galaxy_rod", sound: "sounds/milkyway.mp3" }
-};
+    milkyway: { name: "天の川", bg: "images/bg/bg_milkyway.png", reqLevel: 1, gacha: true, matchRod: "galaxy_rod", sound: "sounds/milkyway.mp3" },
 
+    eldorado: { 
+        name: "黄金郷", 
+        bg: "images/bg/bg_eldorado.png", 
+        reqLevel: 80, 
+        gacha: true, 
+        matchRod: "eldorado_rod", 
+        matchNet: "divine_net",   
+        sound: "sounds/eldorado.mp3" 
+    },
+    shinju: { name: "神獣界", bg: "images/bg/bg_shinju.png", reqLevel: 200, sound: "sounds/shinju.mp3" }
+};
 let currentLocation = "sea";
 let currentToolMode = "rod"; // "rod" or "net"
 let currentShopTab = "rod";  // "rod" or "net"
@@ -34,8 +44,8 @@ const GACHA_SERIES_LIST = [
     { key: "ryugu", title: "⛩️ 竜宮城ガチャ", mapKey: "ryugu", mapName: "⛩️ 竜宮城エリア解放", rodKey: "ryugu_rod", rodName: "👑 乙姫の釣り竿", banner: "images/banner/banner_ryugu.png", color: "#ff66cc" },
     { key: "ruins", title: "🏛️ 古代遺跡ガチャ", mapKey: "ruins", mapName: "🏛️ 古代遺跡エリア解放", rodKey: "ruins_rod", rodName: "🗿 古代の発掘竿", banner: "images/banner/banner_ruins.png", color: "#d2b48c" },
     { key: "poison", title: "☠️ 毒沼ガチャ", mapKey: "poison", mapName: "☠️ 毒沼エリア解放", rodKey: "poison_rod", rodName: "🧪 解毒の釣り竿", banner: "images/banner/banner_poison.png", color: "#a020f0" },
-    { key: "milkyway", title: "🌌 天の川ガチャ", mapKey: "milkyway", mapName: "🌌 天の川エリア解放", rodKey: "galaxy_rod", rodName: "🌌 銀河の釣り竿", banner: "images/banner/banner_milkyway.png", color: "#1e90ff" }
-];
+    { key: "milkyway", title: "🌌 天の川ガチャ", mapKey: "milkyway", mapName: "🌌 天の川エリア解放", rodKey: "galaxy_rod", rodName: "🌌 銀河の釣り竿", banner: "images/banner/banner_milkyway.png", color: "#1e90ff" },
+    { key: "eldorado", title: "🏆 黄金郷ガチャ", mapKey: "eldorado", mapName: "🏆 黄金郷エリア解放 (0.5%)", rodKey: "eldorado_rod", rodName: "🏆 エルドラドロッド", banner: "images/banner/banner_eldorado.png", color: "#ffd700" }];
 
 let currentGachaIndex = 0;
 
@@ -48,7 +58,8 @@ const ROD_DATA = {
     gold: { id: "gold", name: "金の竿", icon: "images/fishingrod/gold_fishing_rod.png", price: 5000, desc: "黄金に輝く竿。大物やレアな魚がヒットする確率がアップ！" },
     bronze: { id: "bronze", name: "青銅の竿", icon: "images/fishingrod/copper_fishing_rod.png", price: 12000, desc: "深海エリア専用の特化竿。ヒット判定と連打時間が少し長くなる。" },
     legend: { id: "legend", name: "伝説の竿", icon: "images/fishingrod/legendary_fishing_rod.png", price: 40000, desc: "太古の神木で作られた幻の竿。すべてのエリアで全能力が大幅UP！" },
-
+    god_beast_rod: { id: "god_beast_rod", name: "神獣の竿", icon: "images/fishingrod/god_beast_rod.png", price: 100000, desc: "神獣界のボスに対抗できる伝説の竿。連打パワーが爆発的に上昇！" },
+    
     lava_rod: { id: "lava_rod", name: "耐溶岩釣り竿", icon: "images/fishingrod/lava_fishing_rod.png", price: 0, gacha: true, desc: "火山エリア特化。溶岩の熱に耐え、通常通りの待ち時間で釣りが可能！" },
     jungle_rod: { id: "jungle_rod", name: "ジャングルの釣り竿", icon: "images/fishingrod/jungle_fishing_rod.png", price: 0, gacha: true, desc: "はちみつエリア特化。粘り気のあるはちみつでもスムーズに釣りが可能！" },
     holy_rod: { id: "holy_rod", name: "聖なる釣り竿", icon: "images/fishingrod/holy_fishing_rod.png", price: 0, gacha: true, desc: "聖なる泉エリア特化。聖なる力を宿し、通常通りの待ち時間で釣りが可能！" },
@@ -56,7 +67,8 @@ const ROD_DATA = {
     ryugu_rod: { id: "ryugu_rod", name: "乙姫の釣り竿", icon: "images/fishingrod/ryugu_rod.png", price: 0, gacha: true, desc: "竜宮城エリア特化。海底の海底神殿でも安定して釣りが可能！" },
     ruins_rod: { id: "ruins_rod", name: "古代の発掘竿", icon: "images/fishingrod/ruins_rod.png", price: 0, gacha: true, desc: "古代遺跡エリア特化。太古の呪いを無効化して釣りが可能！" },
     poison_rod: { id: "poison_rod", name: "解毒の釣り竿", icon: "images/fishingrod/poison_rod.png", price: 0, gacha: true, desc: "毒沼エリア特化。強力な毒素を浄化し、安全に釣りが可能！" },
-    galaxy_rod: { id: "galaxy_rod", name: "銀河の釣り竿", icon: "images/fishingrod/galaxy_rod.png", price: 0, gacha: true, desc: "天の川エリア特化。星々の輝きで宇宙生物を引き寄せる！" }
+    galaxy_rod: { id: "galaxy_rod", name: "銀河の釣り竿", icon: "images/fishingrod/galaxy_rod.png", price: 0, gacha: true, desc: "天の川エリア特化。星々の輝きで宇宙生物を引き寄せる！" },
+    eldorado_rod: { id: "eldorado_rod", name: "エルドラドロッド", icon: "images/fishingrod/eldorado_rod.png", price: 0, gacha: true, desc: "黄金郷エリア特化。金ピカの光で黄金郷の生物を即座に引き寄せる！" }
 };
 
 /* ===================================================
@@ -71,7 +83,7 @@ const NET_DATA = {
 };
 
 /* ===================================================
-   実績・称号定義データ
+   実績・称号定義データ（新規実績を追加）
    =================================================== */
 const ACHIEVEMENT_DATA = {
     first_catch: { id: "first_catch", name: "初めての１匹", icon: "images/trophy/trophy_copper.png", desc: "初めて魚を1匹釣り上げた" },
@@ -83,6 +95,9 @@ const ACHIEVEMENT_DATA = {
     net_apprentice: { id: "net_apprentice", name: "捕獲見習い", icon: "images/trophy/trophy_copper.png", desc: "累計20匹の生き物をネットで捕まえた" },
     net_master: { id: "net_master", name: "ネットマスター", icon: "images/trophy/trophy_silver.png", desc: "累計100匹の生き物をネットで捕まえた" },
     net_combo_master: { id: "net_combo_master", name: "一網打尽！", icon: "images/trophy/trophy_silver.png", desc: "一度も失敗せず30匹連続でネットで捕まえた" },
+    
+    miss_master: { id: "miss_master", name: "準備運動はそこまでだ。", icon: "images/trophy/trophy_copper.png", desc: "通算で50回捕獲（または釣り）に失敗した" },
+    thousand_catches: { id: "thousand_catches", name: "おさかな無双", icon: "images/trophy/trophy_gold.png", desc: "累計で1,000匹の生き物を捕獲した（竿＋網）" },
     
     comp_sea: { id: "comp_sea", name: "海の支配者", icon: "images/trophy/trophy_silver.png", desc: "海の生き物をすべて図鑑に登録した" },
     comp_river: { id: "comp_river", name: "清流の主", icon: "images/trophy/trophy_silver.png", desc: "川の生き物をすべて図鑑に登録した" },
@@ -99,9 +114,14 @@ const ACHIEVEMENT_DATA = {
     comp_ruins: { id: "comp_ruins", name: "太古の解明者", icon: "images/trophy/trophy_silver.png", desc: "古代遺跡の生き物をすべて図鑑に登録した" },
     comp_poison: { id: "comp_poison", name: "毒耐性皆伝", icon: "images/trophy/trophy_silver.png", desc: "毒沼の生き物をすべて図鑑に登録した" },
     comp_milkyway: { id: "comp_milkyway", name: "銀河の旅行者", icon: "images/trophy/trophy_silver.png", desc: "天の川の生き物をすべて図鑑に登録した" },
+    comp_eldorado: { id: "comp_eldorado", name: "輝きの支配", icon: "images/trophy/trophy_gold.png", desc: "黄金郷の生き物をすべて図鑑に登録した" },
+    comp_shinju: { id: "comp_shinju", name: "汝の願いは？", icon: "images/trophy/trophy_gold.png", desc: "神獣界の生き物をすべて図鑑に登録した" },
     
-    buy_all_shop: { id: "buy_all_shop", name: "ぜ～んぶください！", icon: "images/trophy/trophy_gold.png", desc: "ショップのすべてのアイテム（竿）を購入した" },
+    buy_all_shop: { id: "buy_all_shop", name: "ぜ～んぶください！", icon: "images/trophy/trophy_gold.png", desc: "ショップのすべてのアイテムを購入した" },
+    comp_all_rods: { id: "comp_all_rods", name: "ストックは何本？", icon: "images/trophy/trophy_gold.png", desc: "すべての釣り竿（ガチャ限定含む）を獲得した" },
+    comp_all_nets: { id: "comp_all_nets", name: "夏休みは終わったよ？", icon: "images/trophy/trophy_gold.png", desc: "すべての捕獲ネット（ガチャ限定含む）を獲得した" },
     rich_man: { id: "rich_man", name: "大金持ち", icon: "images/trophy/trophy_silver.png", desc: "所持金が10,000ゴールドに達した" },
+    ultra_rich: { id: "ultra_rich", name: "ガチャでも引いてみる？", icon: "images/trophy/trophy_gold.png", desc: "所持金が100,000ゴールドに達した" },
     all_maps: { id: "all_maps", name: "航海時代", icon: "images/trophy/trophy_gold.png", desc: "すべての基本エリア(全7箇所)を解放した" },
     zukan_master: { id: "zukan_master", name: "伝説の釣り人", icon: "images/trophy/trophy_gold.png", desc: "おさかな絵巻(全種類の魚)をコンプリートした" }
 };
@@ -242,7 +262,7 @@ const FISH_DATA = [
     { id: 162, name: "キタユウレイクラゲ", location: "underground", toolType: "net", netSize: "biggest", price: 1100, image: "images/fish/kitayuureikurage.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】無数の触手を棚引かせて漂う、世界最大級のクラゲ。", reqTime: 0.500, shadowWidth: 130, shadowHeight: 65, isBig: true, weight: 8, tapPower: 7, decaySpeed: 1.4 },
 
     // 7. 深海 (deepsea) - 竿/網
-    { id: 75, name: "チョウチンアンコウ", location: "deepsea", toolType: "rod", price: 600, image: "images/fish/fish_chouchin.png", shadowImage: "images/shadows/shadow_big.png", desc: "頭の発光器で獲物を誘い込んで捕食する深海魚。", reqTime: 0.550, shadowWidth: 120, shadowHeight: 55, isBig: false, weight: 10, tapPower: 9, decaySpeed: 1.3 },
+    { id: 75, name: "チョウチンアンコウ", location: "deepsea", toolType: "rod", price: 600, image: "images/fish/fish_chouchin.png", shadowImage: "images/shadows/shadow_midi.png", desc: "頭の発光器で獲物を誘い込んで捕食する深海魚。", reqTime: 0.550, shadowWidth: 70, shadowHeight: 50, isBig: false, weight: 10, tapPower: 9, decaySpeed: 1.3 },
     { id: 109, name: "コウモリダコ", location: "deepsea", toolType: "rod", price: 750, image: "images/fish/koumoridako.png", shadowImage: "images/shadows/shadow_midi.png", desc: "マントのような膜を持つ、タコとイカの原始的な祖先。", reqTime: 0.650, shadowWidth: 80, shadowHeight: 45, isBig: false, weight: 15 },
     { id: 106, name: "デメニギス", location: "deepsea", toolType: "rod", price: 850, image: "images/fish/demenigisu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "頭部が透明で、緑色の球状の目が内部にある不思議な深海魚。", reqTime: 0.600, shadowWidth: 85, shadowHeight: 40, isBig: false, weight: 12 },
     { id: 108, name: "サカバンバスピス", location: "deepsea", toolType: "rod", price: 1100, image: "images/fish/sacabambaspis.png", shadowImage: "images/shadows/shadow_midi.png", desc: "間抜けな表情が魅力的な太古の無顎類。", reqTime: 0.550, shadowWidth: 90, shadowHeight: 35, isBig: false, weight: 10 },
@@ -342,7 +362,7 @@ const FISH_DATA = [
     { id: 213, name: "バラハタ", location: "poison", toolType: "rod", price: 650, image: "images/fish/poison/barahata.png", shadowImage: "images/shadows/shadow_big.png", desc: "鮮やかな赤に斑点模様を持つハタ。食物連鎖でシガテラ毒を蓄積する。", reqTime: 0.480, shadowWidth: 120, shadowHeight: 40, isBig: true, weight: 10, tapPower: 9, decaySpeed: 1.3 },
     { id: 215, name: "トラフグ", location: "poison", toolType: "rod", price: 800, image: "images/fish/poison/torahugu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "フグの最高級品種。内臓に致死性の猛毒テトロドトキシンを持つ。", reqTime: 0.500, shadowWidth: 90, shadowHeight: 45, isBig: false, weight: 15 },
     { id: 216, name: "オニダルマオコゼ", location: "poison", toolType: "rod", price: 950, image: "images/fish/poison/onidaruma.png", shadowImage: "images/shadows/shadow_midi.png", desc: "岩そっくりに擬態する。背ビレの毒棘は踏むと死に至ることもある最恐魚。", reqTime: 0.450, shadowWidth: 95, shadowHeight: 45, isBig: false, weight: 12 },
-    { id: 214, name: "オオウナギ（毒沼変異）", location: "poison", toolType: "rod", price: 1800, image: "images/fish/poison/oounagi.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "毒沼の環境に適応し、体内に強力な毒素を溜め込んで巨大化した主。", reqTime: 0.350, shadowWidth: 170, shadowHeight: 45, isBig: true, weight: 5, tapPower: 6, decaySpeed: 1.5 },
+    { id: 214, name: "オオウナギ", location: "poison", toolType: "rod", price: 1800, image: "images/fish/poison/oounagi.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "毒沼の環境に適応し、体内に強力な毒素を溜め込んで巨大化した主。", reqTime: 0.350, shadowWidth: 170, shadowHeight: 45, isBig: true, weight: 5, tapPower: 6, decaySpeed: 1.5 },
     { id: 220, name: "ガンガゼ", location: "poison", toolType: "net", netSize: "small", price: 250, image: "images/fish/poison/gangaze.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】非常に長く折れやすい毒針を無数に生やした危険なウニの仲間。", reqTime: 0.850, shadowWidth: 50, shadowHeight: 50, isBig: false, weight: 30 },
     { id: 217, name: "スベスベマンジュウガニ", location: "poison", toolType: "net", netSize: "small", price: 300, image: "images/fish/poison/manju_kani.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】滑らかな丸い甲羅が美味しそうだが、麻痺性貝毒やテトロドトキシンを持つ。", reqTime: 0.800, shadowWidth: 45, shadowHeight: 30, isBig: false, weight: 30 },
     { id: 221, name: "ヤドクガエル", location: "poison", toolType: "net", netSize: "small", price: 350, image: "images/fish/poison/yadokugaeru.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】派手な警戒色を持ち、皮膚から矢の毒に使われる強力な毒を出す。", reqTime: 0.750, shadowWidth: 40, shadowHeight: 25, isBig: false, weight: 25 },
@@ -362,13 +382,39 @@ const FISH_DATA = [
     { id: 230, name: "アストロクラブ", location: "milkyway", toolType: "net", netSize: "midi", price: 380, image: "images/fish/milkyway/asutorokurabu.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】甲羅に小宇宙が閉じ込められたかのような、群青色に輝く美しいカニ。", reqTime: 0.700, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 25 },
     { id: 117, name: "コメットクラゲ", location: "milkyway", toolType: "net", netSize: "small", price: 400, image: "images/fish/milkyway/komettokurage.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】彗星のように長い光の尾を引きながら漂うクラゲ。", reqTime: 0.600, shadowWidth: 60, shadowHeight: 45, isBig: false, weight: 20 },
     { id: 231, name: "プラネットウニ", location: "milkyway", toolType: "net", netSize: "midi", price: 450, image: "images/fish/milkyway/puranettouni.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】土星のような光の環を周囲に浮かべた、青く発光する神秘的なウニ。", reqTime: 0.650, shadowWidth: 55, shadowHeight: 55, isBig: false, weight: 20 },
-    { id: 232, name: "ブラックホールタコ", location: "milkyway", toolType: "net", netSize: "big", price: 950, image: "images/fish/milkyway/black_tako.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】中心に光を吸い込むかのような暗黒を宿した、天の川の暗部に潜む大タコ。", reqTime: 0.480, shadowWidth: 120, shadowHeight: 60, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 }
+    { id: 232, name: "ブラックホールタコ", location: "milkyway", toolType: "net", netSize: "big", price: 950, image: "images/fish/milkyway/black_tako.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】中心に光を吸い込むかのような暗黒を宿した、天の川の暗部に潜む大タコ。", reqTime: 0.480, shadowWidth: 120, shadowHeight: 60, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.3 },
+
+    // 15. 黄金郷 (eldorado) - 竿/網 (高価値エリア)
+    { id: 233, name: "ゴールデンピラニア", location: "eldorado", toolType: "rod", price: 1500, image: "images/fish/eldorado/golden_pirania.png", shadowImage: "images/shadows/shadow_small.png", desc: "全身が純金でできたような煌めきを放つ凶暴な魚。", reqTime: 0.550, shadowWidth: 60, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 245, name: "ゴールデンリュウキン", location: "eldorado", toolType: "rod", price: 1800, image: "images/fish/eldorado/golden_ryukin.png", shadowImage: "images/shadows/shadow_small.png", desc: "ひらひらと金粉の舞うドレスのようなヒレをなびかせる優雅な金魚。", reqTime: 0.600, shadowWidth: 55, shadowHeight: 30, isBig: false, weight: 30 },
+    { id: 240, name: "ゴールデンタイ", location: "eldorado", toolType: "rod", price: 2500, image: "images/fish/eldorado/golden_tai.png", shadowImage: "images/shadows/shadow_midi.png", desc: "鱗の一枚一枚が金貨のように眩しく輝く、めでたすぎる黄金の鯛。", reqTime: 0.500, shadowWidth: 90, shadowHeight: 40, isBig: false, weight: 25 },
+    { id: 234, name: "ゴールドアロワナ", location: "eldorado", toolType: "rod", price: 3000, image: "images/fish/eldorado/gold_arowana.png", shadowImage: "images/shadows/shadow_midi.png", desc: "黄金郷の清流を優雅に泳ぐ至高の古代魚。", reqTime: 0.450, shadowWidth: 100, shadowHeight: 35, isBig: false, weight: 20 },
+    { id: 246, name: "エルドラドアンコウ", location: "eldorado", toolType: "rod", price: 3200, image: "images/fish/eldorado/eldorado_ankou.png", shadowImage: "images/shadows/shadow_midi.png", desc: "頭の発光器に巨大なイエローダイヤモンドが輝く深海魚。", reqTime: 0.500, shadowWidth: 90, shadowHeight: 45, isBig: false, weight: 20 },
+    { id: 241, name: "トレジャーエイ", location: "eldorado", toolType: "rod", price: 3500, image: "images/fish/eldorado/treasure_ei.png", shadowImage: "images/shadows/shadow_big.png", desc: "背中に無数の宝石と金貨を散りばめた、滑空するように泳ぐ大きなエイ。", reqTime: 0.450, shadowWidth: 130, shadowHeight: 50, isBig: true, weight: 15, tapPower: 8, decaySpeed: 1.4 },
+    { id: 247, name: "ゴールドガー", location: "eldorado", toolType: "rod", price: 4500, image: "images/fish/eldorado/gold_gar.png", shadowImage: "images/shadows/shadow_big.png", desc: "全身が磨き上げられた金の装甲で覆われた、鋭い口先を持つ大型古代魚。", reqTime: 0.420, shadowWidth: 140, shadowHeight: 45, isBig: true, weight: 10, tapPower: 8, decaySpeed: 1.4 },
+    { id: 242, name: "ミダスシーラカンス", location: "eldorado", toolType: "rod", price: 6000, image: "images/fish/eldorado/midas_coelacanth.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "触れるものを金に変えるとされる伝説の力が宿った古代の黄金魚。", reqTime: 0.380, shadowWidth: 170, shadowHeight: 45, isBig: true, weight: 8, tapPower: 6, decaySpeed: 1.5 },
+    { id: 235, name: "キングエルドラド", location: "eldorado", toolType: "rod", price: 8000, image: "images/fish/eldorado/king_eldorado.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "黄金郷の主。巨体から金粉を散らしながら激しく暴れる。", reqTime: 0.350, shadowWidth: 190, shadowHeight: 60, isBig: true, weight: 5, tapPower: 5, decaySpeed: 1.6 },
+    { id: 236, name: "ゴールデンクラブ", location: "eldorado", toolType: "net", netSize: "midi", price: 2000, image: "images/fish/eldorado/golden_crab.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】甲羅に金塊を担いだ珍しいカニ。", reqTime: 0.700, shadowWidth: 65, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 248, name: "ゴールドパールガイ", location: "eldorado", toolType: "net", netSize: "small", price: 2200, image: "images/fish/eldorado/golden_pearl_shell.png", shadowImage: "images/shadows/shadow_small.png", desc: "【網限定】中に大粒のゴールデンパール（黄金真珠）を抱えた非常に高価な二枚貝。", reqTime: 0.700, shadowWidth: 45, shadowHeight: 35, isBig: false, weight: 25 },
+    { id: 249, name: "ミダスロブスター", location: "eldorado", toolType: "net", netSize: "midi", price: 2800, image: "images/fish/eldorado/midas_lobster.png", shadowImage: "images/shadows/shadow_midi.png", desc: "【網限定】金塊を叩いて引き延ばしたような輝くハサミを持つ高級海老。", reqTime: 0.600, shadowWidth: 75, shadowHeight: 40, isBig: false, weight: 20 },
+    { id: 243, name: "ゴールドオクトパス", location: "eldorado", toolType: "net", netSize: "big", price: 4000, image: "images/fish/eldorado/gold_octopus.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】吸盤がすべて金の装飾のようになっており、宝箱を大事そうに抱え込んでいるタコ。", reqTime: 0.600, shadowWidth: 100, shadowHeight: 50, isBig: false, weight: 15 },
+    { id: 250, name: "オーラムクラゲ", location: "eldorado", toolType: "net", netSize: "biggest", price: 4800, image: "images/fish/eldorado/aurum_kurage.png", shadowImage: "images/shadows/shadow_big.png", desc: "【網限定】傘全体が黄金の輝きを放ち、金の糸のような無数の触手を漂わせる巨大クラゲ。", reqTime: 0.480, shadowWidth: 130, shadowHeight: 65, isBig: true, weight: 8, tapPower: 7, decaySpeed: 1.3 },
+    { id: 244, name: "金塊タートル", location: "eldorado", toolType: "net", netSize: "biggest", price: 5000, image: "images/fish/eldorado/kinkai_turtle.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "【網限定】甲羅が積み上げられた巨大な金塊でできている、ずっしりと重い長寿のカメ。", reqTime: 0.500, shadowWidth: 140, shadowHeight: 60, isBig: true, weight: 10, tapPower: 7, decaySpeed: 1.3 },
+
+    // 16. 神獣界 (shinju) - ボス級3種 (要 Lv.200)
+    { id: 237, name: "ミズチ", location: "shinju", toolType: "rod", price: 10000, image: "images/fish/boss/mizuti.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "神獣界の水流を司る伝説の水を呼ぶ龍蛇。", reqTime: 0.450, shadowWidth: 300, shadowHeight: 90, isBig: true, isBoss: true, weight: 5 },
+    { id: 238, name: "ゲンブ", location: "shinju", toolType: "net", netSize: "biggest", price: 12000, image: "images/fish/boss/genbu.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "【網限定】北方を守護する蛇と亀が一体となった四神の一角。", reqTime: 0.400, shadowWidth: 320, shadowHeight: 130, isBig: true, isBoss: true, weight: 3 },
+    { id: 239, name: "リヴァイアタン", location: "shinju", toolType: "rod", price: 15000, image: "images/fish/boss/rivaiatan.png", shadowImage: "images/shadows/shadow_biggest.png", desc: "神獣界の最深部に君臨する、大海を飲み込むとされる超巨大怪獣。", reqTime: 0.350, shadowWidth: 400, shadowHeight: 150, isBig: true, isBoss: true, weight: 1 }
 ];
 
 let gameState = 'TITLE';
 let isZukanOpen = false;
 let currentZukanMainTab = 'normal';
 let currentFilter = 'all';
+let bossPhase = 1;      // 現在のターン (1 or 2)
+let bossStep = 0;       // 現在のフェーズ内のステップ段階
+let timingCount = 0;    // ゲンブ用のタイミング成功回数
+let isBossBattle = false;
 let timerId = null;
 let timeoutTimerId = null;
 let shadowAnimId = null;
@@ -394,7 +440,11 @@ let playerData = JSON.parse(localStorage.getItem('retro_fishing_player_v1')) || 
     currentCombo: 0,
     netCatches: 0,
     netCombo: 0,
-    achievements: []
+    missCount: 0, // 失敗回数
+    achievements: [],
+    playTimeSeconds: 0,
+    hasSeenHowTo: false,
+    easyMode: false
 };
 
 let caughtFish = JSON.parse(localStorage.getItem('retro_fishing_zukan_v4')) || {};
@@ -408,42 +458,106 @@ function savePlayerData() {
     localStorage.setItem('retro_fishing_player_v1', JSON.stringify(playerData));
 }
 
+/* BGM再生用の単一Audioオブジェクト（使い回し用） */
+let bgmAudioPlayer = null;
+let bgmFadeTimer = null;
+
 function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    // HTML要素の titleBgm を確実に取得
     if (!titleBgm) {
         titleBgm = document.getElementById('title-bgm');
-        if (titleBgm) titleBgm.volume = 0.02;
     }
 }
 
+/* 秒数を「〇〇時間〇〇分」フォーマットに変換 (最大: 999時間59分) */
+function formatPlayTime(totalSeconds) {
+    const MAX_SECONDS = (999 * 3600) + (59 * 60);
+    
+    if (totalSeconds >= MAX_SECONDS) {
+        return "999時間59分";
+    }
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const formattedMinutes = String(minutes).padStart(2, '0');
+
+    return `${hours}時間${formattedMinutes}分`;
+}
+
+/* 1秒ごとにプレイ時間をカウントアップするタイマー */
+let playTimeInterval = null;
+
+function startPlayTimeCounter() {
+    if (playTimeInterval) return;
+
+    playTimeInterval = setInterval(() => {
+        if (!playerData.playTimeSeconds) playerData.playTimeSeconds = 0;
+
+        const MAX_SECONDS = (999 * 3600) + (59 * 60);
+        if (playerData.playTimeSeconds < MAX_SECONDS) {
+            playerData.playTimeSeconds++;
+            
+            if (playerData.playTimeSeconds % 60 === 0) {
+                savePlayerData();
+            }
+
+            if (gameState === 'MENU') {
+                updateMenuUI();
+            }
+        }
+    }, 1000);
+}
+
+/* スムーズなBGMフェードアウト＆フェードイン切り替え処理 */
 /* 自然なBGMフェード切り替え処理 */
 function playBgm(soundPath, isTitle = false) {
     if (!soundEnabled) return;
     initAudio();
 
+    // ① タイトル・メニューBGMの再生処理
     if (isTitle) {
+        // 現在ステージBGMが再生中であればフェードアウト
         if (currentBgm && currentBgm !== titleBgm) {
             fadeOutAudio(currentBgm);
         }
-        currentBgm = titleBgm;
-        currentBgmPath = 'title';
-        if (titleBgm) {
-            titleBgm.volume = 0.02;
-            titleBgm.play().catch(() => {});
+
+        // html要素を再取得
+        const titleAudioElem = titleBgm || document.getElementById('title-bgm');
+        
+        if (titleAudioElem) {
+            currentBgm = titleAudioElem;
+            currentBgmPath = 'title';
+
+            // すでに再生中の場合はスキップ
+            if (!titleAudioElem.paused) return;
+
+            titleAudioElem.volume = 0.02;
+            titleAudioElem.currentTime = 0;
+            titleAudioElem.play().catch(err => {
+                console.log("タイトルBGM再生エラー:", err);
+            });
         }
         return;
     }
 
+    // ② ステージBGMの再生処理
     if (currentBgmPath === soundPath && currentBgm && !currentBgm.paused) {
         return; 
     }
 
-    if (currentBgm) {
+    // タイトルBGMまたは前のステージBGMをフェードアウト＆停止
+    const titleAudioElem = titleBgm || document.getElementById('title-bgm');
+    if (titleAudioElem && !titleAudioElem.paused) {
+        fadeOutAudio(titleAudioElem);
+    }
+    if (currentBgm && currentBgm !== titleAudioElem) {
         fadeOutAudio(currentBgm);
     }
 
+    // 新しいステージBGMオブジェクトを生成して再生
     const newAudio = new Audio(soundPath);
     newAudio.loop = true;
     newAudio.volume = 0.0;
@@ -453,7 +567,9 @@ function playBgm(soundPath, isTitle = false) {
 
     newAudio.play().then(() => {
         fadeInAudio(newAudio, 0.02);
-    }).catch(() => {});
+    }).catch(err => {
+        console.log("ステージBGM再生エラー:", err);
+    });
 }
 
 function fadeOutAudio(audio) {
@@ -464,6 +580,7 @@ function fadeOutAudio(audio) {
         if (vol <= 0.001) {
             vol = 0;
             audio.pause();
+            audio.currentTime = 0; // 曲の頭に戻す
             clearInterval(fadeOutTimer);
         } else {
             audio.volume = vol;
@@ -486,10 +603,14 @@ function fadeInAudio(audio, targetVol) {
     }, 50);
 }
 
+/* ステージBGMの更新処理 */
 function updateStageBgm() {
     if (!soundEnabled) return;
+
     if (gameState === 'TITLE' || gameState === 'MENU' || gameState === 'GACHA' || isZukanOpen) {
-        playBgm(null, true);
+        playBgm("sounds/title.mp3", true);
+    } else if (gameState === 'BATTLE') {
+        playBgm("sounds/boss.mp3", false);
     } else {
         const mapObj = MAP_DATA[currentLocation];
         if (mapObj && mapObj.sound) {
@@ -498,24 +619,32 @@ function updateStageBgm() {
     }
 }
 
+function updateSoundUI() {
+    const configImg = document.getElementById('config-sound-img');
+    const headerImg = document.getElementById('header-sound-img');
+    
+    const imgPath = soundEnabled ? "images/supika_o.png" : "images/supika_x.png";
+
+    if (configImg) configImg.src = imgPath;
+    if (headerImg) headerImg.src = imgPath;
+}
+
+/* 音声のON/OFF切り替え */
 function toggleSound() {
     soundEnabled = !soundEnabled;
-    const btn = document.getElementById('sound-btn');
-    const configBtn = document.getElementById('config-sound-btn');
-    
-    const text = soundEnabled ? "音: ON" : "音: OFF";
-    if (btn) btn.innerText = text;
-    if (configBtn) configBtn.innerText = text;
-
     initAudio();
 
     if (soundEnabled) {
         updateStageBgm();
         playWaterPlop();
     } else {
-        if (currentBgm) currentBgm.pause();
-        if (titleBgm) titleBgm.pause();
+        if (bgmFadeTimer) clearInterval(bgmFadeTimer);
+        if (bgmAudioPlayer) bgmAudioPlayer.pause();
+        const htmlTitleAudio = document.getElementById('title-bgm');
+        if (htmlTitleAudio) htmlTitleAudio.pause();
     }
+
+    updateSoundUI();
 }
 
 function setToolMode(mode) {
@@ -546,6 +675,32 @@ function updateMenuUI() {
 
     document.getElementById('player-net-name').innerText = NET_DATA[playerData.equippedNet] ? NET_DATA[playerData.equippedNet].name : "虫取り網";
 
+    const timeElem = document.getElementById('player-play-time');
+    if (timeElem) {
+        timeElem.innerText = formatPlayTime(playerData.playTimeSeconds || 0);
+    }
+
+    const rodCatches = playerData.totalCatches || 0;
+    const netCatches = playerData.netCatches || 0;
+    const grandTotal = rodCatches + netCatches;
+
+    const rodElem = document.getElementById('player-rod-catches');
+    const netElem = document.getElementById('player-net-catches');
+    const totalElem = document.getElementById('player-total-catches');
+
+    if (rodElem) rodElem.innerText = rodCatches;
+    if (netElem) netElem.innerText = netCatches;
+    if (totalElem) totalElem.innerText = grandTotal;
+
+    const howtoBtn = document.getElementById('btn-howto');
+    if (howtoBtn) {
+        if (!playerData.hasSeenHowTo) {
+            howtoBtn.classList.add('highlight-howto');
+        } else {
+            howtoBtn.classList.remove('highlight-howto');
+        }
+    }
+
     document.getElementById('header-level').innerText = curLevel;
     document.getElementById('header-exp-percent').innerText = percent;
     document.getElementById('header-level-bar-inner').style.width = `${percent}%`;
@@ -572,7 +727,18 @@ function goToMenu() {
     document.getElementById('menu-screen').style.display = "flex";
     gameState = 'MENU';
     updateMenuUI();
-    updateStageBgm();
+
+    // ▼ ユーザー操作（ボタン押下）の直後にタイトルBGMを明示的に再生
+    if (soundEnabled && titleBgm) {
+        titleBgm.volume = 0.02;
+        titleBgm.play().then(() => {
+            currentBgm = titleBgm;
+            currentBgmPath = 'title';
+        }).catch(err => {
+            console.log("BGM再生エラー:", err);
+        });
+    }
+
     playWaterPlop();
 }
 
@@ -588,6 +754,7 @@ function goToMenuFromHeader() {
     playWaterPlop();
 }
 
+/* メインメニューからゲーム画面に入る処理（初回BGM確実にフェード切り替え） */
 function startGameFromMenu() {
     initAudio();
     closeAllModals();
@@ -619,30 +786,25 @@ function closeGachaScreen() {
     goToMenu();
 }
 
-// 次のシリーズへ（＞）
 function nextGachaSeries() {
     currentGachaIndex = (currentGachaIndex + 1) % GACHA_SERIES_LIST.length;
     updateGachaSeriesUI();
 }
 
-// 前のシリーズへ（＜）
 function prevGachaSeries() {
     currentGachaIndex = (currentGachaIndex - 1 + GACHA_SERIES_LIST.length) % GACHA_SERIES_LIST.length;
     updateGachaSeriesUI();
 }
 
-// ガチャ画面の表示更新
 function updateGachaSeriesUI() {
     const series = GACHA_SERIES_LIST[currentGachaIndex];
     currentGachaSeries = series.key;
 
-    // タイトル表示更新
     const titleElem = document.getElementById('gacha-series-title');
     if (titleElem) {
         titleElem.innerText = series.title;
     }
 
-    // バナー画像更新
     const bannerImg = document.getElementById('gacha-banner-img');
     if (bannerImg) {
         bannerImg.src = series.banner;
@@ -678,16 +840,16 @@ function renderGachaListModal() {
         </div>
 
         <div class="gacha-list-section">
-            <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール / レア】(確率: 各 1%)</div>
+            <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール / レア】(確率: 各 3%)</div>
             <div class="gacha-list-item-group">
                 ・${currentSeries.rodName}<br>
                 ・🐉 龍神の竿 <span style="font-size:11px; color:#ffd700;">(超レア)</span><br>
-                ・🔱 神獣の網 <span style="font-size:11px; color:#ffd700;">(ネット超レア)</span>
+                ・🔱 神獣の網 <span style="font-size:11px; color:#ffd700;">(超レア)</span>
             </div>
         </div>
 
         <div class="gacha-list-section">
-            <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計84%)</div>
+            <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計82%)</div>
             <div class="gacha-list-item-group">
                 ・🥫 空き缶 (10 G)<br>
                 ・👞 長靴 (10 G)<br>
@@ -733,13 +895,14 @@ function spinGacha(count) {
     };
 
     const currentSeries = GACHA_SERIES_LIST[currentGachaIndex];
+    const seriesMapWeight = currentSeries.key === 'eldorado' ? 0.5 : 5.0;
 
     const seriesMap = { 
         type: "map", 
         key: currentSeries.mapKey, 
         name: currentSeries.mapName, 
         icon: MAP_DATA[currentSeries.mapKey].bg, 
-        weight: 5 
+        weight: seriesMapWeight 
     };
     
     const seriesRod = { 
@@ -747,7 +910,7 @@ function spinGacha(count) {
         key: currentSeries.rodKey, 
         name: currentSeries.rodName, 
         icon: ROD_DATA[currentSeries.rodKey].icon, 
-        weight: 1 
+        weight: 3 
     };
 
     const pool = [
@@ -839,6 +1002,8 @@ function spinGacha(count) {
    =================================================== */
 function openConfigModal() {
     initAudio();
+    updateDifficultyUI();
+    updateSoundUI();
     document.getElementById('config-modal').style.display = "flex";
     playWaterPlop();
 }
@@ -900,13 +1065,21 @@ function isShopAllBought() {
     return shopRods.every(k => playerData.ownedRods.includes(k));
 }
 
+let achievementQueue = [];
+let isToastShowing = false;
+
 function checkAchievements() {
     if (!playerData.achievements) playerData.achievements = [];
 
     const totalUnlockedFish = Object.keys(caughtFish).filter(id => caughtFish[id] && caughtFish[id].unlocked).length;
 
+    const rodCatches = playerData.totalCatches || 0;
     const netCatches = playerData.netCatches || 0;
+    const grandTotalCatches = rodCatches + netCatches;
     const netCombo = playerData.netCombo || 0;
+
+    const hasAllRods = Object.keys(ROD_DATA).every(k => playerData.ownedRods.includes(k));
+    const hasAllNets = Object.keys(NET_DATA).every(k => playerData.ownedNets.includes(k));
 
     const conditions = [
         { id: "first_catch", cond: playerData.totalCatches >= 1 },
@@ -931,6 +1104,8 @@ function checkAchievements() {
         { id: "comp_ruins", cond: isAreaCompleted("ruins") },
         { id: "comp_poison", cond: isAreaCompleted("poison") },
         { id: "comp_milkyway", cond: isAreaCompleted("milkyway") },
+        { id: "comp_eldorado", cond: isAreaCompleted("eldorado") },
+        { id: "comp_shinju", cond: isAreaCompleted("shinju") },
 
         { id: "buy_all_shop", cond: isShopAllBought() },
 
@@ -939,21 +1114,41 @@ function checkAchievements() {
         { id: "net_master", cond: netCatches >= 100 },
         { id: "net_combo_master", cond: netCombo >= 30 },
 
-        { id: "zukan_master", cond: totalUnlockedFish >= FISH_DATA.length }
+        { id: "zukan_master", cond: totalUnlockedFish >= FISH_DATA.length },
+
+        { id: "miss_master", cond: (playerData.missCount || 0) >= 50 },
+        { id: "thousand_catches", cond: grandTotalCatches >= 1000 },
+        { id: "comp_all_rods", cond: hasAllRods },
+        { id: "comp_all_nets", cond: hasAllNets },
+        { id: "ultra_rich", cond: playerData.gold >= 100000 }
     ];
 
     conditions.forEach(item => {
         if (item.cond && !playerData.achievements.includes(item.id)) {
             playerData.achievements.push(item.id);
             savePlayerData();
-            triggerAchievementToast(item.id);
+            enqueueAchievementToast(item.id);
         }
     });
 }
 
-function triggerAchievementToast(achId) {
+function enqueueAchievementToast(achId) {
+    achievementQueue.push(achId);
+    processAchievementQueue();
+}
+
+function processAchievementQueue() {
+    if (isToastShowing || achievementQueue.length === 0) return;
+
+    isToastShowing = true;
+    const achId = achievementQueue.shift();
     const ach = ACHIEVEMENT_DATA[achId];
-    if (!ach) return;
+
+    if (!ach) {
+        isToastShowing = false;
+        processAchievementQueue();
+        return;
+    }
 
     playSE('levelup');
 
@@ -962,13 +1157,19 @@ function triggerAchievementToast(achId) {
     document.getElementById('toast-name').innerText = ach.name;
 
     toast.classList.add('show');
+
     setTimeout(() => {
         toast.classList.remove('show');
+        
+        setTimeout(() => {
+            isToastShowing = false;
+            processAchievementQueue();
+        }, 500);
     }, 3500);
 }
 
 function resetAllData() {
-    const c1 = window.confirm("本当にすべてのデータを削除しますか？\n（レベル、ゴールド、購入した竿・網、図鑑記録、実績が全消去されます）");
+    const c1 = window.confirm("本当にすべてのデータを削除しますか？\n（レベル、ゴールド、購入した竿・網、図鑑記録、実績、プレイ時間が全消去されます）");
     if (c1) {
         const c2 = window.confirm("本当によろしいですか？この操作は取り消せません。");
         if (c2) {
@@ -979,7 +1180,10 @@ function resetAllData() {
                 level: 1, exp: 0, gold: 0, equippedRod: "wood",
                 ownedRods: ["wood"], equippedNet: "bug_net", ownedNets: ["bug_net"],
                 unlockedGachaMaps: [], totalCatches: 0, currentCombo: 0,
-                netCatches: 0, netCombo: 0, achievements: []
+                netCatches: 0, netCombo: 0, missCount: 0, achievements: [],
+                playTimeSeconds: 0,
+                hasSeenHowTo: false,
+                easyMode: false
             };
             savePlayerData();
             updateMenuUI();
@@ -1096,6 +1300,12 @@ function equipItem(type, key) {
 function openHowToPlay() {
     closeAllModals();
     document.getElementById('howto-modal').style.display = "flex";
+    if (!playerData.hasSeenHowTo) {
+        playerData.hasSeenHowTo = true;
+        savePlayerData();
+        const howtoBtn = document.getElementById('btn-howto');
+        if (howtoBtn) howtoBtn.classList.remove('highlight-howto');
+    }
 }
 
 function closeHowToPlay() {
@@ -1123,8 +1333,9 @@ function renderMapGrid() {
     Object.keys(MAP_DATA).forEach(locKey => {
         const map = MAP_DATA[locKey];
         let isUnlocked = playerData.level >= map.reqLevel;
+        
         if (map.gacha) {
-            isUnlocked = playerData.unlockedGachaMaps.includes(locKey);
+            isUnlocked = isUnlocked && playerData.unlockedGachaMaps.includes(locKey);
         }
 
         const isCurrent = currentLocation === locKey;
@@ -1136,7 +1347,8 @@ function renderMapGrid() {
             btn.innerText = `${map.name} ${map.gacha ? '(ガチャ)' : '(Lv.' + map.reqLevel + '〜)'}`;
             btn.onclick = () => selectLocation(locKey);
         } else {
-            btn.innerText = map.gacha ? `🔒 ${map.name} (ガチャ限定)` : `🔒 ${map.name} (要 Lv.${map.reqLevel})`;
+            let reqLabel = map.gacha ? `要 Lv.${map.reqLevel}＆ガチャ` : `要 Lv.${map.reqLevel}`;
+            btn.innerText = `🔒 ？？？ (${reqLabel})`;
         }
         grid.appendChild(btn);
     });
@@ -1227,13 +1439,26 @@ function renderZukanSubFilterUI() {
 
     let locations = [];
     if (currentZukanMainTab === 'normal') {
-        locations = ['all', 'sea', 'river', 'swamp', 'lake', 'snow', 'underground', 'deepsea'];
+        locations = ['all', 'sea', 'river', 'swamp', 'lake', 'snow', 'underground', 'deepsea', 'shinju'];
     } else {
-        locations = ['all', 'volcano', 'honey', 'holy', 'ryugu', 'ruins', 'poison', 'milkyway'];
+        locations = ['all', 'volcano', 'honey', 'holy', 'ryugu', 'ruins', 'poison', 'milkyway', 'eldorado'];
     }
 
     locations.forEach(loc => {
-        const name = loc === 'all' ? 'すべて' : (MAP_DATA[loc] ? MAP_DATA[loc].name : loc);
+        let name = "すべて";
+        if (loc !== 'all') {
+            const map = MAP_DATA[loc];
+            if (map) {
+                let isUnlocked = playerData.level >= map.reqLevel;
+                if (map.gacha) {
+                    isUnlocked = playerData.unlockedGachaMaps && playerData.unlockedGachaMaps.includes(loc);
+                }
+                name = isUnlocked ? map.name : "？？？";
+            } else {
+                name = loc;
+            }
+        }
+
         const btn = document.createElement('button');
         btn.className = `filter-btn ${currentFilter === loc ? 'active' : ''}`;
         btn.innerText = name;
@@ -1287,9 +1512,17 @@ function renderZukanGrid() {
     });
 
     listToDisplay.forEach(fish => {
-        const isUnlocked = caughtFish[fish.id] && caughtFish[fish.id].unlocked;
+        const fishRecord = caughtFish[fish.id];
+        const isUnlocked = fishRecord && fishRecord.unlocked;
         const card = document.createElement('div');
         card.className = `zukan-card ${isUnlocked ? 'discovered' : ''}`;
+        
+        if (isUnlocked && fishRecord.isNew) {
+            const badge = document.createElement('span');
+            badge.className = 'zukan-new-badge';
+            badge.innerText = 'NEW';
+            card.appendChild(badge);
+        }
 
         const img = document.createElement('img');
         if (isUnlocked) {
@@ -1342,6 +1575,12 @@ function openZukanDetail(fish) {
     const best = caughtFish[fish.id].bestTime.toFixed(3);
     time.innerText = `最速記録: ${best}秒`;
 
+    if (caughtFish[fish.id] && caughtFish[fish.id].isNew) {
+        caughtFish[fish.id].isNew = false;
+        localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
+        renderZukanGrid();
+    }
+
     modal.style.display = "flex";
 }
 
@@ -1358,7 +1597,7 @@ function closeZukan() {
 }
 
 /* ===================================================
-   効果音（SE）関連
+   効果音（SE）再生関数
    =================================================== */
 function playWaterPlop() {
     if (!soundEnabled || !audioCtx) return;
@@ -1436,19 +1675,67 @@ function playTone(freq, duration, type = 'square') {
 /* ===================================================
    ゲームメインループ・アクション処理
    =================================================== */
+function registerMiss() {
+    playerData.missCount = (playerData.missCount || 0) + 1;
+    savePlayerData();
+    checkAchievements();
+}
+
 function handleAction() {
     initAudio();
 
     if (gameState === 'READY') {
+        const equippedRod = playerData.equippedRod;
+        const equippedNet = playerData.equippedNet || 'bug_net';
+
+        // 深海エリア制限
         if (currentLocation === 'deepsea' && currentToolMode === 'rod') {
-            const rod = playerData.equippedRod;
-            if (rod !== 'bronze' && rod !== 'legend' && rod !== 'dragon_rod') {
+            if (equippedRod !== 'bronze' && equippedRod !== 'legend' && equippedRod !== 'dragon_rod') {
                 playSE('foul');
                 document.getElementById('status-text').innerText = "青銅の竿か伝説の竿が必要だ！";
                 document.getElementById('status-text').style.color = "#ff3333";
                 return;
             }
         }
+
+        // 黄金郷エリア制限
+        if (currentLocation === 'eldorado') {
+            if (currentToolMode === 'rod') {
+                if (equippedRod !== 'eldorado_rod' && equippedRod !== 'legend' && equippedRod !== 'dragon_rod') {
+                    playSE('foul');
+                    document.getElementById('status-text').innerText = "エルドラドロッドが必要だ！";
+                    document.getElementById('status-text').style.color = "#ff3333";
+                    return;
+                }
+            } else if (currentToolMode === 'net') {
+                if (equippedNet !== 'divine_net') {
+                    playSE('foul');
+                    document.getElementById('status-text').innerText = "神獣の網が必要だ！";
+                    document.getElementById('status-text').style.color = "#ff3333";
+                    return;
+                }
+            }
+        }
+
+        // 神獣界エリア制限
+        if (currentLocation === 'shinju') {
+            if (currentToolMode === 'rod') {
+                if (equippedRod !== 'god_beast_rod' && equippedRod !== 'dragon_rod') {
+                    playSE('foul');
+                    document.getElementById('status-text').innerText = "神獣の竿が必要だ！";
+                    document.getElementById('status-text').style.color = "#ff3333";
+                    return;
+                }
+            } else if (currentToolMode === 'net') {
+                if (equippedNet !== 'divine_net') {
+                    playSE('foul');
+                    document.getElementById('status-text').innerText = "神獣の網が必要だ！";
+                    document.getElementById('status-text').style.color = "#ff3333";
+                    return;
+                }
+            }
+        }
+
         startWaiting();
     } else if (gameState === 'WAITING') {
         foulAction();
@@ -1524,7 +1811,6 @@ function hideFishShadow() {
 
 function startWaiting() {
     gameState = 'WAITING';
-    
     currentTargetFish = getRandomFish();
 
     document.getElementById('status-text').innerText = "じっと待て……";
@@ -1542,14 +1828,15 @@ function startWaiting() {
     const currentMapObj = MAP_DATA[currentLocation];
     const equippedRod = playerData.equippedRod;
 
-    let isSlowWaiting = false;
+let isSlowWaiting = false;
     if (currentToolMode === 'rod' && currentMapObj && currentMapObj.gacha) {
         const reqRodKey = currentMapObj.matchRod;
-        if (equippedRod !== reqRodKey && equippedRod !== 'legend' && equippedRod !== 'dragon_rod') {
+        // ▼神獣の竿(god_beast_rod)を追加して、伝説の竿・龍神の竿と同等の待ち時間短縮を適用
+        if (equippedRod !== reqRodKey && equippedRod !== 'legend' && equippedRod !== 'dragon_rod' && equippedRod !== 'god_beast_rod') {
             isSlowWaiting = true;
         }
     }
-
+    
     const randomDelay = isSlowWaiting 
         ? Math.floor(Math.random() * 4000) + 8000
         : Math.floor(Math.random() * 3000) + 3000;
@@ -1572,7 +1859,11 @@ function startWaiting() {
             if (net === 'divine_net') timeBonus = 1.5;
         }
 
-        const limitTime = currentTargetFish.reqTime * timeBonus;
+        let rawReqTime = currentTargetFish.reqTime;
+        if (rawReqTime < 0.350) rawReqTime = 0.350;
+
+        let easyBonus = playerData.easyMode ? 0.350 : 0.0;
+        const limitTime = (rawReqTime * timeBonus) + easyBonus;
 
         clearTimeout(timeoutTimerId);
         timeoutTimerId = setTimeout(() => {
@@ -1587,7 +1878,7 @@ function startWaiting() {
                 } else {
                     playerData.netCombo = 0;
                 }
-                savePlayerData();
+                registerMiss();
                 showResult(false, currentTargetFish, limitTime + 0.1);
             }
         }, limitTime * 1000);
@@ -1608,7 +1899,8 @@ function foulAction() {
     } else {
         playerData.netCombo = 0;
     }
-    savePlayerData();
+    
+    registerMiss();
     document.getElementById('status-text').innerText = "早合わせ！逃げられた！";
     document.getElementById('status-text').style.color = "#ff3333";
 }
@@ -1631,10 +1923,16 @@ function hitAction() {
         if (net === 'divine_net') timeBonus = 1.5;
     }
 
-    const limitTime = currentTargetFish.reqTime * timeBonus;
+    let rawReqTime = currentTargetFish.reqTime;
+    if (rawReqTime < 0.350) rawReqTime = 0.350;
+
+    let easyBonus = playerData.easyMode ? 0.350 : 0.0;
+    const limitTime = (rawReqTime * timeBonus) + easyBonus;
 
     if (reactionTime <= limitTime) {
-        if (currentTargetFish.isBig) {
+        if (currentTargetFish.isBoss) {
+            startBossBattle(1);
+        } else if (currentTargetFish.isBig) {
             startBattle();
         } else {
             finishCatch(true);
@@ -1646,7 +1944,8 @@ function hitAction() {
         } else {
             playerData.netCombo = 0;
         }
-        savePlayerData();
+        
+        registerMiss();
         showResult(false, currentTargetFish, reactionTime);
     }
 }
@@ -1654,6 +1953,8 @@ function hitAction() {
 function startBattle() {
     gameState = 'BATTLE';
     battleGauge = 30;
+    updateStageBgm();
+
     document.getElementById('status-text').innerText = "叩け！叩け！叩け！";
     document.getElementById('status-text').style.color = "#ff2200";
     document.getElementById('mash-container').style.display = "flex";
@@ -1683,7 +1984,8 @@ function startBattle() {
             } else {
                 playerData.netCombo = 0;
             }
-            savePlayerData();
+            
+            registerMiss();
             showResult(false, currentTargetFish, reactionTime);
         }
         updateGaugeUI();
@@ -1692,7 +1994,12 @@ function startBattle() {
 
 function battleTap() {
     if (gameState !== 'BATTLE') return;
-    
+
+    if (isBossBattle) {
+        handleBossTap();
+        return;
+    }
+
     playSE('tap');
 
     let power = currentTargetFish.tapPower || 11;
@@ -1764,16 +2071,23 @@ function finishCatch(isSuccess) {
         savePlayerData();
         updateMenuUI();
 
-        if (!caughtFish[currentTargetFish.id] || reactionTime < caughtFish[currentTargetFish.id].bestTime) {
+        let isFirstGet = false;
+
+        if (!caughtFish[currentTargetFish.id]) {
+            isFirstGet = true;
             caughtFish[currentTargetFish.id] = {
                 unlocked: true,
-                bestTime: reactionTime
+                bestTime: reactionTime,
+                isNew: true
             };
+            localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
+        } else if (reactionTime < caughtFish[currentTargetFish.id].bestTime) {
+            caughtFish[currentTargetFish.id].bestTime = reactionTime;
             localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
         }
 
         checkAchievements();
-        showResult(true, currentTargetFish, reactionTime, earnedGold, earnedExp);
+        showResult(true, currentTargetFish, reactionTime, earnedGold, earnedExp, isFirstGet);
     }
 }
 
@@ -1796,8 +2110,9 @@ function closeLevelUpModal() {
     document.getElementById('levelup-modal').style.display = "none";
 }
 
-function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0) {
+function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirstGet = false) {
     gameState = 'RESULT';
+    updateStageBgm();
     const modal = document.getElementById('result-modal');
     const title = document.getElementById('result-title');
     const img = document.getElementById('result-img');
@@ -1805,6 +2120,7 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0) {
     const priceText = document.getElementById('result-price');
     const timeText = document.getElementById('result-time');
     const nextBtn = document.getElementById('next-btn');
+    const newBadge = document.getElementById('result-new-badge');
 
     img.style.animation = 'none';
     img.offsetHeight; 
@@ -1823,6 +2139,10 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0) {
         img.onerror = () => { img.src = fish.fallbackSvg; };
 
         timeText.innerText = `反応速度: ${time.toFixed(3)}秒`;
+
+        if (newBadge) {
+            newBadge.style.display = isFirstGet ? "inline-block" : "none";
+        }
     } else {
         title.innerText = "逃げられた…";
         title.style.color = "#ff3333";
@@ -1830,6 +2150,8 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0) {
         priceText.style.display = "none";
         img.style.display = "none";
         timeText.innerText = `反応速度: ${time.toFixed(3)}秒`;
+
+        if (newBadge) newBadge.style.display = "none";
     }
 
     modal.style.display = "block";
@@ -1864,8 +2186,229 @@ function closeResult() {
     }
 }
 
+function toggleGameDifficulty() {
+    playerData.easyMode = !playerData.easyMode;
+    savePlayerData();
+    updateDifficultyUI();
+    playWaterPlop();
+}
+
+function toggleUpdateBox() {
+    const content = document.getElementById('update-content');
+    const btn = document.getElementById('update-toggle-btn');
+    
+    if (content.style.display === "none") {
+        content.style.display = "block";
+        btn.innerText = "ー";
+    } else {
+        content.style.display = "none";
+        btn.innerText = "＋";
+    }
+}
+
+function updateDifficultyUI() {
+    const btn = document.getElementById('config-mode-btn');
+    if (btn) {
+        if (playerData.easyMode) {
+            btn.innerText = "モード: 簡単 (+0.35s)";
+            btn.style.background = "#0066aa";
+        } else {
+            btn.innerText = "モード: 標準";
+            btn.style.background = "#006644";
+        }
+    }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     initAudio();
     updateMenuUI();
+    updateSoundUI();
     checkAchievements();
+    startPlayTimeCounter();
 });
+
+/* ===================================================
+   神獣界 ボス専用バトルシステム
+   =================================================== */
+
+function startBossBattle(phase) {
+    gameState = 'BATTLE';
+    isBossBattle = true;
+    bossPhase = phase;
+    bossStep = 1;
+    timingCount = 0;
+
+    updateStageBgm();
+
+    const name = currentTargetFish.name;
+
+    if (name === "ミズチ") {
+        setupMashStep("【ターン " + bossPhase + "/2】画面を連打しろ！ (" + bossStep + "/3)");
+    } else if (name === "ゲンブ") {
+        setupTimingStep("【ターン " + bossPhase + "/2】「一閃」で捕まえろ！ (1/3)");
+    } else if (name === "リヴァイアタン") {
+        setupMashStep("【ターン " + bossPhase + "/2】連打で押し込め！");
+    }
+}
+
+function setupMashStep(titleText) {
+    battleGauge = 20;
+    document.getElementById('status-text').innerText = titleText;
+    document.getElementById('status-text').style.color = "#ff2200";
+    document.getElementById('mash-container').style.display = "flex";
+    document.getElementById('mash-title').innerText = titleText;
+    updateGaugeUI();
+
+    clearInterval(battleIntervalId);
+    battleIntervalId = setInterval(() => {
+        if (gameState !== 'BATTLE') return;
+        
+        let decay = bossPhase === 2 ? 2.5 : 1.8;
+        if (playerData.equippedRod === 'god_beast_rod') decay *= 0.6;
+
+        battleGauge -= decay;
+        if (battleGauge <= 0) {
+            failBossBattle();
+        }
+        updateGaugeUI();
+    }, 100);
+}
+
+function setupTimingStep(titleText) {
+    clearInterval(battleIntervalId);
+    document.getElementById('mash-container').style.display = "none";
+    document.getElementById('status-text').innerText = titleText;
+    document.getElementById('status-text').style.color = "#ffd700";
+
+    setTimeout(() => {
+        if (gameState !== 'BATTLE') return;
+        document.getElementById('exclamation').style.display = "block";
+        playSE('signal');
+        startTime = Date.now();
+
+        clearTimeout(timeoutTimerId);
+        timeoutTimerId = setTimeout(() => {
+            if (gameState === 'BATTLE') {
+                failBossBattle();
+            }
+        }, 450);
+    }, Math.random() * 1500 + 1000);
+}
+
+function handleBossTap() {
+    const name = currentTargetFish.name;
+
+    if (name === "ミズチ") {
+        playSE('tap');
+        battleGauge += (playerData.equippedRod === 'god_beast_rod') ? 15 : 10;
+        updateGaugeUI();
+
+        if (battleGauge >= 100) {
+            bossStep++;
+            if (bossStep <= 3) {
+                setupMashStep("【ターン " + bossPhase + "/2】画面を連打しろ！ (" + bossStep + "/3)");
+            } else {
+                advanceBossPhase();
+            }
+        }
+    } 
+    else if (name === "ゲンブ") {
+        if (document.getElementById('exclamation').style.display === "block") {
+            clearTimeout(timeoutTimerId);
+            document.getElementById('exclamation').style.display = "none";
+            const req = playerData.easyMode ? 0.40 + 0.35 : 0.40;
+            const react = (Date.now() - startTime) / 1000;
+
+            if (react <= req) {
+                playSE('success');
+                timingCount++;
+                if (timingCount < 3) {
+                    setupTimingStep("【ターン " + bossPhase + "/2】「一閃」で捕まえろ！ (" + (timingCount + 1) + "/3)");
+                } else {
+                    advanceBossPhase();
+                }
+            } else {
+                failBossBattle();
+            }
+        } else {
+            failBossBattle();
+        }
+    } 
+    else if (name === "リヴァイアタン") {
+        if (bossStep === 1 || bossStep === 3) {
+            playSE('tap');
+            let p = (bossStep === 3) ? 8 : 12;
+            if (playerData.equippedRod === 'god_beast_rod') p += 5;
+            
+            battleGauge += p;
+            updateGaugeUI();
+
+            if (battleGauge >= 100) {
+                bossStep++;
+                if (bossStep === 2) {
+                    setupTimingStep("【ターン " + bossPhase + "/2】一閃に合わせてタップ！");
+                } else if (bossStep === 3) {
+                    setupMashStep("【ターン " + bossPhase + "/2】限界を超えて超連打！");
+                } else {
+                    advanceBossPhase();
+                }
+            }
+        } else if (bossStep === 2) {
+            if (document.getElementById('exclamation').style.display === "block") {
+                clearTimeout(timeoutTimerId);
+                document.getElementById('exclamation').style.display = "none";
+                const req = playerData.easyMode ? 0.35 + 0.35 : 0.35;
+                const react = (Date.now() - startTime) / 1000;
+
+                if (react <= req) {
+                    playSE('success');
+                    bossStep = 3;
+                    setupMashStep("【ターン " + bossPhase + "/2】限界を超えて超連打！");
+                } else {
+                    failBossBattle();
+                }
+            } else {
+                failBossBattle();
+            }
+        }
+    }
+}
+
+function advanceBossPhase() {
+    clearInterval(battleIntervalId);
+    document.getElementById('mash-container').style.display = "none";
+    document.getElementById('exclamation').style.display = "none";
+
+    if (bossPhase === 1) {
+        playSE('foul');
+        document.getElementById('status-text').innerText = "ダメだ！まだ捕まえられない！";
+        document.getElementById('status-text').style.color = "#ff3333";
+
+        setTimeout(() => {
+            if (gameState === 'BATTLE') {
+                startBossBattle(2);
+            }
+        }, 1800);
+    } else {
+        isBossBattle = false;
+        finishCatch(true);
+    }
+}
+
+function failBossBattle() {
+    clearInterval(battleIntervalId);
+    clearTimeout(timeoutTimerId);
+    isBossBattle = false;
+    document.getElementById('mash-container').style.display = "none";
+    document.getElementById('exclamation').style.display = "none";
+    playSE('foul');
+
+    if (currentToolMode === 'rod') {
+        playerData.currentCombo = 0;
+    } else {
+        playerData.netCombo = 0;
+    }
+    
+    registerMiss();
+    showResult(false, currentTargetFish, 0.999);
+}

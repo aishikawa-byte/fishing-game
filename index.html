@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>爆釣一閃！おさかな一本勝負</title>
+    <!-- ファビコン（ブラウザアイコン）の設定 -->
+    <link rel="icon" href="images/favicon.png" type="image/x-icon">
+    <!-- スマホでWebアプリとして追加した時のアイコン（任意） -->
+    <link rel="apple-touch-icon" href="images/icon.png">
     <!-- 外部スタイルシートの読み込み -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -24,7 +28,7 @@
     <!-- タイトル画面 -->
     <div id="title-screen">
         <div id="main-logo">爆釣一閃！<br>おさかな一本勝負</div>
-        <div class="version-text">Ver 2.1.3</div>
+        <div class="version-text">Ver 2.2.17</div>
         <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
     </div>
 
@@ -50,19 +54,26 @@
             <div><strong>所持金:</strong> <span id="player-gold" style="color:#00ffcc; font-weight:bold;">0</span> G</div>
             <div><strong>装備中の竿:</strong> <span id="player-rod-name">木の竿</span></div>
             <div><strong>装備中の網:</strong> <span id="player-net-name">虫取り網</span></div>
+            <div><strong>プレイ時間:</strong> <span id="player-play-time" style="color:#ffcc00; font-weight:bold;">0時間00分</span></div>
+            <!-- ▼ 追加：釣獲数の表示 ▼ -->
+            <div style="margin-top: 4px; border-top: 1px dotted #555; padding-top: 4px; font-size: 11px;">
+                <div><strong>竿で釣った数:</strong> <span id="player-rod-catches" style="color:#ffd700; font-weight:bold;">0</span> 匹</div>
+                <div><strong>網で捕った数:</strong> <span id="player-net-catches" style="color:#ff99ff; font-weight:bold;">0</span> 匹</div>
+                <div><strong>捕獲総合計:</strong> <span id="player-total-catches" style="color:#00ffcc; font-weight:bold;">0</span> 匹</div>
+            </div>
         </div>
 
         <button class="menu-btn" onclick="startGameFromMenu()">釣りを始める</button>
-        <button class="menu-btn" style="background: rgba(100, 0, 120, 0.9); color:#ff66ff; border-color:#ff66ff;" onclick="openGachaScreen()">🎰 釣りガチャ</button>
+        <button class="menu-btn" onclick="openGachaScreen()">ガチャ</button>
         <button class="menu-btn" onclick="openShop()">道具屋 (ショップ)</button>
         <button class="menu-btn" onclick="openZukan()">おさかな絵巻 (図鑑)</button>
         <button class="menu-btn" onclick="openAchievements()">実績・称号</button>
-        <button class="menu-btn" onclick="openHowToPlay()">遊び方</button>
+        <button class="menu-btn" id="btn-howto" onclick="openHowToPlay()">遊び方</button>
     </div>
 
 <!-- ガチャ画面 -->
     <div id="gacha-screen">
-        <div class="gacha-title">🎰 釣りガチャ 🎰</div>
+        <div class="gacha-title">ガチャ</div>
         <div class="gacha-gold-text">所持金: <span id="gacha-gold">0</span> G</div>
         
         <!-- ▼ 矢印スタイルのシリーズ切替UI ▼ -->
@@ -75,7 +86,7 @@
         <div class="gacha-box-ui">
             <!-- 目玉商品のバナー画像表示エリア -->
             <img id="gacha-banner-img" class="gacha-banner-img" src="images/banner/banner_volcano.png" alt="ガチャバナー" onclick="zoomImage(this.src)">
-            <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 84%</div>
+            <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 82%</div>
         </div>
 
         <div style="display:flex; gap:10px; width:100%; justify-content:center; margin-bottom:8px;">
@@ -109,7 +120,7 @@
             </div>
 
             <div class="gacha-list-section">
-                <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール】(確率: 各 1%)</div>
+                <div class="gacha-list-sec-title" style="color:#00ffcc;">【専用特化ツール】(確率: 各 3%)</div>
                 <div class="gacha-list-item-group">
                     ・🔥 耐溶岩釣り竿<br>
                     ・🌿 ジャングルの釣り竿<br>
@@ -120,7 +131,7 @@
             </div>
 
             <div class="gacha-list-section">
-                <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計84%)</div>
+                <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計82%)</div>
                 <div class="gacha-list-item-group">
                     ・🥫 空き缶 (10 G)<br>
                     ・👞 長靴 (10 G)<br>
@@ -168,14 +179,41 @@
         <div style="width:100%; flex:1; overflow-y:auto; padding-right:4px;">
             <div class="config-row">
                 <span>サウンド出力</span>
-                <button class="btn" id="config-sound-btn" onclick="toggleSound()">音: ON</button>
+                <button class="btn sound-icon-btn" id="config-sound-btn" onclick="toggleSound()">
+                    <img id="config-sound-img" src="images/supika_o.png" alt="Sound">
+                </button>
             </div>
 
-            <!-- アップデート情報 -->
+            <div class="config-row">
+                <span>ゲーム難易度</span>
+                <button class="btn" id="config-mode-btn" style="background:#006644;" onclick="toggleGameDifficulty()">モード: 標準</button>
+            </div>
+
+            <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
-                <div class="update-box-title">📢 アプデ情報 (Ver 2.1.3)</div>
-                ・一部生き物の画像を修正しました。
-                
+                <div class="update-box-header" onclick="toggleUpdateBox()">
+                    <span class="update-box-title">📢 アプデ情報 (Ver 2.2.17)</span>
+                    <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
+                </div>
+                <div id="update-content" class="update-content" style="display: none;">
+                    ・アプリアイコンを追加しました。<br>
+                    ・音の有無アイコンを追加し、変更しました。<br>
+                    ・絵巻図鑑の背景を追加しました。<br>
+                    ・メインメニューにプレイ時間表示を追加しました。<br>
+                    ・メインメニューに何匹捕まえたかの表示を追加しました。<br>
+                    ・初めて捕まえた生き物には「NEW」が表示されるようになりました。<br>
+                    ・アップデート、追記載の欄にアコーディオン機能を追加しました。<br>
+                    ・「釣りを始める」ボタンの高さを調整しました。<br>
+                    ・遊び方に追記文章を追加しました。<br>
+                    ・２つ実績を解除した際、重複する不具合を修正しました。<br>
+                    ・設定のUIを調整しました。<br>
+                    ・データが初期状態（リセット）のとき、「遊び方」のボタンが目立つように改良しました。<br>
+                    ・未開放エリアを「？」で表示するようにしました。<br>
+                    ・「易しめ」モードが設定から選択できるようになりました。<br>
+                    ・新しいエリアを２つ追加しました。<br>
+                    ・新しいアイテムを１つ追加しました。<br>
+                    ・新しい実績を５つ追加しました。
+                </div>
             </div>
 
             <div class="config-row" style="border-bottom: none; flex-direction: column; align-items: flex-start; gap: 8px;">
@@ -206,8 +244,10 @@
     <!-- UI Header -->
     <div class="ui-header">
         <div class="ui-header-top">
-            <button class="btn" id="sound-btn" onclick="toggleSound()">音: ON</button>
-            
+        <button class="btn sound-icon-btn" id="sound-btn" onclick="toggleSound()">
+                <img id="header-sound-img" src="images/supika_o.png" alt="Sound">
+            </button>
+                        
             <div class="header-level-box">
                 <span>Lv.<span id="header-level">1</span> (<span id="header-exp-percent">0</span>%)</span>
                 <div class="level-bar-outer">
@@ -266,6 +306,9 @@
             上のボタンでいつでも切替可能！網モード時は網限定の小さな生き物や特殊水生生物が出現します！<br><br>
             ❹ <strong style="color:#00ffcc;">レベルUPで新エリア開放！</strong><br>
             生き物を獲ると経験値とお金が手に入り、レベルが上がると新しい釣り場や強力な道具が手に入ります。
+            <span style="font-size: 12px; color: #ffaaaa; display: block; margin-top: 6px; line-height: 1.5;">
+                ※通信回線が不安定な場合や、瞬発力に自信のない方は設定から「易しめ」モードへの切り替えがオススメです。
+            </span>
         </div>
         <button class="btn" style="padding: 8px 25px; font-size: 16px;" onclick="closeHowToPlay()">閉じる</button>
     </div>
@@ -286,16 +329,22 @@
     </div>
 
     <!-- リザルト modal -->
-    <div id="result-modal">
+<div id="result-modal">
         <h3 id="result-title">大物 GET!!</h3>
-        <img id="result-img" class="clickable-fish" src="" alt="Fish" onclick="zoomImage(this.src)">
+        
+        <div class="result-img-wrapper">
+            <!-- ▼ NEWバッジ ▼ -->
+            <div id="result-new-badge" class="result-new-badge" style="display: none;">NEW!</div>
+            <!-- ▼ 魚画像（alt属性も分かりやすく設定） ▼ -->
+            <img id="result-img" class="clickable-fish" src="" alt="獲得生物" onclick="zoomImage(this.src)">
+        </div>
+
         <div style="font-size: 12px; color: #aaa;">(タップで生物を拡大表示)</div>
         <div id="result-name" style="font-size: 22px; font-weight: bold; color:#fff; margin-top: 4px; margin-bottom: 4px;">---</div>
         <div id="result-price" style="font-size: 16px; color: #ffd700; font-weight: bold; margin-bottom: 4px;">+0 G 獲得！</div>
         <div id="result-time" style="font-size: 14px; color: #00ffcc; margin-bottom: 15px;">反応速度: 0.000秒</div>
         <button class="btn" id="next-btn" style="font-size: 16px; padding: 8px 20px;" onclick="closeResult()">次へ進む</button>
     </div>
-
     <!-- 図鑑 modal -->
     <div id="zukan-modal">
         <div class="zukan-header">

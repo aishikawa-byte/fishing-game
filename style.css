@@ -404,6 +404,25 @@ body {
     box-shadow: 0 2px 0 #000;
 }
 
+/* 初回・データリセット時の「遊び方」ボタン強調表示 */
+.menu-btn.highlight-howto {
+    background: #cc0000 !important;
+    color: #ffffff !important;
+    border: 3px double #00ffcc !important;
+    animation: howtoGlow 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes howtoGlow {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 5px #00ffcc, 0 4px 0 #000;
+    }
+    100% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px #00ffcc, 0 6px 0 #000;
+    }
+}
+
 /* ガチャ画面 */
 #gacha-screen {
     position: absolute;
@@ -497,7 +516,7 @@ body {
     cursor: zoom-in;
 }
 
-/* モーダル枠・オーバーレイ */
+/* モーダル枠・オーバーレイ共通 */
 #gacha-list-modal,
 #achievement-modal,
 #config-modal,
@@ -524,7 +543,82 @@ body {
     overflow: hidden;
 }
 
-/* ★遊び方（#howto-modal）のスクロールバー追加修正★ */
+/* ▼ 設定モーダルの外枠・余白調整 ▼ */
+#config-modal {
+    padding: 16px 14px; /* 上下16px、左右14pxの内側余白を確保 */
+}
+
+/* 設定画面内のスクロールコンテンツエリア（文字の枠かぶりを防止） */
+#config-modal > div:nth-child(2) {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 10px 4px 6px; /* 左右に内側余白を持たせて黄色枠との重なりを解消 */
+    margin-bottom: 8px;
+}
+
+/* 各設定行のレイアウト整列 */
+.config-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px; /* 左右に内側パディングを追加 */
+    border-bottom: 1px dotted #334455;
+    font-size: 14px;
+}
+
+/* アプデ情報ボックスの余白調整 */
+.update-box {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #d4af37;
+    padding: 8px 10px;
+    margin: 10px 0;
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #ddd;
+    border-radius: 4px;
+}
+
+.update-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+.update-box-title {
+    color: #ffd700;
+    font-family: 'Reggae One', cursive;
+    font-size: 13px;
+}
+
+.update-toggle-btn {
+    background: #223344;
+    color: #ffd700;
+    border: 1px solid #d4af37;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.update-content {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed #d4af37;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+/* 遊び方（#howto-modal）のスクロールバー設定 */
 #howto-modal > div:first-child {
     flex-shrink: 0;
     margin-bottom: 6px;
@@ -958,38 +1052,6 @@ body {
     100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-.config-row {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px dotted #334455;
-    font-size: 14px;
-}
-
-.update-box {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid #d4af37;
-    padding: 10px;
-    margin-top: 10px;
-    text-align: left;
-    font-size: 11px;
-    line-height: 1.5;
-    color: #ddd;
-    border-radius: 4px;
-}
-
-.update-box-title {
-    color: #ffd700;
-    font-family: 'Reggae One', cursive;
-    font-size: 13px;
-    margin-bottom: 6px;
-    border-bottom: 1px dashed #d4af37;
-    padding-bottom: 4px;
-}
-
 .map-grid {
     width: 100%;
     display: flex;
@@ -1046,6 +1108,37 @@ body {
     border-radius: 8px;
 }
 
+/* ▼ リザルト画面のNEW!バッジ演出 ▼ */
+.result-img-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 8px 0;
+}
+
+.result-new-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background: linear-gradient(135deg, #ff0055, #ff6600);
+    color: #ffffff;
+    font-family: 'Reggae One', cursive;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.9);
+    animation: resultNewBounce 0.6s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 10;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+@keyframes resultNewBounce {
+    0% { transform: scale(1) rotate(12deg); }
+    100% { transform: scale(1.15) rotate(18deg); }
+}
+
 #result-title {
     font-family: 'Reggae One', cursive;
     color: #ffd700;
@@ -1072,28 +1165,45 @@ body {
     100% { transform: scale(1.1) rotate(0deg); opacity: 1; }
 }
 
-/* 図鑑画面 */
+/* ===================================================
+   おさかな絵巻（図鑑）画面・巻物背景最適化
+   =================================================== */
+
+/* 図鑑モーダル全体 */
 #zukan-modal {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(5, 10, 20, 0.98);
-    border: 4px solid #d4af37;
+    background-image: url('images/bg/bg_zukan.png');
+    background-size: 100% 100%;
+    background-position: center;
+    border: none;
     display: none;
     flex-direction: column;
     z-index: 50;
-    padding: 10px;
+    /* 左右の巻物軸（木の部分）を避けるためのパディング調整 */
+    padding: 24px 32px 20px 32px;
 }
 
+/* 図鑑ヘッダー */
 .zukan-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #d4af37;
+    border-bottom: 2px solid #8b4513;
     padding-bottom: 6px;
     margin-bottom: 6px;
 }
 
+.zukan-header span {
+    font-family: 'Reggae One', cursive;
+    font-size: 20px;
+    color: #ffd700;
+    /* 明るい背景でも文字が浮かび上がるフチどり影 */
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+
+/* メインタブ */
 .zukan-main-tabs {
     display: flex;
     width: 100%;
@@ -1105,45 +1215,52 @@ body {
     flex: 1;
     padding: 6px;
     font-size: 12px;
-    background: #112233;
-    color: #aaa;
-    border: 2px solid #d4af37;
+    background: #2b1d0c;
+    color: #ddd;
+    border: 2px solid #8b4513;
     cursor: pointer;
     text-align: center;
     font-family: 'DotGothic16', sans-serif;
     border-radius: 4px;
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.5);
 }
 
 .zukan-main-tab.active {
     background: #8b0000;
     color: #ffd700;
     font-weight: bold;
+    border-color: #ffd700;
+    text-shadow: 1px 1px 0 #000;
 }
 
+/* 進捗バーコンテナ */
 .zukan-progress-container {
     width: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid #d4af37;
+    background: rgba(20, 10, 5, 0.85);
+    border: 2px solid #8b4513;
     padding: 6px 10px;
     margin-bottom: 6px;
     display: flex;
     flex-direction: column;
     gap: 4px;
     border-radius: 4px;
+    box-shadow: inset 0 0 5px #000;
 }
 
 .zukan-progress-text {
     font-size: 11px;
     color: #ffd700;
+    font-weight: bold;
     display: flex;
     justify-content: space-between;
+    text-shadow: 1px 1px 0 #000;
 }
 
 .zukan-progress-bar-outer {
     width: 100%;
     height: 10px;
-    background: #222;
-    border: 1px solid #fff;
+    background: #111;
+    border: 1px solid #d4af37;
     border-radius: 5px;
     overflow: hidden;
 }
@@ -1155,6 +1272,7 @@ body {
     transition: width 0.3s ease;
 }
 
+/* サブフィルターボタン */
 .zukan-filter {
     display: flex;
     flex-wrap: wrap;
@@ -1166,45 +1284,51 @@ body {
 .filter-btn {
     font-size: 10px;
     padding: 3px 6px;
-    background: #112233;
-    border: 1px solid #d4af37;
-    color: #aaa;
+    background: #2b1d0c;
+    border: 1px solid #8b4513;
+    color: #ccc;
     cursor: pointer;
     font-family: 'DotGothic16', sans-serif;
     border-radius: 3px;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
 }
 
 .filter-btn.active {
     background: #8b0000;
     color: #ffd700;
     font-weight: bold;
+    border-color: #ffd700;
+    text-shadow: 1px 1px 0 #000;
 }
 
+/* 図鑑カードグリッド */
 .zukan-grid {
     flex: 1;
     overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
-    padding-right: 2px;
+    padding-right: 4px;
 }
 
+/* 図鑑カード単体 */
 .zukan-card {
-    background: #111a24;
-    border: 2px dotted #334455;
+    background: rgba(15, 20, 30, 0.92);
+    border: 2px solid #554433;
     padding: 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.1s, border-color 0.1s;
-    border-radius: 4px;
+    transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
+    border-radius: 6px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
 
 .zukan-card.discovered {
     border-color: #d4af37;
-    background: #182218;
+    background: rgba(15, 35, 20, 0.95);
 }
 
 .zukan-card.discovered:active {
@@ -1217,6 +1341,7 @@ body {
     object-fit: contain;
     image-rendering: pixelated;
     margin-bottom: 4px;
+    filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.8));
 }
 
 .zukan-card-name {
@@ -1224,6 +1349,7 @@ body {
     font-weight: bold;
     text-align: center;
     color: #ffd700;
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
     word-break: break-all;
     line-height: 1.2;
 }
@@ -1339,4 +1465,55 @@ body {
     text-shadow: 1px 1px 2px #000;
     text-align: center;
     flex: 1;
+}
+
+/* ▼ メインメニューの「釣りを始める」ボタンの高さを個別に高く設定 ▼ */
+#menu-screen .menu-btn:first-of-type {
+    padding: 20px 22px; /* パディングを上下8pxから12pxへ拡大 */
+    font-size: clamp(17px, 4.2vw, 20px); /* 文字サイズも少し大きく */
+    margin-bottom: 8px; /* 下のボタンとの間隔を確保 */
+}
+
+/* サウンドアイコンボタン共通スタイル */
+.sound-icon-btn {
+    padding: 2px 6px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 30px;
+}
+
+.sound-icon-btn img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+/* ▼ 初獲得（NEW）バッジのスタイル ▼ */
+.zukan-card {
+    position: relative; /* バッジ位置調整用 */
+}
+
+.zukan-new-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    background: #ff0055;
+    color: #ffffff;
+    font-size: 8px;
+    font-weight: bold;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 4px rgba(255, 0, 85, 0.8);
+    animation: newBadgePulse 1s infinite alternate;
+    z-index: 5;
+    pointer-events: none;
+}
+
+@keyframes newBadgePulse {
+    0% { transform: scale(0.95); opacity: 0.85; }
+    100% { transform: scale(1.08); opacity: 1; }
 }
