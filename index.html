@@ -28,7 +28,7 @@
     <!-- タイトル画面 -->
     <div id="title-screen">
         <div id="main-logo">爆釣一閃！<br>おさかな一本勝負</div>
-        <div class="version-text">Ver 2.2.17</div>
+        <div class="version-text">Ver 2.2.18</div>
         <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
     </div>
 
@@ -99,9 +99,12 @@
             <button class="btn" onclick="closeGachaScreen()">メニューへ戻る</button>
         </div>
 
-        <div id="gacha-result-area" style="width:100%; display:none;">
-            <div style="font-family: 'Reggae One', cursive; font-size: 16px; color: #ffd700; text-shadow: 1px 1px 2px #000;">獲得結果 (タップで拡大)</div>
-            <div class="gacha-result-grid" id="gacha-result-grid"></div>
+        <div id="gacha-result-area" style="width:100%; display:none; margin-top: 10px;">
+            <div class="gacha-result-title">
+                <span>✨ 獲得結果 ✨</span>
+                <span class="gacha-result-sub">(タップで拡大)</span>
+            </div>
+        <div class="gacha-result-grid" id="gacha-result-grid"></div>
         </div>
     </div>
 
@@ -192,10 +195,14 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 2.2.17)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 2.2.18)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V2.2.18=====<br>
+                    ・ガチャ関連のUIを改良しました。
+                    <br>
+                    ==V2.2.17=====<br>
                     ・アプリアイコンを追加しました。<br>
                     ・音の有無アイコンを追加し、変更しました。<br>
                     ・絵巻図鑑の背景を追加しました。<br>

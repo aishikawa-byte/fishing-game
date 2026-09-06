@@ -885,6 +885,7 @@ function spinGacha(count) {
     if (!playerData.unlockedGachaMaps) playerData.unlockedGachaMaps = [];
     if (!playerData.ownedNets) playerData.ownedNets = ["bug_net"];
 
+    // ▼ ゴミアイテムの画像パス
     const TRASH_PATHS = {
         kan: "images/trash/trash_kan.png",
         kutu: "images/trash/trash_kutu.png",
@@ -892,6 +893,12 @@ function spinGacha(count) {
         ryuuboku: "images/trash/trash_ryuuboku.png",
         kire: "images/trash/trash_kire.png",
         kaisou: "images/trash/trash_kaisou.png"
+    };
+
+    // ▼ ゴールド（コイン）の画像パス（※画像ファイル名やフォルダ構成に合わせて変更してください）
+    const GOLD_PATHS = {
+        gold30: "images/gold/gold_30.png",
+        gold50: "images/gold/gold_50.png"
     };
 
     const currentSeries = GACHA_SERIES_LIST[currentGachaIndex];
@@ -926,8 +933,9 @@ function spinGacha(count) {
         { type: "trash", name: "🧹 ボロきれ (5 G)", icon: TRASH_PATHS.kire, amount: 5, weight: 14.0 },
         { type: "trash", name: "🌿 ワカメ (10 G)", icon: TRASH_PATHS.kaisou, amount: 10, weight: 14.0 },
 
-        { type: "gold", amount: 50, name: "💰 50 Gold", icon: "data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'gold\'/></svg>", weight: 5.5 },
-        { type: "gold", amount: 30, name: "💰 30 Gold", icon: "data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'gold\'/></svg>", weight: 5.5 }
+        // ▼ icon の部分をSVGから画像パスに変更 ▼
+        { type: "gold", amount: 50, name: "💰 50 Gold", icon: GOLD_PATHS.gold50, weight: 5.5 },
+        { type: "gold", amount: 30, name: "💰 30 Gold", icon: GOLD_PATHS.gold30, weight: 5.5 }
     ];
 
     const totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
@@ -982,13 +990,28 @@ function spinGacha(count) {
     updateMenuUI();
     document.getElementById('gacha-gold').innerText = playerData.gold;
 
+    // ガチャ結果カードの生成処理
     const grid = document.getElementById('gacha-result-grid');
     grid.innerHTML = "";
+    
     results.forEach(res => {
         const card = document.createElement('div');
-        card.className = `gacha-result-card ${res.isTrash ? 'trash' : ''}`;
+        
+        // レアリティ判定クラスの決定
+        let rarityClass = "";
+        if (res.isTrash) {
+            rarityClass = "trash";
+        } else if (res.name.includes("龍神") || res.name.includes("神獣") || res.name.includes("エルドラド")) {
+            rarityClass = "super-rare";
+        } else if (res.name.includes("エリア解放") || res.name.includes("竿") || res.name.includes("網")) {
+            rarityClass = "rare";
+        }
+
+        card.className = `gacha-result-card ${rarityClass}`;
+        
         const fallbackTrash = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='25' y='70' font-size='60' fill='gray'>🗑</text></svg>";
-        card.innerHTML = `<img src="${res.icon}" alt="Icon" onerror="this.src='${fallbackTrash}'" onclick="zoomImage('${res.icon}')"><div>${res.name}</div>`;
+        card.innerHTML = `<img src="${res.icon}" alt="Icon" onerror="this.src='${fallbackTrash}'" onclick="zoomImage('${res.icon}')"><div style="text-align:center; line-height:1.2;">${res.name}</div>`;
+        
         grid.appendChild(card);
     });
 
