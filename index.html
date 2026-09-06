@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- PWA用のマニフェストリンク追加 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a192f">
     <title>爆釣一閃！おさかな一本勝負</title>
     <!-- ファビコン（ブラウザアイコン）の設定 -->
     <link rel="icon" href="images/favicon.png" type="image/x-icon">
@@ -11,6 +14,18 @@
     <!-- 外部スタイルシートの読み込み -->
     <link rel="stylesheet" href="style.css">
 </head>
+<script>
+  // サービスワーカーの登録
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then((reg) => {
+        console.log('PWA Service Worker registered:', reg);
+      }).catch((err) => {
+        console.log('Service Worker registration failed:', err);
+      });
+    });
+  }
+</script>
 <body>
 
 <audio id="title-bgm" src="sounds/title.mp3" loop preload="auto"></audio>
