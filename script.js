@@ -630,6 +630,7 @@ function updateSoundUI() {
 }
 
 /* 音声のON/OFF切り替え */
+/* 音声のON/OFF切り替え（ステージBGMの消音漏れを完全修正） */
 function toggleSound() {
     soundEnabled = !soundEnabled;
     initAudio();
@@ -638,10 +639,27 @@ function toggleSound() {
         updateStageBgm();
         playWaterPlop();
     } else {
-        if (bgmFadeTimer) clearInterval(bgmFadeTimer);
-        if (bgmAudioPlayer) bgmAudioPlayer.pause();
+        // ① タイトルBGM(HTML要素)を即座に停止
         const htmlTitleAudio = document.getElementById('title-bgm');
-        if (htmlTitleAudio) htmlTitleAudio.pause();
+        if (htmlTitleAudio) {
+            htmlTitleAudio.pause();
+        }
+
+        // ② 現在再生中のBGM(currentBgm)を確実に完全停止
+        if (currentBgm) {
+            currentBgm.pause();
+        }
+
+        // ③ 予備のプレイヤーも停止
+        if (bgmAudioPlayer) {
+            bgmAudioPlayer.pause();
+        }
+
+        // ④ 進行中のフェードタイマーが存在すればすべてクリアして強制停止
+        if (bgmFadeTimer) {
+            clearInterval(bgmFadeTimer);
+            bgmFadeTimer = null;
+        }
     }
 
     updateSoundUI();
