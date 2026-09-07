@@ -43,7 +43,7 @@
     <!-- タイトル画面 -->
     <div id="title-screen">
         <div id="main-logo">爆釣一閃！<br>おさかな一本勝負</div>
-        <div class="version-text">Ver 2.2.19</div>
+        <div class="version-text">Ver 2.2.20</div>
         <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
     </div>
 
@@ -88,10 +88,15 @@
 
 <!-- ガチャ画面 -->
     <div id="gacha-screen">
+        <!-- ▼ 右上に配置する注意書きボタン（画像：images/tyuui.png） ▼ -->
+        <button id="btn-gacha-notice" class="gacha-notice-btn" onclick="openGachaNotice()">
+            <img src="images/tyuui.png" alt="注意" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'20\' y=\'75\' font-size=\'70\' fill=\'yellow\'>⚠️</text></svg>'">
+        </button>
+
         <div class="gacha-title">ガチャ</div>
         <div class="gacha-gold-text">所持金: <span id="gacha-gold">0</span> G</div>
         
-        <!-- ▼ 矢印スタイルのシリーズ切替UI ▼ -->
+        <!-- 矢印切替UI -->
         <div class="gacha-arrow-selector">
             <button class="gacha-arrow-btn" onclick="prevGachaSeries()">＜</button>
             <div id="gacha-series-title" class="gacha-series-title-text">🌋 火山ガチャ</div>
@@ -99,7 +104,6 @@
         </div>
 
         <div class="gacha-box-ui">
-            <!-- 目玉商品のバナー画像表示エリア -->
             <img id="gacha-banner-img" class="gacha-banner-img" src="images/banner/banner_volcano.png" alt="ガチャバナー" onclick="zoomImage(this.src)">
             <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 82%</div>
         </div>
@@ -119,8 +123,29 @@
                 <span>✨ 獲得結果 ✨</span>
                 <span class="gacha-result-sub">(タップで拡大)</span>
             </div>
-        <div class="gacha-result-grid" id="gacha-result-grid"></div>
+            <div class="gacha-result-grid" id="gacha-result-grid"></div>
         </div>
+    </div>
+
+    <!-- ▼ ガチャ注意書き modal ▼ -->
+<div id="gacha-notice-modal">
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚠️ ガチャの使い方と注意</div>
+        
+        <div style="width:100%; flex:1; min-height:0; overflow-y:auto; padding:0 8px; text-align:left; font-size:15px; line-height:1.8; color:#eee;">
+            ❶ <strong style="color:#ffd700;">ガチャのまわし方</strong><br>
+            お持ちのお金（G）を使って引くことができます。<br>
+            「1回（1000G）」または「10連（10000G）」が選べます。<br><br>
+            ❷ <strong style="color:#ff66ff;">矢印で「種類」を変えられます</strong><br>
+            画面上の矢印ボタン（＜ ＞）を押すと、ガチャの種類が変わります。<br>
+            種類ごとに当たる「新しい釣り場」や「特別な竿」が変わります。<br><br>
+            ❸ <strong style="color:#00ffcc;">当たりが出たらどうなる？</strong><br>
+            ・<strong style="color:#00ffcc;">新しい釣り場</strong>：上の「場所移動」ボタンを押すと、すぐに遊べるようになります。<br>
+            ・<strong style="color:#00ffcc;">特別な竿・網</strong>：「道具屋（ショップ）」に入ると、いつでも持っている道具を選べます。<br><br>
+            ❹ <strong style="color:#ff8888;">すでに持っている物が当たったとき</strong><br>
+            同じ釣り場や道具がもう一度当たった場合は、お返しとして自動的に 150 G がお金に戻されます。
+        </div>
+
+        <button class="btn" style="padding: 10px 35px; font-size: 16px; margin-top: 10px;" onclick="closeGachaNotice()">閉じる</button>
     </div>
 
     <!-- ガチャ景品一覧 modal -->
@@ -210,10 +235,12 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 2.2.19)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 2.2.20)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V2.2.20=====<br>
+                    ・ガチャ画面に注意書きボタンを追加しました。<br>
                     ==V2.2.19=====<br>
                     ・釣りゲーム中に音声がオフにできない問題を修正しました。<br>
                     ==V2.2.18=====<br>

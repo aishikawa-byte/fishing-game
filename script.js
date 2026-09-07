@@ -444,6 +444,7 @@ let playerData = JSON.parse(localStorage.getItem('retro_fishing_player_v1')) || 
     achievements: [],
     playTimeSeconds: 0,
     hasSeenHowTo: false,
+    hasSeenGachaNotice: false,
     easyMode: false
 };
 
@@ -729,7 +730,8 @@ function closeAllModals() {
     const ids = [
         'map-modal', 'zukan-modal', 'howto-modal', 'shop-screen', 
         'gacha-screen', 'gacha-list-modal', 'config-modal', 
-        'achievement-modal', 'zoom-modal', 'levelup-modal'
+        'achievement-modal', 'zoom-modal', 'levelup-modal',
+        'gacha-notice-modal' // ▼ 追加
     ];
     ids.forEach(id => {
         const el = document.getElementById(id);
@@ -1224,6 +1226,7 @@ function resetAllData() {
                 netCatches: 0, netCombo: 0, missCount: 0, achievements: [],
                 playTimeSeconds: 0,
                 hasSeenHowTo: false,
+                hasSeenGachaNotice: false,
                 easyMode: false
             };
             savePlayerData();
@@ -2452,4 +2455,47 @@ function failBossBattle() {
     
     registerMiss();
     showResult(false, currentTargetFish, 0.999);
+}
+
+function openGachaScreen() {
+    initAudio();
+    closeAllModals();
+    gameState = 'GACHA';
+    document.getElementById('menu-screen').style.display = "none";
+    document.getElementById('gacha-gold').innerText = playerData.gold;
+    document.getElementById('gacha-result-area').style.display = "none";
+    document.getElementById('gacha-screen').style.display = "flex";
+    
+    updateGachaSeriesUI();
+    updateGachaNoticeUI(); // ▼ 追加
+    updateStageBgm();
+    playWaterPlop();
+}
+
+function updateGachaNoticeUI() {
+    const btn = document.getElementById('btn-gacha-notice');
+    if (btn) {
+        if (!playerData.hasSeenGachaNotice) {
+            btn.classList.add('highlight-notice');
+        } else {
+            btn.classList.remove('highlight-notice');
+        }
+    }
+}
+
+/* ガチャ注意書きモーダルの開閉処理 */
+function openGachaNotice() {
+    // ※ closeAllModals() はガチャ画面自体も消してしまうため呼ばない
+    document.getElementById('gacha-notice-modal').style.display = "flex";
+    
+    if (!playerData.hasSeenGachaNotice) {
+        playerData.hasSeenGachaNotice = true;
+        savePlayerData();
+        updateGachaNoticeUI();
+    }
+    playWaterPlop();
+}
+
+function closeGachaNotice() {
+    document.getElementById('gacha-notice-modal').style.display = "none";
 }
