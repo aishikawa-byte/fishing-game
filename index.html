@@ -9,7 +9,7 @@
     <title>爆釣一閃！おさかな一本勝負</title>
     <!-- ファビコン（ブラウザアイコン）の設定 -->
     <link rel="icon" href="images/favicon.png" type="image/x-icon">
-    <!-- スマホでWebアプリとして追加した時のアイコン（任意） -->
+    <!-- スマホでWebアプリとして追加した時のアイコン -->
     <link rel="apple-touch-icon" href="images/icon.png">
     <!-- 外部スタイルシートの読み込み -->
     <link rel="stylesheet" href="style.css">
@@ -40,19 +40,27 @@
         </div>
     </div>
 
-    <!-- タイトル画面 -->
-    <div id="title-screen">
-        <div id="main-logo">爆釣一閃！<br>おさかな一本勝負</div>
-        <div class="version-text">Ver 2.2.20</div>
-        <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
-    </div>
+<!-- タイトル画面内 -->
+<div id="title-screen">
+    <!-- ▼ onclick を追加 ▼ -->
+    <div id="main-logo" onclick="onLogoTap()">爆釣一閃！<br>おさかな一本勝負</div>
+    <div class="version-text">Ver 2.3.0</div>
+    <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
+</div>
 
     <!-- メインメニュー画面 -->
     <div id="menu-screen">
-        <div class="config-icon-btn" onclick="openConfigModal()">
-            <img src="images/config.png" alt="Config" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'25\' y=\'70\' font-size=\'60\' fill=\'white\'>⚙</text></svg>'">
+        <!-- 右上アイコン群（左：ランキング / 右端：設定） -->
+        <div id="menu-clear-badge" class="menu-clear-badge" style="display: none;">★</div>
+        <div class="header-icon-btns">
+            <div class="ranking-icon-btn" onclick="openRankingModal()">
+                <img src="images/trophy/trophy_gold.png" alt="Ranking" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'25\' y=\'75\' font-size=\'60\' fill=\'gold\'>🏆</text></svg>'">
+            </div>
+            <div class="config-icon-btn" onclick="openConfigModal()">
+                <img src="images/config.png" alt="Config" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'25\' y=\'75\' font-size=\'60\' fill=\'white\'>⚙</text></svg>'">
+            </div>
         </div>
-
+        
         <div class="menu-title">メインメニュー</div>
         
         <div class="menu-status-box">
@@ -70,7 +78,6 @@
             <div><strong>装備中の竿:</strong> <span id="player-rod-name">木の竿</span></div>
             <div><strong>装備中の網:</strong> <span id="player-net-name">虫取り網</span></div>
             <div><strong>プレイ時間:</strong> <span id="player-play-time" style="color:#ffcc00; font-weight:bold;">0時間00分</span></div>
-            <!-- ▼ 追加：釣獲数の表示 ▼ -->
             <div style="margin-top: 4px; border-top: 1px dotted #555; padding-top: 4px; font-size: 11px;">
                 <div><strong>竿で釣った数:</strong> <span id="player-rod-catches" style="color:#ffd700; font-weight:bold;">0</span> 匹</div>
                 <div><strong>網で捕った数:</strong> <span id="player-net-catches" style="color:#ff99ff; font-weight:bold;">0</span> 匹</div>
@@ -78,6 +85,7 @@
             </div>
         </div>
 
+        <button class="menu-btn" style="background: #0066aa;" onclick="openEquipScreen()">装備・アイテム</button>
         <button class="menu-btn" onclick="startGameFromMenu()">釣りを始める</button>
         <button class="menu-btn" onclick="openGachaScreen()">ガチャ</button>
         <button class="menu-btn" onclick="openShop()">道具屋 (ショップ)</button>
@@ -86,9 +94,8 @@
         <button class="menu-btn" id="btn-howto" onclick="openHowToPlay()">遊び方</button>
     </div>
 
-<!-- ガチャ画面 -->
+    <!-- ガチャ画面 -->
     <div id="gacha-screen">
-        <!-- ▼ 右上に配置する注意書きボタン（画像：images/tyuui.png） ▼ -->
         <button id="btn-gacha-notice" class="gacha-notice-btn" onclick="openGachaNotice()">
             <img src="images/tyuui.png" alt="注意" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'20\' y=\'75\' font-size=\'70\' fill=\'yellow\'>⚠️</text></svg>'">
         </button>
@@ -96,7 +103,6 @@
         <div class="gacha-title">ガチャ</div>
         <div class="gacha-gold-text">所持金: <span id="gacha-gold">0</span> G</div>
         
-        <!-- 矢印切替UI -->
         <div class="gacha-arrow-selector">
             <button class="gacha-arrow-btn" onclick="prevGachaSeries()">＜</button>
             <div id="gacha-series-title" class="gacha-series-title-text">🌋 火山ガチャ</div>
@@ -127,8 +133,8 @@
         </div>
     </div>
 
-    <!-- ▼ ガチャ注意書き modal ▼ -->
-<div id="gacha-notice-modal">
+    <!-- ガチャ注意書き modal -->
+    <div id="gacha-notice-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚠️ ガチャの使い方と注意</div>
         
         <div style="width:100%; flex:1; min-height:0; overflow-y:auto; padding:0 8px; text-align:left; font-size:15px; line-height:1.8; color:#eee;">
@@ -149,7 +155,7 @@
     </div>
 
     <!-- ガチャ景品一覧 modal -->
-    <div id="gacha-list-modal">
+    <div id="gacha-list-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">🎰 ガチャ景品ラインナップ 🎰</div>
 
         <div class="gacha-list-scroll-area">
@@ -198,7 +204,7 @@
     </div>
 
     <!-- 実績・称号 modal -->
-    <div id="achievement-modal">
+    <div id="achievement-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 8px; flex-shrink: 0;">実績・称号</div>
         
         <div class="achievement-progress-container">
@@ -216,7 +222,7 @@
     </div>
 
     <!-- 設定 modal -->
-    <div id="config-modal">
+    <div id="config-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">設定</div>
         
         <div style="width:100%; flex:1; overflow-y:auto; padding-right:4px;">
@@ -232,13 +238,31 @@
                 <button class="btn" id="config-mode-btn" style="background:#006644;" onclick="toggleGameDifficulty()">モード: 標準</button>
             </div>
 
+            <div class="config-row">
+                <span>振動・バイブ</span>
+                <button class="btn" id="config-vibe-btn" style="background:#006644;" onclick="toggleVibration()">バイブ: ON</button>
+            </div>
+            
+            <div class="config-row" style="border-top: 1px dashed #444; padding-top: 10px; margin-top: 10px;">
+                <span style="color:#ffcc00;">隠しコマンド</span>
+                <button class="btn" style="background:#6600cc; font-size:12px;" onclick="openCheatPrompt()">コード入力</button>
+            </div>
+
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 2.2.20)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 2.3.0)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V2.3.0======<br>
+                    ・新しい実績を追加しました。<br>
+                    ・タイトル画面が時刻によって変更するようになりました。<br>
+                    ・メインメニューに装備画面を追加しました。<br>
+                    ・特殊な２つのエリアで伝説の竿の使用ができなくなりました。<br>
+                    ・設定にバイブレーション機能を追加しました。<br>
+                    ・メインメニューにランキング機能を追加しました。<br>
+                    ・設定に隠しコマンド機能を追加しました。<br>
                     ==V2.2.20=====<br>
                     ・ガチャ画面に注意書きボタンを追加しました。<br>
                     ==V2.2.19=====<br>
@@ -286,6 +310,7 @@
         <div class="shop-tab-group">
             <button class="shop-tab-btn active" id="shop-tab-rod" onclick="switchShopTab('rod')">🎣 釣り竿</button>
             <button class="shop-tab-btn" id="shop-tab-net" onclick="switchShopTab('net')">🕸 捕獲ネット</button>
+            <button class="shop-tab-btn" id="shop-tab-acc" onclick="switchShopTab('acc')">🎒 アクセサリ</button>
         </div>
 
         <div class="shop-list" id="shop-list"></div>
@@ -294,7 +319,7 @@
     <!-- UI Header -->
     <div class="ui-header">
         <div class="ui-header-top">
-        <button class="btn sound-icon-btn" id="sound-btn" onclick="toggleSound()">
+            <button class="btn sound-icon-btn" id="sound-btn" onclick="toggleSound()">
                 <img id="header-sound-img" src="images/supika_o.png" alt="Sound">
             </button>
                         
@@ -345,7 +370,7 @@
     </div>
 
     <!-- 遊び方 modal -->
-    <div id="howto-modal">
+    <div id="howto-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 24px; color: #ffd700; margin-bottom: 14px;">遊び方</div>
         <div style="font-size: 15px; line-height: 1.8; text-align: left; margin-bottom: 20px; color: #fff;">
             ❶ <strong style="color:#ffd700;">画面タップで道具を準備！</strong><br>
@@ -364,7 +389,7 @@
     </div>
 
     <!-- レベルアップ modal -->
-    <div id="levelup-modal">
+    <div id="levelup-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 32px; color: #ffd700; text-shadow: 3px 3px 0 #8b0000; margin-bottom: 8px;">LEVEL UP!!</div>
         <div id="levelup-text" style="font-size: 20px; color: #fff; font-weight: bold; margin-bottom: 10px;">釣りレベルが 2 に上がった！</div>
         <div id="levelup-unlock-text" style="font-size: 15px; color: #00ffcc; margin-bottom: 20px;">🌊 新エリア「川」が解放されました！</div>
@@ -372,20 +397,18 @@
     </div>
 
     <!-- マップ選択 modal -->
-    <div id="map-modal">
+    <div id="map-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">釣り場を選択</div>
         <div class="map-grid" id="map-grid"></div>
         <button class="btn" style="margin-top: 12px; padding: 6px 20px; flex-shrink: 0;" onclick="closeMapModal()">閉じる</button>
     </div>
 
     <!-- リザルト modal -->
-<div id="result-modal">
+    <div id="result-modal" class="modal">
         <h3 id="result-title">大物 GET!!</h3>
         
         <div class="result-img-wrapper">
-            <!-- ▼ NEWバッジ ▼ -->
             <div id="result-new-badge" class="result-new-badge" style="display: none;">NEW!</div>
-            <!-- ▼ 魚画像（alt属性も分かりやすく設定） ▼ -->
             <img id="result-img" class="clickable-fish" src="" alt="獲得生物" onclick="zoomImage(this.src)">
         </div>
 
@@ -395,8 +418,9 @@
         <div id="result-time" style="font-size: 14px; color: #00ffcc; margin-bottom: 15px;">反応速度: 0.000秒</div>
         <button class="btn" id="next-btn" style="font-size: 16px; padding: 8px 20px;" onclick="closeResult()">次へ進む</button>
     </div>
+
     <!-- 図鑑 modal -->
-    <div id="zukan-modal">
+    <div id="zukan-modal" class="modal">
         <div class="zukan-header">
             <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">おさかな絵巻</span>
             <div>
@@ -425,7 +449,7 @@
     </div>
 
     <!-- 図鑑詳細モーダル -->
-    <div id="zukan-detail-modal">
+    <div id="zukan-detail-modal" class="modal">
         <div id="zukan-detail-title">---</div>
         <img id="zukan-detail-img" src="" alt="Fish Detail" onclick="zoomImage(this.src)">
         <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">(タップで生物を拡大表示)</div>
@@ -438,6 +462,85 @@
     <!-- 画像単体拡大モーダル -->
     <div id="zoom-modal" onclick="closeZoomModal()">
         <img id="zoom-img" src="" alt="Zoomed Item">
+    </div>
+</div>
+
+<!-- ランキング modal -->
+<div id="ranking-modal" class="modal">
+    <div class="modal-content">
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚡ 最速反応速度ランキング ⚡</div>
+        
+        <div style="width:100%; flex:1; overflow-y:auto; padding: 4px;">
+            <div id="ranking-list" class="ranking-list">
+                <!-- JSで動的生成 -->
+            </div>
+        </div>
+
+        <button class="btn" style="margin-top: 10px; padding: 6px 25px; font-size: 15px;" onclick="closeRankingModal()">閉じる</button>
+    </div>
+</div>
+
+<!-- 装備画面 modal -->
+<div id="equip-screen" class="modal">
+    <div class="modal-content equip-modal-content">
+        <div class="equip-header">
+            <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">装備変更</span>
+            <button class="btn" onclick="closeEquipScreen()">閉じる</button>
+        </div>
+
+        <!-- 画面中央：２分割レイアウト（竿側 / 網側） -->
+        <div class="equip-main-container">
+            <!-- 竿エリア -->
+            <div class="equip-column">
+                <div class="equip-column-title">🎣 釣り竿</div>
+                <div class="equip-slot-box" onclick="openEquipSelectModal('rod')">
+                    <img id="equip-rod-img" src="" alt="竿">
+                    <span id="equip-rod-name">未装備</span>
+                </div>
+                <!-- 竿用アクセサリ枠 -->
+                <div class="equip-acc-container">
+                    <div class="equip-acc-slot" onclick="openEquipSelectModal('rodAcc')">
+                        <img id="equip-rodAcc-img" src="" style="display:none;">
+                        <span id="equip-rodAcc-name">枠<br>(釣り糸等)</span>
+                    </div>
+                    <div class="equip-acc-slot" onclick="openEquipSelectModal('bait')">
+                        <img id="equip-bait-img" src="" style="display:none;">
+                        <span id="equip-bait-name">枠<br>(まき餌)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="equip-divider"></div>
+
+            <!-- 網エリア -->
+            <div class="equip-column">
+                <div class="equip-column-title">🕸 捕獲ネット</div>
+                <div class="equip-slot-box" onclick="openEquipSelectModal('net')">
+                    <img id="equip-net-img" src="" alt="網">
+                    <span id="equip-net-name">未装備</span>
+                </div>
+                <!-- 網用アクセサリ枠 -->
+                <div class="equip-acc-container">
+                    <div class="equip-acc-slot" onclick="openEquipSelectModal('netAcc')">
+                        <img id="equip-netAcc-img" src="" style="display:none;">
+                        <span id="equip-netAcc-name">枠<br>(補強ネット等)</span>
+                    </div>
+                    <div class="equip-acc-slot" onclick="openEquipSelectModal('netReel')">
+                        <img id="equip-netReel-img" src="" style="display:none;">
+                        <span id="equip-netReel-name">枠<br>(定置網等)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 装備選択ポップアップ modal -->
+<div id="equip-select-modal" class="modal">
+    <div class="modal-content">
+        <div id="equip-select-title" style="font-family: 'Reggae One', cursive; font-size: 18px; color: #ffd700; margin-bottom: 10px;">所持一覧</div>
+        <div id="equip-select-list" class="equip-select-list"></div>
+        <button class="btn" style="margin-top: 10px; padding: 6px 20px;" onclick="closeEquipSelectModal()">閉じる</button>
     </div>
 </div>
 
