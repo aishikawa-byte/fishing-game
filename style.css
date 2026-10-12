@@ -613,7 +613,11 @@ body {
 #map-modal,
 #howto-modal,
 #zukan-detail-modal,
-#gacha-notice-modal {
+#gacha-notice-modal,
+#mission-modal,
+#zukan-area-modal,
+#ng-prize-modal,
+#clear-modal {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -1859,4 +1863,493 @@ body {
     align-items: center;
     justify-content: center;
     letter-spacing: 1px;
+}
+
+/* ===== Ver 2.4.0 ===== */
+.tagline { font-size: 12px; color: #cfe8ff; text-shadow: 1px 1px 0 #000; margin: -4px 0 10px; text-align: center; line-height: 1.6; }
+.menu-row { display: flex; gap: 6px; width: 85%; max-width: 280px; }
+.menu-row .menu-btn { width: 50%; margin: 3px 0; padding: 8px 2px; font-size: clamp(11px, 3.2vw, 13px); }
+.btn-home { background: #0a5a8a; border-color: #ffd700; }
+.btn-home.pulse { animation: homePulse 1s infinite alternate; }
+@keyframes homePulse { from { box-shadow: 0 0 0 0 rgba(255,215,0,.9); } to { box-shadow: 0 0 10px 4px rgba(255,215,0,.9); } }
+
+#weather-layer { position: absolute; inset: 0; pointer-events: none; z-index: 3; transition: background .8s; }
+#weather-layer.w-rain { background: linear-gradient(rgba(20,40,80,.35), rgba(20,40,80,.35)), repeating-linear-gradient(105deg, rgba(180,210,255,.35) 0 1px, transparent 1px 14px); background-size: auto, 100px 100px; animation: rainMove .35s linear infinite; }
+@keyframes rainMove { to { background-position: 0 0, -30px 100px; } }
+#weather-layer.w-fog { background: rgba(230,240,255,.14); }
+#weather-layer.w-sunset { background: linear-gradient(rgba(255,120,40,.28), rgba(255,60,90,.2)); }
+
+#status-hud { position: absolute; top: 104px; left: 6px; z-index: 21; display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.hud-chip { font-size: 11px; background: rgba(0,0,0,.75); border: 1px solid #d4af37; border-radius: 10px; padding: 2px 8px; color: #fff; width: fit-content; }
+.hud-chip.combo { color: #ffb347; }
+.hud-chip.frenzy { color: #ff0; border-color: #ff0; animation: pulse .4s infinite alternate; }
+
+#tutorial-banner { display: none; position: absolute; top: 108px; left: 50%; transform: translateX(-50%); width: 92%; z-index: 23; background: rgba(0,60,100,.92); border: 2px solid #7fd0ff; border-radius: 8px; padding: 8px 10px; font-size: 12px; line-height: 1.5; text-align: center; pointer-events: none; }
+#wait-tip { display: none; max-width: 90%; margin-top: 10px; font-size: 11px; color: #cfe; background: rgba(0,0,0,.6); border-radius: 6px; padding: 5px 8px; z-index: 10; line-height: 1.5; }
+#omen-layer { display: none; z-index: 11; font-size: clamp(14px, 4.5vw, 18px); color: #fff; background: rgba(0,0,0,.7); border: 2px solid #7fd0ff; border-radius: 6px; padding: 6px 12px; margin-bottom: 8px; }
+#omen-layer.on { display: block; }
+#omen-layer.big { color: #ff6; border-color: #f33; box-shadow: 0 0 14px #f33; animation: pulse .25s infinite alternate; }
+
+#catch-slots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 15; pointer-events: none; }
+#catch-slots .slot { width: 42px; height: 42px; background: rgba(0,0,0,.7); border: 2px solid #d4af37; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #888; font-size: 18px; }
+#catch-slots .slot img { width: 34px; height: 34px; object-fit: contain; image-rendering: pixelated; }
+#catch-slots.reach .slot:not(.empty) { border-color: #ff3; box-shadow: 0 0 10px #ff3; }
+
+#result-rank { font-size: 16px; font-weight: bold; color: #ffee55; min-height: 0; }
+#result-bonus { font-size: 12px; color: #9fe; line-height: 1.6; margin-bottom: 8px; }
+#result-img.silhouette { filter: brightness(0) opacity(.55); pointer-events: none; }
+
+.float-text { position: absolute; left: 50%; top: 45%; transform: translateX(-50%); z-index: 90; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 0 #000; pointer-events: none; white-space: nowrap; animation: floatUp 1.5s ease-out forwards; }
+.float-text.big { font-size: 26px; font-family: 'Reggae One', cursive; }
+@keyframes floatUp { from { opacity: 1; margin-top: 0; } to { opacity: 0; margin-top: -90px; } }
+#game-container.shake { animation: shakeAnim .4s; }
+@keyframes shakeAnim { 0%,100% { transform: translate(0,0); } 20% { transform: translate(-5px,3px); } 40% { transform: translate(5px,-3px); } 60% { transform: translate(-4px,-2px); } 80% { transform: translate(4px,2px); } }
+
+.mission-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: rgba(255,255,255,.07); border: 1px solid #556; border-radius: 6px; padding: 8px; margin-bottom: 8px; text-align: left; font-size: 13px; }
+.mission-sub { font-size: 11px; color: #ffd700; margin-top: 2px; }
+.ng-chip { display: inline-block; margin: 3px; padding: 4px 8px; border-radius: 12px; background: #223; border: 1px solid #99a; font-size: 13px; }
+.ng-chip.hot { border-color: #ffd700; color: #ffd700; box-shadow: 0 0 8px #ffd700; }
+
+@media (prefers-reduced-motion: reduce) {
+    #game-container.shake, #weather-layer.w-rain, #omen-layer.big, .btn-home.pulse, .hud-chip.frenzy { animation: none; }
+}
+
+
+/* ===== 視認性の改善 (v2.4.1) ===== */
+.tagline { display: inline-block; font-size: 13px; color: #fff; background: rgba(5, 12, 28, .82); border: 1px solid rgba(212,175,55,.8); border-radius: 8px; padding: 6px 12px; margin: 0 0 12px; text-shadow: 1px 1px 0 #000, 0 0 4px #000; }
+.menu-row { align-items: stretch; }
+.menu-row .menu-btn { white-space: nowrap; font-size: 12px; padding: 8px 2px; min-height: 36px; }
+#tutorial-banner { background: rgba(2, 24, 48, .97); border-color: #ffd700; font-size: 13px; color: #fff; text-shadow: 1px 1px 0 #000; box-shadow: 0 3px 10px rgba(0,0,0,.7); }
+#wait-tip { background: rgba(0, 0, 0, .88); border: 1px solid #5a7; color: #fff; font-size: 12px; text-shadow: 1px 1px 0 #000; }
+#omen-layer { background: rgba(0, 0, 0, .9); text-shadow: 1px 1px 0 #000; }
+.hud-chip { background: rgba(0, 0, 0, .9); text-shadow: 1px 1px 0 #000; font-size: 12px; }
+.float-text { text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000; }
+#catch-slots .slot { background: rgba(0, 0, 0, .88); }
+#result-rank, #result-bonus { text-shadow: 1px 1px 0 #000; }
+#result-bonus { background: rgba(0,0,0,.45); border-radius: 6px; padding: 4px 6px; }
+#result-bonus:empty { display: none; padding: 0; }
+
+#result-rank { margin: 2px 0 4px; }
+#result-rank:empty { display: none; }
+.float-text { font-family: 'DotGothic16', sans-serif; }
+
+#menu-screen .menu-row .menu-btn:nth-of-type(n) { width: 50%; margin: 3px 0; padding: 8px 2px; font-size: 12px; white-space: nowrap; min-height: 38px; }
+
+
+/* ===== 魚影（紺色シルエット） ===== */
+#fish-shadow.navy-shadow {
+    background-color: transparent !important;
+    filter: brightness(0) invert(10%) sepia(100%) saturate(2200%) hue-rotate(205deg) brightness(.55) drop-shadow(0 0 3px rgba(70, 120, 220, .6));
+    opacity: .9;
+}
+
+/* ===== キーボード操作：選択中のボタン表示 ===== */
+body.kb-mode .kb-focus {
+    outline: 3px solid #ffffff !important;
+    outline-offset: -3px;
+    box-shadow: 0 0 0 3px #ffd700, 0 0 16px 6px rgba(255, 215, 0, .9), inset 0 0 12px rgba(255, 255, 255, .55) !important;
+    filter: brightness(1.4) saturate(1.2);
+    animation: kbGlow .7s infinite alternate;
+}
+@keyframes kbGlow { from { box-shadow: 0 0 0 3px #ffd700, 0 0 8px 3px rgba(255,215,0,.7), inset 0 0 8px rgba(255,255,255,.4); } to { box-shadow: 0 0 0 3px #ffd700, 0 0 20px 8px rgba(255,215,0,1), inset 0 0 14px rgba(255,255,255,.7); } }
+@media (prefers-reduced-motion: reduce) { body.kb-mode .kb-focus { animation: none; } }
+
+/* ===== 天気アイコン ===== */
+.weather-icon { vertical-align: middle; image-rendering: pixelated; object-fit: contain; }
+.float-text .weather-icon { filter: drop-shadow(1px 1px 0 #000); }
+
+
+/* ===================================================
+   Ver 2.6.0
+   =================================================== */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+button { -webkit-appearance: none; appearance: none; font-family: inherit; }
+@supports (-webkit-touch-callout: none) {
+    body { min-height: -webkit-fill-available; }
+    #game-container { height: -webkit-fill-available; }
+}
+
+/* ---- メインメニュー（iPhoneなど小さい画面でもはみ出さない） ---- */
+#menu-screen { justify-content: flex-start; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: max(14px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom)); }
+#menu-screen > .menu-title { margin-top: auto; flex-shrink: 0; }
+#menu-screen > .menu-howto { margin-bottom: auto; }
+#menu-screen > * { flex-shrink: 0; }
+.menu-status-box { width: 90%; max-width: 310px; padding: 8px 12px; box-sizing: border-box; }
+.menu-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+#menu-screen .menu-btn.menu-main:nth-of-type(n) { width: 90%; max-width: 310px; padding: 13px 10px; font-size: clamp(16px, 4.6vw, 19px); margin: 4px 0 8px; box-sizing: border-box; }
+.menu-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(4, auto); grid-template-columns: 1fr 1fr; gap: 8px; width: 90%; max-width: 310px; margin-bottom: 8px; }
+#menu-screen .menu-grid .menu-btn:nth-of-type(n) { width: 100%; max-width: none; margin: 0; padding: 10px 4px; font-size: clamp(12px, 3.5vw, 14px); min-height: 44px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; text-align: center; word-break: keep-all; overflow-wrap: anywhere; }
+#menu-screen .menu-btn.menu-howto:nth-of-type(n) { width: 90%; max-width: 310px; padding: 9px 10px; font-size: 14px; margin: 0 0 auto; box-sizing: border-box; }
+@media (max-height: 720px) {
+    .menu-title { font-size: 20px; padding: 4px 14px; margin-bottom: 6px; }
+    .menu-status-box { padding: 6px 10px; margin-bottom: 6px; font-size: 12px; }
+    #menu-screen .menu-btn.menu-main:nth-of-type(n) { padding: 10px; margin: 2px 0 6px; }
+    #menu-screen .menu-grid .menu-btn:nth-of-type(n) { min-height: 38px; padding: 7px 4px; }
+    .menu-grid { gap: 6px; margin-bottom: 6px; }
+}
+#gacha-screen { padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+#shop-screen, #equip-screen { padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+.btn, .menu-btn { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* ---- 黄金色の枠を内容に合わせた高さに ---- */
+#result-modal { padding: 12px 14px; width: 84%; max-width: 330px; box-sizing: border-box; }
+#result-modal h3 { font-size: 20px; margin: 0 0 2px; }
+#result-img { max-height: 96px; max-width: 70%; object-fit: contain; }
+.result-img-wrapper { margin: 4px 0; }
+#result-name { font-size: 19px !important; margin: 2px 0 !important; }
+#result-price { font-size: 15px !important; margin-bottom: 2px !important; }
+#result-bonus { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 4px 0 6px; background: none; padding: 0; }
+#result-bonus:empty { display: none; }
+.chip { font-size: 11px; background: rgba(255,255,255,.12); border: 1px solid #886; border-radius: 10px; padding: 1px 7px; color: #fff; text-shadow: 1px 1px 0 #000; }
+#result-time { font-size: 12px !important; margin-bottom: 8px !important; }
+#result-rank { font-size: 15px; }
+#levelup-modal { padding: 12px 16px; width: 80%; max-width: 300px; box-sizing: border-box; }
+#levelup-modal > div:first-child { font-size: 26px !important; margin-bottom: 4px !important; }
+#levelup-text { font-size: 16px !important; margin-bottom: 6px !important; }
+#levelup-unlock-text { font-size: 13px !important; margin-bottom: 10px !important; }
+#mission-modal, #zukan-area-modal, #howto-modal, #gacha-notice-modal { height: auto; max-height: 82%; padding: 12px 10px; box-sizing: border-box; }
+#mission-modal { width: 86%; max-width: 340px; }
+#mission-list { flex: none !important; max-height: 46vh; padding: 0 6px; box-sizing: border-box; }
+#zukan-detail-modal { height: auto; max-height: 88%; padding: 12px 10px; box-sizing: border-box; }
+#zukan-detail-desc { max-height: 34vh; overflow-y: auto; text-align: left; white-space: pre-wrap; font-size: 13px; line-height: 1.6; padding: 0 12px; box-sizing: border-box; }
+#zukan-detail-img.spin { animation: spin360 .8s ease; }
+@keyframes spin360 { to { transform: rotate(360deg); } }
+
+/* ---- 遊び方 ---- */
+.howto-title { font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 10px; }
+.howto-body { width: 100%; padding: 0 12px; box-sizing: border-box; overflow-y: auto; margin-bottom: 10px; }
+.howto-step { font-size: 14px; line-height: 1.6; text-align: left; background: rgba(255,255,255,.06); border-left: 4px solid #d4af37; padding: 6px 8px; margin-bottom: 6px; color: #fff; }
+.howto-step b { display: block; color: #ffd700; font-size: 14px; }
+.howto-step em { font-style: normal; color: #ff7777; font-weight: bold; }
+.howto-step.small { font-size: 12px; color: #aaa; border-left-color: #556; }
+.howto-practice { background: #006644; border-color: #00ffcc; margin-bottom: 8px; padding: 10px 14px; font-size: 15px; }
+
+/* ---- ガチャ：タブ・ノーマルガチャ ---- */
+.gacha-tabs { display: flex; gap: 6px; width: 100%; max-width: 340px; margin: 4px 0 8px; }
+.gacha-tab { flex: 1; padding: 9px 4px; font-size: 13px; background: #2a1b3d; color: #ccc; border: 2px solid #6a4a8a; border-radius: 6px; cursor: pointer; }
+.gacha-tab.active { background: #8800aa; color: #fff; border-color: #ffd700; box-shadow: 0 0 8px #ff88ff; }
+#gacha-screen.ng-mode .ev-only { display: none !important; }
+.ng-only { display: none; flex-direction: column; align-items: center; width: 100%; }
+#gacha-screen.ng-mode .ng-only { display: flex; }
+.ng-info { font-size: 12px; color: #fff; background: rgba(0,0,0,.7); border-radius: 6px; padding: 5px 10px; margin-bottom: 8px; line-height: 1.6; }
+.ng-btns { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 10px; }
+.ng-btns .btn { padding: 10px 12px; font-size: 14px; }
+#ng-result { width: 100%; max-width: 340px; text-align: center; }
+.ng-jackpot { font-family: 'Reggae One', cursive; font-size: 24px; color: #ffd700; text-shadow: 2px 2px 0 #8b0000; animation: pulse .4s infinite alternate; }
+.ng-total { font-size: 16px; margin: 6px 0; background: rgba(0,0,0,.75); border-radius: 8px; padding: 6px; }
+.ng-total b { font-size: 30px; color: #ffd700; }
+.ng-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.ng-grid.single { grid-template-columns: 1fr; max-width: 150px; margin: 0 auto; }
+.ng-card { background: rgba(10,10,20,.9); border: 2px solid #666; border-radius: 8px; padding: 6px 2px; animation: ngPop .35s both; }
+.ng-ico { font-size: 22px; }
+.ng-val { font-size: 13px; font-weight: bold; color: #fff; }
+.ng-val small { font-size: 10px; margin-left: 1px; }
+.single .ng-ico { font-size: 46px; }
+.single .ng-val { font-size: 28px; }
+.ng-card.tier1 { border-color: #5aa0ff; }
+.ng-card.tier2 { border-color: #55dd77; }
+.ng-card.tier3 { border-color: #cc66ff; box-shadow: 0 0 8px #cc66ff; }
+.ng-card.tier4 { border-color: #ffd700; box-shadow: 0 0 12px #ffd700; background: rgba(60,45,0,.9); }
+.ng-card.tier5 { border-color: #ff66cc; box-shadow: 0 0 14px #ff66cc; animation: ngPop .35s both, rainbowBorder 1s linear infinite; }
+@keyframes ngPop { 0% { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes rainbowBorder { 0% { border-color: #ff5555; } 33% { border-color: #55ff55; } 66% { border-color: #5599ff; } 100% { border-color: #ff5555; } }
+.gacha-back { margin: 4px 0 10px; flex-shrink: 0; }
+
+/* ---- 釣り画面：スロット・網 ---- */
+#catch-slots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; padding: 17px 8px 6px; background: rgba(10, 25, 60, .8); border: 2px solid #4aa3ff; border-radius: 10px; z-index: 15; pointer-events: none; }
+#catch-slots::before { content: attr(data-label); position: absolute; top: 2px; left: 0; right: 0; text-align: center; font-size: 10px; color: #9fd0ff; text-shadow: 1px 1px 0 #000; }
+#catch-slots .slot { border-style: dashed; border-color: #5a7aa8; }
+#catch-slots .slot.filled { border-style: solid; border-color: #ffd700; background: rgba(70, 50, 0, .85); }
+#catch-slots.reach { border-color: #ff66cc; box-shadow: 0 0 14px #ff66cc; animation: reachPulse .6s infinite alternate; }
+#catch-slots.reach::before { color: #ffaadd; font-size: 11px; }
+@keyframes reachPulse { from { box-shadow: 0 0 6px #ff66cc; } to { box-shadow: 0 0 18px #ff99dd; } }
+.weather-icon { vertical-align: middle; image-rendering: pixelated; margin-right: 2px; }
+.hud-chip { font-size: 13px; }
+
+#net-ring { display: none; position: absolute; border: 4px dashed #ffe27a; border-radius: 50%; z-index: 4; pointer-events: none;
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 9px), repeating-linear-gradient(-45deg, rgba(255,255,255,.18) 0 3px, transparent 3px 9px);
+    box-shadow: 0 0 12px rgba(255, 226, 122, .8), inset 0 0 12px rgba(255, 226, 122, .5); animation: ringPulse .8s infinite alternate; }
+@keyframes ringPulse { from { transform: scale(1); } to { transform: scale(1.06); } }
+#net-ring.swing { animation: ringSwing .35s ease-out; }
+#net-ring.ok { border-color: #55ff99; box-shadow: 0 0 18px #55ff99; }
+#net-ring.ng { border-color: #ff5555; box-shadow: 0 0 18px #ff5555; }
+@keyframes ringSwing { 0% { transform: scale(1) rotate(0); } 50% { transform: scale(1.4) rotate(25deg); } 100% { transform: scale(1) rotate(0); } }
+#wait-tip { display: none !important; }
+
+/* ---- 初回ガイド ---- */
+#guide-layer { display: none; position: absolute; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+#guide-hole { position: absolute; border: 3px solid #ffd700; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, .75), 0 0 16px 4px #ffd700; animation: guidePulse .8s infinite alternate; }
+#guide-hole.wiggle { animation: shakeAnim .4s, guidePulse .8s infinite alternate; }
+@keyframes guidePulse { from { border-color: #ffd700; } to { border-color: #fff; } }
+#guide-bubble { position: absolute; width: 220px; background: #fff8d0; color: #222; border: 3px solid #d4af37; border-radius: 10px; padding: 6px 10px; font-size: 14px; font-weight: bold; text-align: center; line-height: 1.4; }
+#guide-arrow { font-size: 26px; line-height: 1; animation: arrowBounce .6s infinite alternate; }
+@keyframes arrowBounce { from { transform: translateY(0); } to { transform: translateY(8px); } }
+
+/* ---- 図鑑：エリア選択 ---- */
+.zukan-area-btn { width: 100%; padding: 9px; font-size: 14px; background: #5a2d0c; border: 2px solid #d4af37; color: #fff; border-radius: 6px; cursor: pointer; }
+.zukan-area-btn b { color: #ffd700; }
+.zukan-area-row { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 12px 14px; margin-bottom: 6px; font-size: 15px; background: #2b1d0c; border: 2px solid #8b4513; color: #fff; border-radius: 6px; cursor: pointer; }
+.zukan-area-row small { color: #aaa; font-size: 12px; }
+.zukan-area-row.active { background: #8b0000; border-color: #ffd700; color: #ffd700; }
+@media (prefers-reduced-motion: reduce) { #net-ring, #guide-hole, #guide-arrow, #catch-slots.reach, .ng-jackpot { animation: none; } }
+
+/* 黄色い枠（結果・レベルアップ）が .modal の height:100% を引き継いで縦長になっていた問題の修正 */
+#result-modal, #levelup-modal { height: auto !important; max-height: 92%; }
+
+
+/* ---- v2.6.1 ---- */
+#result-img { max-height: 150px !important; max-width: 85% !important; }
+.menu-status-box { font-size: clamp(11px, 3.2vw, 13px); line-height: 1.55; }
+#net-ring.big { border-color: #ff7755; border-width: 5px; box-shadow: 0 0 16px #ff5533, inset 0 0 14px rgba(255, 90, 50, .5); }
+#net-ring.ok { border-color: #55ff99; box-shadow: 0 0 18px #55ff99; }
+#net-ring.ng { border-color: #ff5555; box-shadow: 0 0 18px #ff5555; }
+#net-pips { display: none; position: absolute; z-index: 5; width: 130px; text-align: center; font-size: 15px; color: #fff; background: rgba(0,0,0,.75); border: 2px solid #ff7755; border-radius: 10px; padding: 2px 6px; pointer-events: none; }
+#net-hint { display: none; position: absolute; top: 118px; left: 6%; width: 88%; box-sizing: border-box; z-index: 24; text-align: center; font-size: 15px; font-weight: bold; line-height: 1.5; color: #ffd700; background: rgba(60, 10, 0, .93); border: 3px solid #ff7755; border-radius: 10px; padding: 8px 10px; pointer-events: none; animation: pulse .5s infinite alternate; }
+#net-hint small { font-size: 11px; color: #fff; font-weight: normal; }
+@media (max-height: 720px) { .menu-status-box { padding: 6px 10px; margin-bottom: 6px; line-height: 1.4; } }
+
+
+/* ===================================================
+   Ver 3.0.0
+   =================================================== */
+/* ---- 難易度 ---- */
+.diff-seg { display: flex; gap: 4px; }
+.diff-seg button { padding: 7px 10px; font-size: 13px; background: #2a2a3a; color: #bbb; border: 2px solid #556; border-radius: 6px; cursor: pointer; }
+.diff-seg button.active { background: #0a6a8a; color: #fff; border-color: #ffd700; box-shadow: 0 0 8px #ffd700; }
+#cfg-diff-hard.active { background: #8a1a1a; }
+
+/* ---- 図鑑：閉じるボタンを右上に固定 ---- */
+#zukan-modal .zukan-close { position: absolute; top: 10px; right: 14px; z-index: 40; padding: 6px 14px; font-size: 14px; }
+#zukan-modal .zukan-header { padding-right: 90px; }
+.zukan-area-row.done { border-color: #ffd700; }
+
+/* ---- 魚影 ---- */
+#fish-shadow { background-size: 100% 100%; }
+
+/* ---- ガチャ背景（ノーマル）：専用画像が無い時は通常の背景のまま ---- */
+#gacha-screen.ng-mode { background-image: url('images/bg/bg_gacha_normal.png'), url('images/bg/bg_gacha.png'); background-size: cover; background-position: center; }
+
+/* ---- ノーマルガチャ（刷新） ---- */
+#gacha-screen.ng-mode .gacha-title, #gacha-screen.ng-mode .gacha-gold-text { margin-bottom: 4px; }
+#ng-panel { flex: 1; min-height: 0; align-items: center; justify-content: flex-start; gap: 8px; padding: 0 10px; box-sizing: border-box; position: relative; }
+.ng-title { font-family: 'Reggae One', cursive; font-size: 24px; color: #fff; text-shadow: 2px 2px 0 #7a1b9a, 0 0 10px #ff88ff; }
+.ng-machine { position: relative; width: 150px; height: 150px; flex-shrink: 0; margin: 4px 0; }
+.ng-orb { position: absolute; inset: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0 8%, #ffd1ff 14%, #c26bff 45%, #5a1a9a 100%); box-shadow: 0 0 24px 6px rgba(255, 150, 255, .7), inset -8px -10px 18px rgba(60, 0, 100, .6); animation: orbFloat 2.2s ease-in-out infinite alternate; }
+.ng-orb::after { content: '?'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 60px; font-weight: bold; color: rgba(255, 255, 255, .85); text-shadow: 0 0 10px #fff; }
+.ng-shine { position: absolute; inset: -6px; border-radius: 50%; border: 3px dashed rgba(255, 255, 255, .5); animation: spin360 8s linear infinite; }
+.ng-spark { position: absolute; font-size: 22px; color: #ffe27a; animation: sparkle 1.4s infinite alternate; }
+.ng-spark.s1 { left: -8px; top: 10px; } .ng-spark.s2 { right: -6px; top: 30px; animation-delay: .4s; } .ng-spark.s3 { right: 14px; bottom: -4px; animation-delay: .8s; }
+@keyframes orbFloat { from { transform: translateY(-4px); } to { transform: translateY(5px); } }
+@keyframes sparkle { from { opacity: .2; transform: scale(.7); } to { opacity: 1; transform: scale(1.2); } }
+.ng-machine.shake .ng-orb { animation: orbShake .12s infinite; }
+.ng-machine.burst .ng-orb { animation: orbBurst .6s ease-out; }
+@keyframes orbShake { 0% { transform: translate(-5px, 2px) rotate(-6deg); } 50% { transform: translate(5px, -2px) rotate(6deg); } 100% { transform: translate(-5px, 2px) rotate(-6deg); } }
+@keyframes orbBurst { 0% { transform: scale(1.4); filter: brightness(2.2); } 100% { transform: scale(1); filter: none; } }
+.ng-buffs { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 340px; }
+.ng-buff { font-size: 11px; background: rgba(0, 0, 0, .75); border: 1px solid #ffd700; border-radius: 10px; padding: 2px 8px; color: #fff; }
+.ng-buff.dim { border-color: #667; color: #99a; }
+#ng-result { flex: 1; min-height: 0; width: 100%; max-width: 360px; overflow-y: auto; text-align: center; padding: 2px 4px; box-sizing: border-box; }
+.ng-dock { display: flex; gap: 10px; width: 100%; max-width: 360px; justify-content: center; flex-shrink: 0; }
+.ng-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 4px; font-size: 18px; font-weight: bold; color: #fff; background: linear-gradient(#a23bd6, #5b1b8a); border: 3px solid #ffd700; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 0 #2a0a45; }
+.ng-btn small { font-size: 12px; font-weight: normal; margin-top: 2px; color: #ffe9a8; }
+.ng-btn.free { background: linear-gradient(#10b07a, #07603f); }
+.ng-btn.big { background: linear-gradient(#ff7a3b, #a8300a); }
+.ng-btn:disabled { filter: grayscale(.8) brightness(.7); box-shadow: none; }
+.ng-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #2a0a45; }
+.ng-link { background: none; border: none; color: #ffe9a8; text-decoration: underline; font-size: 13px; padding: 2px; cursor: pointer; text-shadow: 1px 1px 0 #000; }
+.ng-total { font-size: 15px; margin: 2px 0 6px; background: rgba(0, 0, 0, .78); border-radius: 8px; padding: 4px; }
+.ng-total b { font-size: 26px; color: #ffd700; }
+.ng-jackpot { font-family: 'Reggae One', cursive; font-size: 24px; color: #ffd700; text-shadow: 2px 2px 0 #8b0000; animation: pulse .4s infinite alternate; }
+.ng-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.ng-grid.single { grid-template-columns: 1fr; max-width: 190px; margin: 0 auto; }
+.ng-card { background: rgba(10, 10, 25, .92); border: 2px solid #667; border-radius: 8px; padding: 5px 2px; animation: ngPop .4s both; min-height: 64px; position: relative; }
+.ng-ico { font-size: 22px; line-height: 1.1; }
+.ng-name { font-size: 10px; line-height: 1.25; color: #fff; word-break: keep-all; overflow-wrap: anywhere; }
+.ng-desc { font-size: 11px; color: #cfe; margin-top: 3px; }
+.ng-rank { position: absolute; top: -8px; right: -4px; font-size: 9px; background: #d4af37; color: #000; border-radius: 6px; padding: 0 4px; }
+.single .ng-ico { font-size: 54px; } .single .ng-name { font-size: 15px; font-weight: bold; } .single .ng-card { padding: 12px 6px; }
+.ng-card.tier1 { border-color: #5aa0ff; } .ng-card.tier2 { border-color: #55dd77; }
+.ng-card.tier3 { border-color: #cc66ff; box-shadow: 0 0 10px #cc66ff; }
+.ng-card.tier4 { border-color: #ffd700; box-shadow: 0 0 14px #ffd700; background: rgba(70, 50, 0, .92); }
+.ng-card.tier5 { border-color: #ff66cc; box-shadow: 0 0 16px #ff66cc; animation: ngPop .4s both, rainbowBorder 1s linear infinite; }
+.ng-prize-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 5px; font-size: 14px; background: #1a1a2a; border: 2px solid #556; border-radius: 6px; color: #fff; }
+.ng-prize-row.tier2 { border-color: #55dd77; } .ng-prize-row.tier3 { border-color: #cc66ff; } .ng-prize-row.tier4 { border-color: #ffd700; } .ng-prize-row.tier5 { border-color: #ff66cc; }
+.ng-prize-note { font-size: 11px; color: #bbb; line-height: 1.6; margin-top: 6px; text-align: left; }
+.hud-chip.buff { border-color: #55ddff; color: #bff; }
+
+/* ---- 工房・景品一覧 ---- */
+#workshop-modal, #ng-prize-modal { height: auto; max-height: 86%; padding: 12px 10px; box-sizing: border-box; width: 90%; max-width: 360px; }
+.ws-gold { font-size: 14px; color: #ccc; margin-bottom: 6px; } .ws-gold b { color: #ffd700; font-size: 18px; }
+.ws-list { width: 100%; flex: 1; min-height: 0; overflow-y: auto; padding: 0 4px; box-sizing: border-box; }
+.ws-row { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, .07); border: 1px solid #556; border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; text-align: left; }
+.ws-row img { width: 36px; height: 36px; object-fit: contain; image-rendering: pixelated; }
+.ws-ico { width: 36px; text-align: center; font-size: 26px; }
+.ws-info { flex: 1; font-size: 13px; color: #fff; } .ws-info small { display: block; font-size: 10px; color: #9fd0ff; margin-top: 2px; }
+.ws-lv { color: #ffd700; font-size: 12px; margin-left: 4px; }
+.ws-row .btn { padding: 6px 8px; font-size: 12px; min-width: 76px; }
+
+/* ---- 特別な捕まえ方（ミニゲーム） ---- */
+#sp-layer { display: none; position: absolute; inset: 0; z-index: 70; background: rgba(0, 0, 20, .82); align-items: center; justify-content: center; }
+.sp-box { position: relative; width: 94%; max-width: 380px; background: #0a1226; border: 4px double #ffd700; border-radius: 12px; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.sp-title { font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; text-align: center; }
+.sp-say { font-size: 14px; color: #fff; text-align: center; min-height: 20px; }
+.sp-stage { position: relative; width: 100%; height: 250px; background: radial-gradient(#10264a, #070d1c); border: 2px solid #3a5a9a; border-radius: 8px; overflow: hidden; touch-action: none; user-select: none; }
+.sp-foot { display: flex; align-items: center; gap: 8px; min-height: 22px; }
+.sp-hearts { min-width: 60px; font-size: 16px; color: #ff5577; }
+.sp-prog { flex: 1; height: 12px; background: #223; border: 2px solid #667; border-radius: 8px; overflow: hidden; } #sp-prog-in { height: 100%; width: 0; background: linear-gradient(90deg, #ffd700, #ff8a00); transition: width .15s; }
+.sp-card { display: none; position: absolute; inset: 0; z-index: 5; background: rgba(5, 10, 30, .95); flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 14px; text-align: center; }
+.sp-card-ico { font-size: 48px; } .sp-card-name { font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; }
+.sp-card-text { font-size: 14px; color: #fff; line-height: 1.7; } .sp-card-ok { margin-top: 6px; padding: 8px 18px; background: #c0392b; border: 2px solid #ffd700; border-radius: 8px; color: #fff; animation: pulse .6s infinite alternate; }
+.sp-flash { position: absolute; left: 0; right: 0; top: 40%; text-align: center; font-family: 'Reggae One', cursive; font-size: 34px; opacity: 0; pointer-events: none; text-shadow: 2px 2px 0 #000; z-index: 6; }
+.sp-flash.on { animation: spFlash .8s ease-out; } @keyframes spFlash { 0% { opacity: 1; transform: scale(.6); } 60% { opacity: 1; transform: scale(1.1); } 100% { opacity: 0; transform: scale(1); } }
+.sp-bar { position: absolute; height: 36px; background: #1d2740; border: 2px solid #8aa; border-radius: 6px; } .sp-bar.tall { height: 48px; }
+.sp-zone { position: absolute; top: 0; bottom: 0; background: rgba(255, 226, 122, .55); border: 2px solid #ffe27a; box-shadow: 0 0 12px #ffe27a; border-radius: 4px; } .sp-zone.good { background: rgba(60, 220, 120, .55); border-color: #5f8; box-shadow: 0 0 12px #5f8; }
+.sp-marker { position: absolute; top: -6px; bottom: -6px; width: 6px; margin-left: -3px; background: #fff; border-radius: 3px; box-shadow: 0 0 8px #fff; }
+.sp-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #4aa3ff, #aee0ff); border-radius: 3px; opacity: .85; }
+.sp-target { position: absolute; border: 4px dashed #ffe27a; border-radius: 50%; background: rgba(255, 226, 122, .15); } .sp-target.on { background: rgba(120, 255, 160, .35); border-color: #7fff9f; box-shadow: 0 0 14px #7fff9f; }
+.sp-cursor { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff, 0 0 0 3px #4aa3ff; z-index: 3; }
+.sp-heart { position: absolute; width: 24px; height: 24px; background: #ff4466; clip-path: polygon(50% 100%, 0 40%, 10% 10%, 30% 0, 50% 20%, 70% 0, 90% 10%, 100% 40%); filter: drop-shadow(0 0 6px #ff4466); }
+.sp-haz { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #6ad 60%, #247); box-shadow: 0 0 8px #6ad; }
+.sp-orb { position: absolute; border: 3px solid #ffe27a; border-radius: 50%; background: rgba(255, 226, 122, .2); } .sp-ring { position: absolute; border: 4px solid #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; pointer-events: none; }
+
+/* ---- 殿堂入り ---- */
+#clear-modal { z-index: 200; background: rgba(10, 5, 30, .96); flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 20px; overflow: hidden; }
+.clear-title { font-family: 'Reggae One', cursive; font-size: 34px; color: #ffd700; text-shadow: 3px 3px 0 #8b0000, 0 0 16px #ffd700; animation: pulse .6s infinite alternate; }
+.clear-sub { font-size: 20px; color: #fff; } .clear-text { font-size: 14px; color: #fff; line-height: 1.8; } .clear-reward { font-size: 14px; color: #ffe27a; background: rgba(0, 0, 0, .6); border: 2px solid #ffd700; border-radius: 10px; padding: 8px 12px; }
+.clear-confetti { position: absolute; inset: 0; pointer-events: none; } .clear-confetti i { position: absolute; top: -20px; width: 8px; height: 14px; animation: confettiFall 3s linear infinite; }
+@keyframes confettiFall { to { transform: translateY(700px) rotate(540deg); } }
+body.hof #menu-title { color: #ffd700; text-shadow: 0 0 10px #ffd700, 2px 2px 0 #8b0000; border-color: #ffd700; }
+.hof-btn { width: 100%; margin-bottom: 8px; background: #7a5a00; border-color: #ffd700; }
+
+
+/* ===================================================
+   Ver 3.0.0 (c) UI調整
+   =================================================== */
+:root { --css-ver: '30-g'; }
+
+/* ---- メインメニュー：縦1列 ---- */
+.menu-grid { display: flex !important; flex-direction: column; gap: 6px; width: 90%; max-width: 310px; margin-bottom: 8px; }
+#menu-screen .menu-grid .menu-btn:nth-of-type(n) { width: 100%; max-width: none; min-height: 40px; padding: 8px 10px; font-size: 15px; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+@media (max-height: 760px) {
+    #menu-screen .menu-grid .menu-btn:nth-of-type(n) { min-height: 34px; padding: 6px 10px; font-size: 14px; }
+    .menu-grid { gap: 5px; margin-bottom: 5px; }
+    #menu-screen .menu-btn.menu-main:nth-of-type(n) { padding: 9px 10px; margin: 0 0 5px; }
+    #menu-screen .menu-btn.menu-howto:nth-of-type(n) { padding: 7px 10px; }
+}
+
+/* ---- ノーマルガチャ：アップロード背景に合わせて文字を見やすく ---- */
+#gacha-screen.ng-mode .gacha-title { display: none; }
+#gacha-screen.ng-mode .gacha-gold-text { background: rgba(30, 18, 6, .88); color: #ffe9a8; border: 2px solid #8a5a1a; border-radius: 8px; padding: 3px 14px; text-shadow: 1px 1px 0 #000; }
+#gacha-screen.ng-mode .gacha-tab { background: rgba(40, 24, 8, .9); color: #f3dfb0; border-color: #8a5a1a; font-size: 14px; padding: 10px 4px; }
+#gacha-screen.ng-mode .gacha-tab.active { background: #7a2fa8; color: #fff; border-color: #ffd700; box-shadow: 0 0 10px #ffd700; }
+.ng-title { color: #4a2a0a; text-shadow: 0 0 6px #fff4d0, 1px 1px 0 #fff4d0, -1px -1px 0 #fff4d0; }
+.ng-buff { background: rgba(30, 18, 6, .9); border-color: #d4af37; color: #fff4d0; font-size: 12px; }
+.ng-spacer { flex: 1; min-height: 8px; }
+#ng-panel { position: relative; }
+#ng-result { display: none; position: absolute; left: 3%; right: 3%; top: 4%; max-height: 62%; z-index: 30; background: rgba(28, 16, 4, .95); border: 3px solid #d4af37; border-radius: 12px; padding: 10px; overflow-y: auto; box-shadow: 0 0 24px rgba(0, 0, 0, .7); color: #fff; }
+.ng-close { margin-top: 10px; padding: 8px 40px; font-size: 16px; }
+#ng-flash { position: absolute; left: -10px; right: -10px; top: -10px; bottom: -10px; background: #fff; opacity: 0; pointer-events: none; z-index: 40; }
+#ng-flash.on { animation: ngFlash .6s ease-out; }
+@keyframes ngFlash { 0% { opacity: .9; } 100% { opacity: 0; } }
+#gacha-screen.ng-shake { animation: ngBgShake .1s infinite; }
+@keyframes ngBgShake { 0% { background-position: 48% 50%; } 50% { background-position: 52% 51%; } 100% { background-position: 48% 50%; } }
+.ng-dock { position: relative; width: 100%; max-width: 380px; gap: 8px; padding: 8px; background: rgba(255, 244, 208, .88); border: 3px solid #8a5a1a; border-radius: 14px; box-sizing: border-box; }
+.ng-btn { padding: 18px 4px; font-size: 26px; border-radius: 12px; min-height: 92px; justify-content: center; }
+.ng-btn small { font-size: 15px; margin-top: 4px; }
+.ng-link { color: #4a2a0a; text-shadow: 0 0 4px #fff4d0; font-size: 14px; font-weight: bold; }
+#gacha-screen.ng-mode .gacha-back { margin: 2px 0 8px; }
+
+/* ---- 工房（専用画面） ---- */
+#workshop-screen { display: none; position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: 45; flex-direction: column; align-items: center; padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom)); box-sizing: border-box;
+    background: linear-gradient(rgba(10, 6, 0, .72), rgba(10, 6, 0, .82)), url('images/bg/bg_shop.png') center / cover; color: #fff; }
+.wk-head { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.wk-title { font-family: 'Reggae One', cursive; font-size: 26px; color: #ffd700; text-shadow: 2px 2px 0 #000; }
+.wk-gold { font-size: 14px; background: rgba(0, 0, 0, .7); border: 2px solid #8a5a1a; border-radius: 8px; padding: 4px 10px; } .wk-gold b { color: #ffd700; font-size: 18px; }
+.wk-tabs { display: flex; gap: 8px; width: 100%; margin-bottom: 6px; }
+.wk-tab { flex: 1; padding: 12px 4px; font-size: 15px; font-weight: bold; background: #2a2218; color: #cbb98a; border: 2px solid #6a5a3a; border-radius: 8px; cursor: pointer; }
+.wk-tab.active { background: #8a5a14; color: #fff; border-color: #ffd700; box-shadow: 0 0 10px #ffd700; }
+.wk-note { width: 100%; font-size: 12px; line-height: 1.5; color: #ffe9a8; background: rgba(0, 0, 0, .6); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; box-sizing: border-box; min-height: 18px; }
+.wk-list { flex: 1; min-height: 0; width: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-right: 2px; }
+.wk-sec { font-size: 14px; font-weight: bold; color: #ffd700; margin: 6px 0 4px; border-bottom: 1px solid #8a5a1a; }
+#workshop-screen .ws-row { background: rgba(30, 20, 8, .92); border: 2px solid #8a5a1a; }
+#workshop-screen .ws-row img { width: 44px; height: 44px; max-width: 44px; object-fit: contain; image-rendering: pixelated; flex-shrink: 0; }
+.ws-eq { font-size: 10px; background: #1a7a4a; color: #fff; border-radius: 6px; padding: 0 5px; margin-left: 4px; }
+.wk-back { margin-top: 8px; flex-shrink: 0; padding: 10px 24px; font-size: 16px; }
+
+
+/* ===================================================
+   Ver 3.0.0 (d)
+   =================================================== */
+/* ---- 実績のグループ見出し ---- */
+.ach-group { font-size: 13px; font-weight: bold; color: #ffd700; background: rgba(0, 0, 0, .55); border-left: 4px solid #d4af37; padding: 4px 8px; margin: 10px 0 6px; border-radius: 4px; }
+
+/* ---- イベントガチャ：結果を画面中央に・演出 ---- */
+#gacha-result-area { display: none; position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: 35; background: rgba(8, 4, 24, .8); align-items: center; justify-content: center; margin: 0 !important; width: auto !important; overflow: hidden; }
+.gr-panel { position: relative; width: 92%; max-width: 400px; max-height: 88%; overflow-y: auto; background: linear-gradient(#1d1238, #0c0820); border: 3px solid #ffd700; border-radius: 14px; padding: 12px 10px; box-sizing: border-box; box-shadow: 0 0 30px rgba(255, 215, 0, .5); z-index: 2; }
+#gr-fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+#gr-fx span { position: absolute; top: -30px; animation: grFall 2.6s linear infinite; }
+@keyframes grFall { to { transform: translateY(800px) rotate(360deg); opacity: .2; } }
+#gr-banner { text-align: center; font-family: 'Reggae One', cursive; font-size: 22px; margin: 4px 0 8px; color: #fff; text-shadow: 2px 2px 0 #000; }
+#gr-banner.rank2 { color: #8ff; text-shadow: 0 0 10px #4ff, 2px 2px 0 #036; animation: pulse .5s infinite alternate; }
+#gr-banner.rank3 { font-size: 26px; background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bff95, #6bc5ff, #c56bff, #ff6b6b); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; animation: grRainbow 1.2s linear infinite; }
+@keyframes grRainbow { to { background-position: 200% 0; } }
+.gacha-result-card { animation: grCard .6s cubic-bezier(.2, 1.4, .4, 1) both; }
+.gacha-result-card.rare { box-shadow: 0 0 14px #4ff; }
+.gacha-result-card.super-rare { box-shadow: 0 0 20px #ffd700, 0 0 40px #ff66cc; animation: grCard .6s cubic-bezier(.2, 1.4, .4, 1) both, rainbowBorder 1s linear infinite; }
+@keyframes grCard { 0% { transform: rotateY(90deg) scale(.3); opacity: 0; } 100% { transform: rotateY(0) scale(1); opacity: 1; } }
+.gr-ok { display: block; margin: 8px auto 0; padding: 10px 44px; font-size: 18px; }
+#ev-flash { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 60; }
+#ev-flash.on { animation: ngFlash .7s ease-out; }
+#gacha-screen.ev-shake { animation: ngBgShake .09s infinite; }
+@media (prefers-reduced-motion: reduce) { #gr-fx span, #gr-banner.rank2, #gr-banner.rank3, .gacha-result-card.super-rare { animation: none; } }
+.gr-panel .gacha-result-grid { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 6px; max-height: 44vh; overflow-y: auto; }
+.gr-panel .gacha-result-card { font-size: 11px; padding: 6px 3px; }
+
+
+/* ===================================================
+   Ver 3.0.0 (e)
+   =================================================== */
+.fxi { vertical-align: middle; image-rendering: pixelated; }
+/* 失敗ウィンドウ：魚はシルエットのみ（アニメーションの光や色を無効化） */
+#result-img.silhouette { filter: brightness(0) invert(10%) sepia(100%) saturate(2200%) hue-rotate(205deg) brightness(.55) !important; animation: none !important; opacity: .92; pointer-events: none; }
+/* ノーマルガチャの結果枠：中央に配置 */
+#ng-panel { position: static !important; }
+#ng-result { left: 0 !important; right: 0 !important; margin: 0 auto; width: 94%; max-width: 380px; top: 96px !important; box-sizing: border-box; }
+
+
+/* ===================================================
+   Ver 3.0.0 (f)
+   =================================================== */
+/* 網のとき、中央の状態表示（網の絵文字）が輪と重なるので隠す */
+#game-container.net-mode #status-text { visibility: hidden; }
+/* イベントガチャの結果：見出しの拡大縮小で横スクロールバーが出ないように */
+.gr-panel { overflow-x: hidden !important; }
+.gr-panel .gacha-result-title { overflow: hidden; text-align: center; }
+.gr-panel .gacha-result-title span { display: inline-block; max-width: 100%; }
+/* 図鑑：NEWを消すボタン */
+.zukan-newclear-btn { padding: 6px 10px; font-size: 12px; font-weight: bold; background: #1c5a3a; color: #fff; border: 2px solid #7be0a0; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+.zukan-newclear-btn small { margin-left: 3px; font-weight: normal; }
+.zukan-newclear-btn:disabled { background: #333; color: #888; border-color: #555; cursor: default; }
+
+
+/* ===================================================
+   Ver 3.0.0 (g)
+   =================================================== */
+/* ---- メインメニュー：PC（高さ720px）でもスクロールなしで収まるように、全体を少しコンパクトに ---- */
+#menu-screen { padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+.menu-title { font-size: 20px; padding: 4px 14px; margin-bottom: 6px; }
+.menu-status-box { padding: 6px 10px; margin-bottom: 6px; line-height: 1.4; font-size: 12px; }
+#menu-screen .menu-btn.menu-main:nth-of-type(n) { padding: 9px 10px; margin: 0 0 5px; font-size: 17px; }
+.menu-grid { gap: 5px; margin-bottom: 5px; }
+#menu-screen .menu-grid .menu-btn:nth-of-type(n) { min-height: 34px; padding: 6px 10px; font-size: 14px; }
+#menu-screen .menu-btn.menu-howto:nth-of-type(n) { padding: 7px 10px; font-size: 14px; }
+/* ---- 図鑑：エリアによって左右に余白ができる問題（一覧を常に横いっぱいに） ---- */
+.zukan-grid { width: 100%; align-self: stretch; box-sizing: border-box; }
+
+@media (max-height: 760px) {
+    .menu-status-box { font-size: 11.5px; line-height: 1.3; padding: 5px 10px; }
+    .menu-grid { gap: 4px; }
+    .menu-title { margin-bottom: 4px; }
 }

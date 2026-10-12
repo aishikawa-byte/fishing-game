@@ -13,7 +13,6 @@
     <link rel="apple-touch-icon" href="images/icon.png">
     <!-- 外部スタイルシートの読み込み -->
     <link rel="stylesheet" href="style.css">
-</head>
 <script>
   // サービスワーカーの登録
   if ('serviceWorker' in navigator) {
@@ -26,6 +25,7 @@
     });
   }
 </script>
+</head>
 <body>
 
 <audio id="title-bgm" src="sounds/title.mp3" loop preload="auto"></audio>
@@ -44,7 +44,8 @@
 <div id="title-screen">
     <!-- ▼ onclick を追加 ▼ -->
     <div id="main-logo" onclick="onLogoTap()">爆釣一閃！<br>おさかな一本勝負</div>
-    <div class="version-text">Ver 2.3.0</div>
+    <div class="version-text" id="version-label">Ver 3.0.0</div>
+    <div class="tagline">すきま時間に、一閃。<br>反射神経 × コレクションの釣りゲーム</div>
     <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
 </div>
 
@@ -61,8 +62,8 @@
             </div>
         </div>
         
-        <div class="menu-title">メインメニュー</div>
-        
+        <div class="menu-title" id="menu-title">メインメニュー</div>
+
         <div class="menu-status-box">
             <div style="display:flex; justify-content:space-between;">
                 <strong>釣りレベル:</strong> 
@@ -85,51 +86,78 @@
             </div>
         </div>
 
-        <button class="menu-btn" style="background: #0066aa;" onclick="openEquipScreen()">装備・アイテム</button>
-        <button class="menu-btn" onclick="startGameFromMenu()">釣りを始める</button>
-        <button class="menu-btn" onclick="openGachaScreen()">ガチャ</button>
-        <button class="menu-btn" onclick="openShop()">道具屋 (ショップ)</button>
-        <button class="menu-btn" onclick="openZukan()">おさかな絵巻 (図鑑)</button>
-        <button class="menu-btn" onclick="openAchievements()">実績・称号</button>
-        <button class="menu-btn" id="btn-howto" onclick="openHowToPlay()">遊び方</button>
+        <button class="menu-btn menu-main" onclick="startGameFromMenu()">🎣 釣りを始める</button>
+        <div class="menu-grid">
+            <button class="menu-btn" id="btn-gacha" onclick="openGachaScreen()">ガチャ</button>
+            <button class="menu-btn" onclick="openShop()">ショップ</button>
+            <button class="menu-btn" onclick="openEquipScreen()">装備・アイテム</button>
+            <button class="menu-btn" id="btn-workshop" onclick="openWorkshop()">工房</button>
+            <button class="menu-btn" id="btn-missions" onclick="openMissions()">ミッション</button>
+            <button class="menu-btn" onclick="openZukan()">図鑑</button>
+            <button class="menu-btn" onclick="openAchievements()">実績・称号</button>
+        </div>
+        <button class="menu-btn menu-howto" id="btn-howto" onclick="openHowToPlay()">遊び方</button>
     </div>
 
     <!-- ガチャ画面 -->
     <div id="gacha-screen">
-        <button id="btn-gacha-notice" class="gacha-notice-btn" onclick="openGachaNotice()">
+        <button id="btn-gacha-notice" class="gacha-notice-btn ev-only" onclick="openGachaNotice()">
             <img src="images/tyuui.png" alt="注意" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'20\' y=\'75\' font-size=\'70\' fill=\'yellow\'>⚠️</text></svg>'">
         </button>
 
         <div class="gacha-title">ガチャ</div>
         <div class="gacha-gold-text">所持金: <span id="gacha-gold">0</span> G</div>
+        <div class="gacha-tabs">
+            <button class="gacha-tab active" id="gtab-ev" onclick="setGachaTab('ev')">🌋 イベントガチャ</button>
+            <button class="gacha-tab" id="gtab-ng" onclick="setGachaTab('ng')">🎲 ノーマルガチャ</button>
+        </div>
         
-        <div class="gacha-arrow-selector">
+        <div class="gacha-arrow-selector ev-only">
             <button class="gacha-arrow-btn" onclick="prevGachaSeries()">＜</button>
             <div id="gacha-series-title" class="gacha-series-title-text">🌋 火山ガチャ</div>
             <button class="gacha-arrow-btn" onclick="nextGachaSeries()">＞</button>
         </div>
 
-        <div class="gacha-box-ui">
+        <div class="gacha-box-ui ev-only">
             <img id="gacha-banner-img" class="gacha-banner-img" src="images/banner/banner_volcano.png" alt="ガチャバナー" onclick="zoomImage(this.src)">
-            <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 82%</div>
+            <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 82% ／ 30回連続ハズレで次は確定当たり</div>
         </div>
 
-        <div style="display:flex; gap:10px; width:100%; justify-content:center; margin-bottom:8px;">
+        <div class="ev-only" style="display:flex; gap:10px; width:100%; justify-content:center; margin-bottom:8px;">
             <button class="btn" style="padding:10px 15px; font-size:14px; background:#440066;" onclick="spinGacha(1)">1回回す<br>(1000 G)</button>
             <button class="btn" style="padding:10px 15px; font-size:14px; background:#8800aa;" onclick="spinGacha(10)">10連ガチャ<br>(10000 G)</button>
         </div>
 
-        <div style="display:flex; gap:10px; margin-bottom: 12px;">
+        <div class="ev-only" style="margin-bottom: 8px;">
             <button class="btn" style="background:#112233;" onclick="openGachaListModal()">景品一覧を見る</button>
-            <button class="btn" onclick="closeGachaScreen()">メニューへ戻る</button>
         </div>
 
-        <div id="gacha-result-area" style="width:100%; display:none; margin-top: 10px;">
-            <div class="gacha-result-title">
-                <span>✨ 獲得結果 ✨</span>
-                <span class="gacha-result-sub">(タップで拡大)</span>
+        <div id="ng-panel" class="ng-only">
+            <div class="ng-title">🎲 ノーマルガチャ</div>
+            <div id="ng-buffs" class="ng-buffs"></div>
+            <div id="ng-result"></div>
+            <div id="ng-flash"></div>
+            <div class="ng-spacer"></div>
+            <div class="ng-dock">
+                <button id="ng-free-btn" class="ng-btn free" onclick="spinNormal('free')">🆓<small>今日の無料</small></button>
+                <button class="ng-btn" onclick="spinNormal(1)">1回<small>600G</small></button>
+                <button class="ng-btn big" onclick="spinNormal(10)">10連<small>6000G</small></button>
             </div>
-            <div class="gacha-result-grid" id="gacha-result-grid"></div>
+            <button class="ng-link" onclick="showNgPrizes()">景品をみる</button>
+        </div>
+
+        <button class="btn gacha-back" onclick="closeGachaScreen()">🏠 メニューへ戻る</button>
+
+        <div id="ev-flash"></div>
+        <div id="gacha-result-area" class="ev-only">
+            <div id="gr-fx"></div>
+            <div class="gr-panel" style="overflow-x:hidden;">
+                <div class="gacha-result-title"><span>✨ 獲得結果 ✨</span></div>
+                <div id="gr-banner"></div>
+                <div class="gacha-result-grid" id="gacha-result-grid"></div>
+                <div class="gacha-result-sub" style="text-align:center;margin:4px 0;">（タップで拡大）</div>
+                <button class="btn gr-ok" onclick="closeGachaResult()">OK</button>
+            </div>
         </div>
     </div>
 
@@ -148,7 +176,7 @@
             ・<strong style="color:#00ffcc;">新しい釣り場</strong>：上の「場所移動」ボタンを押すと、すぐに遊べるようになります。<br>
             ・<strong style="color:#00ffcc;">特別な竿・網</strong>：「道具屋（ショップ）」に入ると、いつでも持っている道具を選べます。<br><br>
             ❹ <strong style="color:#ff8888;">すでに持っている物が当たったとき</strong><br>
-            同じ釣り場や道具がもう一度当たった場合は、お返しとして自動的に 150 G がお金に戻されます。
+            同じ釣り場や道具がもう一度当たった場合は、お返しとして自動的に 150 G がお金に戻されます。<br><br>❺ <strong style="color:#ffd700;">おトクな仕組み</strong><br>30回連続でハズレだと次は必ず当たり。10連は当たり1枠が確定します。迷ったら、まずは気軽な「ノーマルガチャ」へ！
         </div>
 
         <button class="btn" style="padding: 10px 35px; font-size: 16px; margin-top: 10px;" onclick="closeGachaNotice()">閉じる</button>
@@ -182,19 +210,19 @@
             <div class="gacha-list-section">
                 <div class="gacha-list-sec-title" style="color:#aaa;">【ハズレ（釣りゴミ）アイテム】(確率: 合計82%)</div>
                 <div class="gacha-list-item-group">
-                    ・🥫 空き缶 (10 G)<br>
-                    ・👞 長靴 (10 G)<br>
-                    ・🛞 古タイヤ (20 G)<br>
-                    ・🪵 流木 (10 G)<br>
-                    ・🧹 ボロきれ (5 G)<br>
-                    ・🌿 ワカメ (10 G)
+                    ・🥫 空き缶 (30 G)<br>
+                    ・👞 長靴 (30 G)<br>
+                    ・🛞 古タイヤ (60 G)<br>
+                    ・🪵 流木 (30 G)<br>
+                    ・🧹 ボロきれ (15 G)<br>
+                    ・🌿 ワカメ (30 G)
                 </div>
             </div>
 
             <div class="gacha-list-section">
                 <div class="gacha-list-sec-title" style="color:#ffd700;">【その他補填】(確率: 合計10%)</div>
                 <div class="gacha-list-item-group">
-                    ・💰 少額ゴールド (30 G / 50 G)<br>
+                    ・💰 少額ゴールド (100 G / 150 G)<br>
                     <span style="font-size:11px; color:#ccc;">※獲得済みの竿やエリアが重複した場合は150 Gが補填されます。</span>
                 </div>
             </div>
@@ -235,7 +263,11 @@
 
             <div class="config-row">
                 <span>ゲーム難易度</span>
-                <button class="btn" id="config-mode-btn" style="background:#006644;" onclick="toggleGameDifficulty()">モード: 標準</button>
+                <div class="diff-seg">
+                    <button id="cfg-diff-easy" onclick="setDifficulty('easy')">簡単</button>
+                    <button id="cfg-diff-normal" onclick="setDifficulty('normal')">通常</button>
+                    <button id="cfg-diff-hard" onclick="setDifficulty('hard')">難しい</button>
+                </div>
             </div>
 
             <div class="config-row">
@@ -251,10 +283,41 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 2.3.0)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 3.0.0)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V3.0.0======<br>
+                    【大型アップデート】<br>
+                    <b>🎣 あそびが変わった</b><br>
+                    ・網は「輪の中でタップ」に変更（大物は2回成功）<br>
+                    ・各エリアで一番めずらしい生き物は、ミニゲームで勝負！<br>
+                    ・PERFECT・コンボ・入れ食い・ゾロ目・宝箱・天気を追加<br>
+                    ・難易度を「簡単／通常／難しい」から選べる<br>
+                    <b>🗺 エリアと生き物</b><br>
+                    ・海を3つに分割：さざ波の海／沖合の海(Lv.14)／深淵の海(Lv.34)<br>
+                    ・新しい生き物を約90種追加（全員に豆知識つき）<br>
+                    ・黄金郷はLv.100、神獣界はLv.250で開放<br>
+                    ・深海で使える竿は、青銅・伝説・神獣のみ<br>
+                    <b>🛠 ゴールドの使い道</b><br>
+                    ・「工房」で道具を+10まで強化／ブーストを購入<br>
+                    ・アクセサリーを11種追加<br>
+                    ・デイリーミッションは100,000Gで何度でも引き直せる<br>
+                    <b>🎲 ガチャ</b><br>
+                    ・ノーマルガチャを「ガチャ」画面に統合（1回600G・毎日1回無料）<br>
+                    ・バフ・お守り・まき餌が当たる。結果は画面中央に表示<br>
+                    <b>📖 図鑑・実績</b><br>
+                    ・図鑑：エリア選択ウィンドウ／前回の続きから表示／NEWを一括で消せる<br>
+                    ・実績：ヒント表示、全実績達成で「殿堂入り」<br>
+                    <b>🔰 はじめての人へ</b><br>
+                    ・遊び方を短く。「練習」で竿→大物→網を体験<br>
+                    ・メニューは縦1列。🏠でいつでも戻れる<br>
+                    <b>🔧 その他</b><br>
+                    ・魚影を実物サイズに。画像を先読みして表示を安定<br>
+                    ・iPhoneの音・はみ出しを改善<br>
+                    ・ゴールドのバランスを調整（ボーナス上限×1.8、ショップ約1.5倍）<br>
+                    ・天気は、結果画面を閉じるたびに判定。ガチャエリア・神獣界・地底湖・深海では発生しません<br>
+                    <br>
                     ==V2.3.0======<br>
                     ・新しい実績を追加しました。<br>
                     ・タイトル画面が時刻によって変更するようになりました。<br>
@@ -304,7 +367,7 @@
         <div class="shop-header">
             <span style="font-family: 'Reggae One', cursive; font-size: 18px; color: #ffd700;">道具屋</span>
             <span style="font-size: 13px; color: #00ffcc;">所持金: <span id="shop-gold">0</span> G</span>
-            <button class="btn" onclick="closeShop()">戻る</button>
+            <button class="btn" onclick="closeShop()">🏠 メニューへ戻る</button>
         </div>
 
         <div class="shop-tab-group">
@@ -339,7 +402,7 @@
 
         <div class="ui-header-bottom">
             <div class="ui-header-btns">
-                <button class="btn" onclick="goToMenuFromHeader()">メニュー</button>
+                <button class="btn btn-home" id="btn-home" onclick="goToMenuFromHeader()">🏠 メニューへ戻る</button>
                 <button class="btn" onclick="openMapModal()">場所移動</button>
                 <button class="btn" onclick="openZukan()">図鑑</button>
             </div>
@@ -352,40 +415,46 @@
         <button class="tool-mode-btn" id="mode-btn-net" onclick="setToolMode('net')">🕸 網で捕る</button>
     </div>
 
+    <!-- v2.4.0 演出レイヤー -->
+    <div id="weather-layer" class="w-clear"></div>
+    <div id="status-hud"></div>
+    <div id="tutorial-banner"></div>
+    <div id="catch-slots"></div>
     <!-- ゲームエリア -->
     <div id="game-screen" onclick="handleAction()">
         <div id="ripple-effect" class="ripple"></div>
         <div id="fish-shadow"></div>
+        <div id="net-ring"></div>
+        <div id="net-pips"></div>
+        <div id="net-hint"></div>
 
         <div id="mash-container">
-            <div id="mash-title">これはかなりの大物だ！</div>
-            <div style="font-size: 15px; color: #fff; margin-bottom: 6px;">画面を連打して釣り上げろ！</div>
+            <div id="mash-title">大物！</div>
+            <div style="font-size: 15px; color: #fff; margin-bottom: 6px;">連打！</div>
             <div id="gauge-outer">
                 <div id="gauge-inner"></div>
             </div>
         </div>
 
         <div id="exclamation">一閃！</div>
-        <div id="status-text">画面を叩いて竿を振れ！</div>
+        <div id="omen-layer"></div>
+        <div id="status-text">タップで竿を振る</div>
+        <div id="wait-tip"></div>
     </div>
 
     <!-- 遊び方 modal -->
     <div id="howto-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 24px; color: #ffd700; margin-bottom: 14px;">遊び方</div>
-        <div style="font-size: 15px; line-height: 1.8; text-align: left; margin-bottom: 20px; color: #fff;">
-            ❶ <strong style="color:#ffd700;">画面タップで道具を準備！</strong><br>
-            「画面を叩いて〜」の時に画面を押してじっと待ちます。<br><br>
-            ❷ <strong style="color:#ff3333;">「一閃！」で即タップ！</strong><br>
-            影が近付き「一閃！」が出たら、逃げられる前に即タップ！<br><br>
-            ❸ <strong style="color:#ffcc00;">「竿」と「網」を使い分けよう！</strong><br>
-            上のボタンでいつでも切替可能！網モード時は網限定の小さな生き物や特殊水生生物が出現します！<br><br>
-            ❹ <strong style="color:#00ffcc;">レベルUPで新エリア開放！</strong><br>
-            生き物を獲ると経験値とお金が手に入り、レベルが上がると新しい釣り場や強力な道具が手に入ります。
-            <span style="font-size: 12px; color: #ffaaaa; display: block; margin-top: 6px; line-height: 1.5;">
-                ※通信回線が不安定な場合や、瞬発力に自信のない方は設定から「易しめ」モードへの切り替えがオススメです。
-            </span>
+        <div class="howto-title">遊び方</div>
+        <div class="howto-body">
+            <div class="howto-step"><b>🎣 竿</b>タップで竿を振る → 「一閃！」が出たら<em>すぐタップ</em>。大物は連打！</div>
+            <div class="howto-step"><b>🥅 網</b>泳ぐ生き物が<em>輪の中</em>に来た瞬間にタップ。大物は赤い輪で<em>2回</em>タップ！</div>
+            <div class="howto-step"><b>✨ 特別な生き物</b>各エリアで一番めずらしい生き物は、ミニゲームで勝負！ 説明が出るので落ち着いて。</div>
+            <div class="howto-step"><b>💰 お金</b>つかまえてお金をため、ショップ・ガチャ・工房へ。</div>
+            <div class="howto-step"><b>🏠 戻る</b>画面上の「🏠」ボタン。（PCは X / Esc）</div>
+            <div class="howto-step small">PC：↑↓←→で選ぶ ／ Zで決定 ／ Xで戻る</div>
         </div>
-        <button class="btn" style="padding: 8px 25px; font-size: 16px;" onclick="closeHowToPlay()">閉じる</button>
+        <button class="btn howto-practice" onclick="replayTutorial()">🎣 練習してみる（ごほうびなし）</button>
+        <button class="btn" style="padding: 8px 25px; font-size: 15px;" onclick="closeHowToPlay()">閉じる</button>
     </div>
 
     <!-- レベルアップ modal -->
@@ -406,17 +475,20 @@
     <!-- リザルト modal -->
     <div id="result-modal" class="modal">
         <h3 id="result-title">大物 GET!!</h3>
+        <div id="result-rank"></div>
         
         <div class="result-img-wrapper">
             <div id="result-new-badge" class="result-new-badge" style="display: none;">NEW!</div>
             <img id="result-img" class="clickable-fish" src="" alt="獲得生物" onclick="zoomImage(this.src)">
         </div>
 
-        <div style="font-size: 12px; color: #aaa;">(タップで生物を拡大表示)</div>
+        <div id="result-hint" style="font-size: 12px; color: #aaa;">(タップで生物を拡大表示)</div>
         <div id="result-name" style="font-size: 22px; font-weight: bold; color:#fff; margin-top: 4px; margin-bottom: 4px;">---</div>
         <div id="result-price" style="font-size: 16px; color: #ffd700; font-weight: bold; margin-bottom: 4px;">+0 G 獲得！</div>
+        <div id="result-bonus"></div>
         <div id="result-time" style="font-size: 14px; color: #00ffcc; margin-bottom: 15px;">反応速度: 0.000秒</div>
         <button class="btn" id="next-btn" style="font-size: 16px; padding: 8px 20px;" onclick="closeResult()">次へ進む</button>
+        <button class="btn" style="font-size: 14px; padding: 8px 12px; margin-left: 6px;" onclick="menuFromResult()">🏠</button>
     </div>
 
     <!-- 図鑑 modal -->
@@ -424,8 +496,7 @@
         <div class="zukan-header">
             <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">おさかな絵巻</span>
             <div>
-                <button class="btn btn-reset" onclick="resetZukanData()">図鑑初期化</button>
-                <button class="btn" onclick="closeZukan()">閉じる</button>
+                                <button class="btn zukan-close" style="position:absolute;top:10px;right:14px;z-index:40;" onclick="closeZukan()">閉じる</button>
             </div>
         </div>
 
@@ -457,6 +528,44 @@
         <div id="zukan-detail-price" style="font-size: 14px; color: #ffd700; margin-bottom: 4px;">買取価格: 0 G</div>
         <div id="zukan-detail-time">最速記録: ---秒</div>
         <button class="btn" style="padding: 8px 20px; font-size: 15px; margin-top: 10px;" onclick="closeZukanDetail()">閉じる</button>
+    </div>
+
+    <!-- デイリーミッション modal -->
+    <div id="mission-modal" class="modal">
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 8px;">📅 デイリーミッション</div>
+        <div style="font-size:12px; color:#aaa; margin-bottom:10px;">毎日0時にミッションが入れ替わります</div>
+        <div id="mission-list" style="width:100%; flex:1; overflow-y:auto;"></div>
+        <button class="btn" id="mission-reroll" style="margin-top:8px; font-size:13px; padding:8px 12px; background:#6a3a8a;" onclick="rerollMissions()">🔄 ミッションを引き直す（100,000G）</button>
+        <button class="btn" style="margin-top: 10px; padding: 6px 25px; font-size: 15px;" onclick="closeMissions()">閉じる</button>
+    </div>
+
+    <!-- ノーマルガチャ 景品一覧 -->
+    <div id="ng-prize-modal" class="modal">
+        <div class="howto-title">🎁 景品と確率</div>
+        <div id="ng-prize-list" class="ws-list"></div>
+        <button class="btn" style="margin-top: 8px; padding: 6px 25px; font-size: 15px;" onclick="closeNgPrizes()">閉じる</button>
+    </div>
+
+    <!-- 工房（専用画面） -->
+    <div id="workshop-screen">
+        <div class="wk-head">
+            <div class="wk-title">🛠 工房</div>
+            <div class="wk-gold">所持金 <b id="ws-gold">0</b> G</div>
+        </div>
+        <div class="wk-tabs">
+            <button id="ws-tab-upg" class="wk-tab active" onclick="setWsTab('upg')">🔧 道具の強化</button>
+            <button id="ws-tab-boost" class="wk-tab" onclick="setWsTab('boost')">🧪 ブースト</button>
+        </div>
+        <div id="ws-note" class="wk-note"></div>
+        <div id="ws-list" class="wk-list"></div>
+        <button class="btn wk-back" onclick="closeWorkshop()">🏠 メニューへ戻る</button>
+    </div>
+
+    <!-- 図鑑 エリア選択 modal -->
+    <div id="zukan-area-modal" class="modal">
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px;">📍 エリアをえらぶ</div>
+        <div id="zukan-area-list" style="width:100%; flex:1; overflow-y:auto; padding:0 12px; box-sizing:border-box;"></div>
+        <button class="btn" style="margin-top: 8px; padding: 6px 25px; font-size: 15px;" onclick="closeZukanAreaModal()">閉じる</button>
     </div>
 
     <!-- 画像単体拡大モーダル -->
@@ -545,6 +654,18 @@
 </div>
 
 <!-- 外部スクリプトの読み込み -->
+<script src="trivia.js"></script>
+<script src="fishsize.js"></script>
+<script src="fishfacing.js"></script>
 <script src="script.js"></script>
+<script src="addons.js"></script>
+<script>
+  // ファイルの取り違え対策：script.js が正しく読み込めていない時に知らせる
+  window.addEventListener('DOMContentLoaded', function () {
+    if (typeof startGameFromMenu !== 'function') {
+      document.body.insertAdjacentHTML('afterbegin', '<div style="position:fixed;inset:0;z-index:99999;background:#300;color:#fff;padding:24px;font-size:16px;line-height:1.7;">⚠ ゲームのプログラム（script.js）が正しく読み込まれていません。<br>script.js の中身が style.css などになっていないか、ファイルを確認してください。（正しい script.js は約240KBです）</div>');
+    }
+  });
+</script>
 </body>
 </html>

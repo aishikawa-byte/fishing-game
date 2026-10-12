@@ -1,9 +1,8 @@
-
 /* ===================================================
 マップ（釣り場）設定
 =================================================== */
 const MAP_DATA = {
-    sea: { name: "海", bg: "images/bg/bg_sea.png", reqLevel: 1, sound: "sounds/sea.mp3" },
+    sea: { name: "海", bg: "images/bg/旧デザイン/bg_sea.png", reqLevel: 1, sound: "sounds/sea.mp3" },
     river: { name: "川", bg: "images/bg/bg_river.png", reqLevel: 5, sound: "sounds/river.mp3" },
     swamp: { name: "沼地", bg: "images/bg/bg_swamp.png", reqLevel: 10, sound: "sounds/swamp.mp3" },
     lake: { name: "湖", bg: "images/bg/bg_lake.png", reqLevel: 18, sound: "sounds/lake.mp3" },
@@ -22,13 +21,13 @@ const MAP_DATA = {
     eldorado: { 
         name: "黄金郷", 
         bg: "images/bg/bg_eldorado.png", 
-        reqLevel: 80, 
+        reqLevel: 100, 
         gacha: true, 
         matchRod: "eldorado_rod", 
         matchNet: "divine_net",   
         sound: "sounds/eldorado.mp3" 
     },
-    shinju: { name: "神獣界", bg: "images/bg/bg_shinju.png", reqLevel: 200, sound: "sounds/shinju.mp3" }
+    shinju: { name: "神獣界", bg: "images/bg/bg_shinju.png", reqLevel: 250, sound: "sounds/shinju.mp3" }
 };
 let currentLocation = "sea";
 let currentToolMode = "rod"; // "rod" or "net"
@@ -56,11 +55,11 @@ let currentGachaIndex = 0;
    =================================================== */
 const ROD_DATA = {
     wood: { id: "wood", name: "木の竿", icon: "images/fishingrod/wood_fishing_rod.png", price: 0, desc: "初期装備の質素な竿。特別な能力はない。" },
-    iron: { id: "iron", name: "鉄の竿", icon: "images/fishingrod/iron_fishing_rod.png", price: 1200, desc: "頑丈な金属製の竿。連打パワーが増加し大物を釣りやすい。" },
-    gold: { id: "gold", name: "金の竿", icon: "images/fishingrod/gold_fishing_rod.png", price: 5000, desc: "黄金に輝く竿。大物やレアな魚がヒットする確率がアップ！" },
-    bronze: { id: "bronze", name: "青銅の竿", icon: "images/fishingrod/copper_fishing_rod.png", price: 12000, desc: "深海エリア専用の特化竿。ヒット判定と連打時間が少し長くなる。" },
-    legend: { id: "legend", name: "伝説の竿", icon: "images/fishingrod/legendary_fishing_rod.png", price: 40000, desc: "太古の神木で作られた幻の竿。すべてのエリアで全能力が大幅UP！" },
-    god_beast_rod: { id: "god_beast_rod", name: "神獣の竿", icon: "images/fishingrod/god_beast_rod.png", price: 100000, desc: "神獣界のボスに対抗できる伝説の竿。連打パワーが爆発的に上昇！" },
+    iron: { id: "iron", name: "鉄の竿", icon: "images/fishingrod/iron_fishing_rod.png", price: 1800, desc: "頑丈な金属製の竿。連打パワーが増加し大物を釣りやすい。" },
+    gold: { id: "gold", name: "金の竿", icon: "images/fishingrod/gold_fishing_rod.png", price: 7500, desc: "黄金に輝く竿。大物やレアな魚がヒットする確率がアップ！" },
+    bronze: { id: "bronze", name: "青銅の竿", icon: "images/fishingrod/copper_fishing_rod.png", price: 18000, desc: "深海エリア専用の特化竿。ヒット判定と連打時間が少し長くなる。" },
+    legend: { id: "legend", name: "伝説の竿", icon: "images/fishingrod/legendary_fishing_rod.png", price: 60000, desc: "太古の神木で作られた幻の竿。すべてのエリアで全能力が大幅UP！" },
+    god_beast_rod: { id: "god_beast_rod", name: "神獣の竿", icon: "images/fishingrod/god_beast_rod.png", price: 150000, desc: "神獣界のボスに対抗できる伝説の竿。連打パワーが爆発的に上昇！" },
     
     lava_rod: { id: "lava_rod", name: "耐溶岩釣り竿", icon: "images/fishingrod/lava_fishing_rod.png", price: 0, gacha: true, desc: "火山エリア特化。溶岩の熱に耐え、通常通りの待ち時間で釣りが可能！" },
     jungle_rod: { id: "jungle_rod", name: "ジャングルの釣り竿", icon: "images/fishingrod/jungle_fishing_rod.png", price: 0, gacha: true, desc: "はちみつエリア特化。粘り気のあるはちみつでもスムーズに釣りが可能！" },
@@ -78,9 +77,9 @@ const ROD_DATA = {
    =================================================== */
 const NET_DATA = {
     bug_net: { id: "bug_net", name: "虫取り網", icon: "images/net/net_bug.png", price: 0, desc: "初期装備の小さな網。小さな水生生物や昆虫を捕獲可能。", targetSize: ["small"] },
-    tough_net: { id: "tough_net", name: "丈夫な網", icon: "images/net/net_tough.png", price: 1500, desc: "ナイロン製の破れにくい網。普通サイズの生物まで捕獲可能。", targetSize: ["small", "midi"] },
-    iron_net: { id: "iron_net", name: "鉄の網", icon: "images/net/net_iron.png", price: 6000, desc: "鉄線で編まれた強力な網。大きな生き物までガッチリ捕獲！", targetSize: ["small", "midi", "big"] },
-    steel_net: { id: "steel_net", name: "鋼鉄ネット", icon: "images/net/net_steel.png", price: 20000, desc: "最高度の鋼鉄製巨大ネット。特大の生物や伝説の怪物もすくい上げる！", targetSize: ["small", "midi", "big", "biggest"] },
+    tough_net: { id: "tough_net", name: "丈夫な網", icon: "images/net/net_tough.png", price: 2200, desc: "ナイロン製の破れにくい網。普通サイズの生物まで捕獲可能。", targetSize: ["small", "midi"] },
+    iron_net: { id: "iron_net", name: "鉄の網", icon: "images/net/net_iron.png", price: 9000, desc: "鉄線で編まれた強力な網。大きな生き物までガッチリ捕獲！", targetSize: ["small", "midi", "big"] },
+    steel_net: { id: "steel_net", name: "鋼鉄ネット", icon: "images/net/net_steel.png", price: 30000, desc: "最高度の鋼鉄製巨大ネット。特大の生物や伝説の怪物もすくい上げる！", targetSize: ["small", "midi", "big", "biggest"] },
     divine_net: { id: "divine_net", name: "神獣の網", icon: "images/net/net_divine.png", price: 0, gacha: true, desc: "神々の祝福を受けた究極のネット。全生物を最高速度で簡単に捕獲！", targetSize: ["small", "midi", "big", "biggest"] }
 };
 
@@ -88,11 +87,11 @@ const NET_DATA = {
    新規アクセサリ＆消耗品データ
    =================================================== */
 const ACC_DATA = {
-    maki_esa: { id: "maki_esa", name: "まき餌", icon: "images/acc/maki_esa.png", price: 3000, desc: "消耗品。装備中、魚がかかるまでの待ち時間が短縮！" },
-    line_tough: { id: "line_tough", name: "丈夫な釣り糸", icon: "images/acc/line_tough.png", price: 10000, desc: "竿用。ミス時に20%の確率で無効化してセーフ！" },
-    net_tough: { id: "net_tough", name: "補強ネット", icon: "images/acc/net_tough.png", price: 10000, desc: "網用。ミス時に20%の確率で無効化してセーフ！" },
-    bait_reel: { id: "bait_reel", name: "ベイトリール", icon: "images/acc/bait_reel.png", price: 8000, desc: "竿用。大物との戦いでの連打パワーがアップ！" },
-    net_fixed: { id: "net_fixed", name: "定置網", icon: "images/acc/net_fixed.png", price: 8000, desc: "網用。大物との戦いでの連打パワーがアップ！" }
+    maki_esa: { id: "maki_esa", name: "まき餌", icon: "images/acc/maki_esa.png", price: 4500, desc: "消耗品。装備中、魚がかかるまでの待ち時間が短縮！" },
+    line_tough: { id: "line_tough", name: "丈夫な釣り糸", icon: "images/acc/line_tough.png", price: 15000, desc: "竿用。ミス時に20%の確率で無効化してセーフ！" },
+    net_tough: { id: "net_tough", name: "補強ネット", icon: "images/acc/net_tough.png", price: 15000, desc: "網用。ミス時に20%の確率で無効化してセーフ！" },
+    bait_reel: { id: "bait_reel", name: "ベイトリール", icon: "images/acc/bait_reel.png", price: 12000, desc: "竿用。大物との戦いでの連打パワーがアップ！" },
+    net_fixed: { id: "net_fixed", name: "定置網", icon: "images/acc/net_fixed.png", price: 12000, desc: "網用。大物との戦いでの連打パワーがアップ！" }
 };
 
 /* ===================================================
@@ -486,14 +485,6 @@ function savePlayerData() {
 let bgmAudioPlayer = null;
 let bgmFadeTimer = null;
 
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (!titleBgm) {
-        titleBgm = document.getElementById('title-bgm');
-    }
-}
 
 function formatPlayTime(totalSeconds) {
     const MAX_SECONDS = (999 * 3600) + (59 * 60);
@@ -531,103 +522,9 @@ function startPlayTimeCounter() {
     }, 1000);
 }
 
-function playBgm(soundPath, isTitle = false) {
-    if (!soundEnabled) return;
-    initAudio();
 
-    if (isTitle) {
-        if (currentBgm && currentBgm !== titleBgm) {
-            fadeOutAudio(currentBgm);
-        }
 
-        const titleAudioElem = titleBgm || document.getElementById('title-bgm');
-        
-        if (titleAudioElem) {
-            currentBgm = titleAudioElem;
-            currentBgmPath = 'title';
 
-            if (!titleAudioElem.paused) return;
-
-            titleAudioElem.volume = 0.02;
-            titleAudioElem.currentTime = 0;
-            titleAudioElem.play().catch(err => {
-                console.log("タイトルBGM再生エラー:", err);
-            });
-        }
-        return;
-    }
-
-    if (currentBgmPath === soundPath && currentBgm && !currentBgm.paused) {
-        return; 
-    }
-
-    const titleAudioElem = titleBgm || document.getElementById('title-bgm');
-    if (titleAudioElem && !titleAudioElem.paused) {
-        fadeOutAudio(titleAudioElem);
-    }
-    if (currentBgm && currentBgm !== titleAudioElem) {
-        fadeOutAudio(currentBgm);
-    }
-
-    const newAudio = new Audio(soundPath);
-    newAudio.loop = true;
-    newAudio.volume = 0.0;
-    
-    currentBgm = newAudio;
-    currentBgmPath = soundPath;
-
-    newAudio.play().then(() => {
-        fadeInAudio(newAudio, 0.02);
-    }).catch(err => {
-        console.log("ステージBGM再生エラー:", err);
-    });
-}
-
-function fadeOutAudio(audio) {
-    if (!audio) return;
-    let vol = audio.volume;
-    const fadeOutTimer = setInterval(() => {
-        vol -= 0.003;
-        if (vol <= 0.001) {
-            vol = 0;
-            audio.pause();
-            audio.currentTime = 0;
-            clearInterval(fadeOutTimer);
-        } else {
-            audio.volume = vol;
-        }
-    }, 50);
-}
-
-function fadeInAudio(audio, targetVol) {
-    if (!audio) return;
-    let vol = 0;
-    audio.volume = 0;
-    const fadeInTimer = setInterval(() => {
-        vol += 0.002;
-        if (vol >= targetVol) {
-            audio.volume = targetVol;
-            clearInterval(fadeInTimer);
-        } else {
-            audio.volume = vol;
-        }
-    }, 50);
-}
-
-function updateStageBgm() {
-    if (!soundEnabled) return;
-
-    if (gameState === 'TITLE' || gameState === 'MENU' || gameState === 'GACHA' || isZukanOpen) {
-        playBgm("sounds/title.mp3", true);
-    } else if (gameState === 'BATTLE') {
-        playBgm("sounds/boss.mp3", false);
-    } else {
-        const mapObj = MAP_DATA[currentLocation];
-        if (mapObj && mapObj.sound) {
-            playBgm(mapObj.sound, false);
-        }
-    }
-}
 
 function updateSoundUI() {
     const configImg = document.getElementById('config-sound-img');
@@ -639,27 +536,6 @@ function updateSoundUI() {
     if (headerImg) headerImg.src = imgPath;
 }
 
-function toggleSound() {
-    soundEnabled = !soundEnabled;
-    initAudio();
-
-    if (soundEnabled) {
-        updateStageBgm();
-        playWaterPlop();
-    } else {
-        const htmlTitleAudio = document.getElementById('title-bgm');
-        if (htmlTitleAudio) htmlTitleAudio.pause();
-        if (currentBgm) currentBgm.pause();
-        if (bgmAudioPlayer) bgmAudioPlayer.pause();
-
-        if (bgmFadeTimer) {
-            clearInterval(bgmFadeTimer);
-            bgmFadeTimer = null;
-        }
-    }
-
-    updateSoundUI();
-}
 
 function setToolMode(mode) {
     currentToolMode = mode;
@@ -753,26 +629,6 @@ function closeAllModals() {
     closeZukanDetail();
 }
 
-function goToMenu() {
-    initAudio();
-    closeAllModals();
-    document.getElementById('title-screen').style.display = "none";
-    document.getElementById('menu-screen').style.display = "flex";
-    gameState = 'MENU';
-    updateMenuUI();
-
-    if (soundEnabled && titleBgm) {
-        titleBgm.volume = 0.02;
-        titleBgm.play().then(() => {
-            currentBgm = titleBgm;
-            currentBgmPath = 'title';
-        }).catch(err => {
-            console.log("BGM再生エラー:", err);
-        });
-    }
-
-    playWaterPlop();
-}
 
 function goToMenuFromHeader() {
     initAudio();
@@ -956,15 +812,15 @@ function spinGacha(count) {
         { type: "rod", key: "dragon_rod", name: "🐉 龍神の竿", icon: "images/fishingrod/dragon_fishing_rod.png", weight: 1 },
         { type: "net", key: "divine_net", name: "🔱 神獣の網", icon: "images/net/net_divine.png", weight: 1 },
 
-        { type: "trash", name: "🥫 空き缶 (10 G)", icon: TRASH_PATHS.kan, amount: 10, weight: 14.0 },
-        { type: "trash", name: "👞 長靴 (10 G)", icon: TRASH_PATHS.kutu, amount: 10, weight: 14.0 },
-        { type: "trash", name: "🛞 古タイヤ (20 G)", icon: TRASH_PATHS.tire, amount: 20, weight: 14.0 },
-        { type: "trash", name: "🪵 流木 (10 G)", icon: TRASH_PATHS.ryuuboku, amount: 10, weight: 14.0 },
-        { type: "trash", name: "🧹 ボロきれ (5 G)", icon: TRASH_PATHS.kire, amount: 5, weight: 14.0 },
-        { type: "trash", name: "🌿 ワカメ (10 G)", icon: TRASH_PATHS.kaisou, amount: 10, weight: 14.0 },
+        { type: "trash", name: "🥫 空き缶 (30 G)", icon: TRASH_PATHS.kan, amount: 30, weight: 14.0 },
+        { type: "trash", name: "👞 長靴 (30 G)", icon: TRASH_PATHS.kutu, amount: 30, weight: 14.0 },
+        { type: "trash", name: "🛞 古タイヤ (60 G)", icon: TRASH_PATHS.tire, amount: 60, weight: 14.0 },
+        { type: "trash", name: "🪵 流木 (30 G)", icon: TRASH_PATHS.ryuuboku, amount: 30, weight: 14.0 },
+        { type: "trash", name: "🧹 ボロきれ (15 G)", icon: TRASH_PATHS.kire, amount: 15, weight: 14.0 },
+        { type: "trash", name: "🌿 ワカメ (30 G)", icon: TRASH_PATHS.kaisou, amount: 30, weight: 14.0 },
 
-        { type: "gold", amount: 50, name: "💰 50 Gold", icon: GOLD_PATHS.gold50, weight: 5.5 },
-        { type: "gold", amount: 30, name: "💰 30 Gold", icon: GOLD_PATHS.gold30, weight: 5.5 }
+        { type: "gold", amount: 150, name: "💰 150 Gold", icon: GOLD_PATHS.gold50, weight: 5.5 },
+        { type: "gold", amount: 100, name: "💰 100 Gold", icon: GOLD_PATHS.gold30, weight: 5.5 }
     ];
 
     const totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
@@ -981,6 +837,13 @@ function spinGacha(count) {
             }
             rnd -= p.weight;
         }
+
+        const RARE_T = ['map', 'rod', 'net'];
+        const noRare10 = count === 10 && i === 9 && !results.some(r => /エリア解放|竿|網/.test(r.name));
+        if ((playerData.gachaPity || 0) >= 29 || noRare10) {
+            if (!RARE_T.includes(selectedItem.type)) selectedItem = !playerData.unlockedGachaMaps.includes(seriesMap.key) ? seriesMap : seriesRod;
+        }
+        playerData.gachaPity = RARE_T.includes(selectedItem.type) ? 0 : (playerData.gachaPity || 0) + 1;
 
         if (selectedItem.type === "map") {
             if (playerData.unlockedGachaMaps.includes(selectedItem.key)) {
@@ -1075,34 +938,6 @@ function closeAchievements() {
     document.getElementById('achievement-modal').style.display = "none";
 }
 
-function renderAchievementList() {
-    const totalAchievements = Object.keys(ACHIEVEMENT_DATA).length;
-    const unlockedCount = playerData.achievements ? playerData.achievements.length : 0;
-    const percent = totalAchievements > 0 ? Math.floor((unlockedCount / totalAchievements) * 100) : 0;
-
-    document.getElementById('achievement-progress-num').innerText = `${percent}% (${unlockedCount}/${totalAchievements})`;
-    document.getElementById('achievement-progress-bar-inner').style.width = `${percent}%`;
-
-    const list = document.getElementById('achievement-list');
-    list.innerHTML = "";
-
-    Object.keys(ACHIEVEMENT_DATA).forEach(key => {
-        const ach = ACHIEVEMENT_DATA[key];
-        const isUnlocked = playerData.achievements && playerData.achievements.includes(key);
-
-        const item = document.createElement('div');
-        item.className = `achievement-item ${isUnlocked ? 'unlocked' : ''}`;
-
-        item.innerHTML = `
-            <img class="achievement-icon" src="${ach.icon}" alt="Trophy">
-            <div class="achievement-info">
-                <span class="achievement-name">${isUnlocked ? ach.name : "？？？？？"}</span>
-                <span class="achievement-desc">${ach.desc}</span>
-            </div>
-        `;
-        list.appendChild(item);
-    });
-}
 
 function isAreaCompleted(locationKey) {
     const targetAreaFish = FISH_DATA.filter(fish => fish.location === locationKey);
@@ -1145,7 +980,7 @@ function checkAchievements() {
         { id: "rich_man", cond: playerData.gold >= 10000 },
         { id: "all_maps", cond: playerData.level >= 55 },
         
-        { id: "comp_sea", cond: isAreaCompleted("sea") },
+        { id: "comp_sea", cond: ["sea", "sea2", "sea3"].every(k => isAreaCompleted(k)) },
         { id: "comp_river", cond: isAreaCompleted("river") },
         { id: "comp_swamp", cond: isAreaCompleted("swamp") },
         { id: "comp_lake", cond: isAreaCompleted("lake") },
@@ -1408,7 +1243,7 @@ function renderShopList() {
         }
 
         item.innerHTML = `
-            <img class="shop-item-icon" src="${data.icon}" alt="${data.name}" onclick="zoomImage('${data.icon}')" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect x=\'40\' y=\'10\' width=\'20\' height=\'80\' fill=\'sienna\'/></svg>'">
+            <img class="shop-item-icon" src="${data.icon}" alt="${data.name}" onclick="zoomImage('${data.icon}')" onerror="imgFallback(this)">
             <div class="shop-item-info">
                 <div class="shop-item-top">
                     <span class="shop-item-name">${data.name}</span>
@@ -1487,7 +1322,7 @@ function renderMapGrid() {
         btn.className = `map-btn ${isCurrent ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
 
         if (isUnlocked) {
-            btn.innerText = `${map.name} ${map.gacha ? '(ガチャ)' : '(Lv.' + map.reqLevel + '〜)'}`;
+            btn.innerText = `${map.name} ${map.gacha ? '(ガチャ)' : '(Lv.' + map.reqLevel + '〜)'}${map.note ? '\n' + map.note : ''}`;
             btn.onclick = () => selectLocation(locKey);
         } else {
             let reqLabel = map.gacha ? `要 Lv.${map.reqLevel}＆ガチャ` : `要 Lv.${map.reqLevel}`;
@@ -1509,7 +1344,7 @@ function selectLocation(locKey) {
 
     currentLocation = locKey;
     const container = document.getElementById('game-container');
-    container.style.backgroundImage = `url('${map.bg}')`;
+    container.style.backgroundImage = `url('${map.bg}')` + (map.bgFallback ? `, url('${map.bgFallback}')` : '');
     document.getElementById('current-location-text').innerText = `【${map.name}】`;
 
     closeMapModal();
@@ -1517,21 +1352,6 @@ function selectLocation(locKey) {
     playWaterPlop();
 }
 
-function getRandomFish() {
-    const availableFish = FISH_DATA.filter(fish => fish.location === currentLocation && (fish.toolType || "rod") === currentToolMode);
-    if (availableFish.length === 0) {
-        return FISH_DATA.find(f => f.location === currentLocation) || FISH_DATA[0];
-    }
-
-    const totalWeight = availableFish.reduce((sum, fish) => sum + fish.weight, 0);
-
-    let randomVal = Math.floor(Math.random() * totalWeight);
-    for (const fish of availableFish) {
-        if (randomVal < fish.weight) return fish;
-        randomVal -= fish.weight;
-    }
-    return availableFish[0];
-}
 
 function zoomImage(src) {
     if (!src) return;
@@ -1552,67 +1372,8 @@ function resetZukanData() {
 /* ===================================================
    おさかな絵巻（図鑑）機能
    =================================================== */
-function openZukan() {
-    initAudio();
-    isZukanOpen = true;
 
-    resetGameStateToReady();
-    closeAllModals();
 
-    updateStageBgm();
-
-    switchZukanCategory('normal');
-    document.getElementById('zukan-modal').style.display = "flex";
-}
-
-function switchZukanCategory(catKey) {
-    currentZukanMainTab = catKey;
-    currentFilter = 'all';
-
-    document.getElementById('zukan-tab-normal').className = `zukan-main-tab ${catKey === 'normal' ? 'active' : ''}`;
-    document.getElementById('zukan-tab-gacha').className = `zukan-main-tab ${catKey === 'gacha' ? 'active' : ''}`;
-
-    renderZukanSubFilterUI();
-    renderZukanGrid();
-}
-
-function renderZukanSubFilterUI() {
-    const subFilterContainer = document.getElementById('zukan-sub-filter');
-    subFilterContainer.innerHTML = "";
-
-    let locations = [];
-    if (currentZukanMainTab === 'normal') {
-        locations = ['all', 'sea', 'river', 'swamp', 'lake', 'snow', 'underground', 'deepsea', 'shinju'];
-    } else {
-        locations = ['all', 'volcano', 'honey', 'holy', 'ryugu', 'ruins', 'poison', 'milkyway', 'eldorado'];
-    }
-
-    locations.forEach(loc => {
-        let name = "すべて";
-        if (loc !== 'all') {
-            const map = MAP_DATA[loc];
-            if (map) {
-                let isUnlocked = playerData.level >= map.reqLevel;
-                if (map.gacha) {
-                    isUnlocked = playerData.unlockedGachaMaps && playerData.unlockedGachaMaps.includes(loc);
-                }
-                name = isUnlocked ? map.name : "？？？";
-            } else {
-                name = loc;
-            }
-        }
-
-        const btn = document.createElement('button');
-        btn.className = `filter-btn ${currentFilter === loc ? 'active' : ''}`;
-        btn.innerText = name;
-        btn.onclick = () => {
-            currentFilter = loc;
-            renderZukanSubFilterUI();
-            renderZukanGrid();
-        };
-        subFilterContainer.appendChild(btn);
-    });
-}
 
 function resetGameStateToReady() {
     clearTimeout(timerId);
@@ -1626,8 +1387,8 @@ function resetGameStateToReady() {
     
     if (gameState !== 'TITLE' && gameState !== 'MENU' && gameState !== 'GACHA') {
         gameState = 'READY';
-        const actionVerb = currentToolMode === 'rod' ? '竿を振れ！' : '網を構えろ！';
-        document.getElementById('status-text').innerText = `画面を叩いて${actionVerb}`;
+        const actionVerb = currentToolMode === 'rod' ? 'タップで竿を振る' : 'タップで網を構える';
+        document.getElementById('status-text').innerText = `${actionVerb}`;
         document.getElementById('status-text').style.color = "#fff";
     }
 }
@@ -1654,6 +1415,7 @@ function renderZukanGrid() {
         return fish.location === currentFilter;
     });
 
+    listToDisplay.sort(zukanCompare);
     listToDisplay.forEach(fish => {
         const fishRecord = caughtFish[fish.id];
         const isUnlocked = fishRecord && fishRecord.unlocked;
@@ -1699,33 +1461,6 @@ function renderZukanGrid() {
     });
 }
 
-function openZukanDetail(fish) {
-    const modal = document.getElementById('zukan-detail-modal');
-    const title = document.getElementById('zukan-detail-title');
-    const img = document.getElementById('zukan-detail-img');
-    const desc = document.getElementById('zukan-detail-desc');
-    const price = document.getElementById('zukan-detail-price');
-    const time = document.getElementById('zukan-detail-time');
-
-    const locName = MAP_DATA[fish.location] ? MAP_DATA[fish.location].name : "不明";
-
-    title.innerText = `【${fish.name}】`;
-    img.src = fish.image;
-    img.onerror = () => { img.src = fish.fallbackSvg; };
-    desc.innerText = `[生息地: ${locName}] [種別: ${fish.toolType === 'net' ? '網捕獲' : '釣り竿'}]\n` + fish.desc;
-    price.innerText = `買取価格: ${fish.price} G`;
-
-    const best = caughtFish[fish.id].bestTime.toFixed(3);
-    time.innerText = `最速記録: ${best}秒`;
-
-    if (caughtFish[fish.id] && caughtFish[fish.id].isNew) {
-        caughtFish[fish.id].isNew = false;
-        localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
-        renderZukanGrid();
-    }
-
-    modal.style.display = "flex";
-}
 
 function closeZukanDetail() {
     const modal = document.getElementById('zukan-detail-modal');
@@ -1781,39 +1516,7 @@ function playSplashSE() {
     } catch(e) {}
 }
 
-function playSE(type) {
-    if (!soundEnabled || !audioCtx) return;
-    if (type === 'signal') {
-        playSplashSE();
-        playTone(880, 0.15, 'sawtooth');
-        setTimeout(() => playTone(1760, 0.25, 'sawtooth'), 60);
-    } else if (type === 'success') {
-        const notes = [523, 659, 783, 1046];
-        notes.forEach((f, i) => setTimeout(() => playTone(f, 0.12, 'square'), i * 80));
-    } else if (type === 'foul') {
-        playTone(130, 0.35, 'sawtooth');
-    } else if (type === 'tap') {
-        playTone(400, 0.05, 'square');
-    } else if (type === 'levelup') {
-        const notes = [523, 659, 783, 1046, 1318, 1567];
-        notes.forEach((f, i) => setTimeout(() => playTone(f, 0.15, 'triangle'), i * 70));
-    }
-}
 
-function playTone(freq, duration, type = 'square') {
-    try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-    } catch(e) {}
-}
 
 /* ===================================================
    ゲームメインループ・アクション処理
@@ -1833,9 +1536,9 @@ function handleAction() {
 
         // 深海エリア制限
         if (currentLocation === 'deepsea' && currentToolMode === 'rod') {
-            if (equippedRod !== 'bronze' && equippedRod !== 'legend' && equippedRod !== 'dragon_rod') {
+            if (equippedRod !== 'bronze' && equippedRod !== 'legend' && equippedRod !== 'god_beast_rod') {
                 playSE('foul');
-                document.getElementById('status-text').innerText = "青銅の竿か伝説の竿が必要だ！";
+                document.getElementById('status-text').innerText = "青銅・伝説・神獣の竿が必要だ！";
                 document.getElementById('status-text').style.color = "#ff3333";
                 return;
             }
@@ -1912,127 +1615,12 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-function setupFishShadow(fish) {
-    const shadow = document.getElementById('fish-shadow');
-    shadow.style.display = "block";
-    shadow.style.width = `${fish.shadowWidth}px`;
-    shadow.style.height = `${fish.shadowHeight}px`;
-
-    if (fish.shadowImage) {
-        shadow.style.backgroundImage = `url('${fish.shadowImage}')`;
-        shadow.style.backgroundColor = "transparent";
-    } else {
-        shadow.style.backgroundImage = "none";
-        shadow.style.backgroundColor = "rgba(0,0,0,0.7)";
-        shadow.style.borderRadius = "50%";
-    }
-
-    let posX = -180;
-    let posY = Math.random() * 80 + 360; 
-    shadow.style.top = `${posY}px`;
-
-    cancelAnimationFrame(shadowAnimId);
-    
-    function animateShadow() {
-        posX += 2.2;
-        if (posX > 500) posX = -180;
-        const waveY = Math.sin(posX * 0.04) * 6;
-        shadow.style.left = `${posX}px`;
-        shadow.style.transform = `translateY(${waveY}px)`;
-
-        if (gameState === 'WAITING' || gameState === 'SIGNAL') {
-            shadowAnimId = requestAnimationFrame(animateShadow);
-        }
-    }
-    shadowAnimId = requestAnimationFrame(animateShadow);
-}
 
 function hideFishShadow() {
     document.getElementById('fish-shadow').style.display = "none";
     cancelAnimationFrame(shadowAnimId);
 }
 
-function startWaiting() {
-    gameState = 'WAITING';
-    currentTargetFish = getRandomFish();
-
-    document.getElementById('status-text').innerText = "じっと待て……";
-    document.getElementById('status-text').style.color = "#fff";
-    document.getElementById('exclamation').style.display = "none";
-
-    const ripple = document.getElementById('ripple-effect');
-    ripple.style.display = "block";
-    ripple.style.left = "40%";
-    ripple.style.top = "70%";
-
-    playWaterPlop();
-    setupFishShadow(currentTargetFish);
-
-    const currentMapObj = MAP_DATA[currentLocation];
-    const equippedRod = playerData.equippedRod;
-
-    let isSlowWaiting = false;
-    if (currentToolMode === 'rod' && currentMapObj && currentMapObj.gacha) {
-        const reqRodKey = currentMapObj.matchRod;
-        if (equippedRod !== reqRodKey) {
-            isSlowWaiting = true;
-        }
-    }
-
-    let randomDelay = isSlowWaiting 
-        ? Math.floor(Math.random() * 4000) + 8000
-        : Math.floor(Math.random() * 3000) + 3000;
-
-    // まき餌（maki_esa）を装備している場合は待ち時間を50%短縮
-    if (playerData.equippedBait === 'maki_esa') {
-        randomDelay = Math.floor(randomDelay * 0.5);
-    }
-
-    timerId = setTimeout(() => {
-        gameState = 'SIGNAL';
-        startTime = Date.now();
-        document.getElementById('exclamation').style.display = "block";
-        document.getElementById('status-text').innerText = "今だ！合わせろ！";
-        document.getElementById('status-text').style.color = "#ffd700";
-        playSE('signal');
-        triggerVibration(200);
-
-        let timeBonus = 1.0;
-        if (currentToolMode === 'rod') {
-            const rod = playerData.equippedRod;
-            if (rod === 'bronze' && currentLocation === 'deepsea') timeBonus = 1.4;
-            if (rod === 'legend' || rod === 'dragon_rod') timeBonus = 1.3;
-        } else {
-            const net = playerData.equippedNet || 'bug_net';
-            if (net === 'divine_net') timeBonus = 1.5;
-        }
-
-        let rawReqTime = currentTargetFish.reqTime;
-        if (rawReqTime < 0.350) rawReqTime = 0.350;
-
-        let easyBonus = playerData.easyMode ? 0.350 : 0.0;
-        const limitTime = (rawReqTime * timeBonus) + easyBonus;
-
-        clearTimeout(timeoutTimerId);
-        timeoutTimerId = setTimeout(() => {
-            if (gameState === 'SIGNAL') {
-                hideFishShadow();
-                document.getElementById('ripple-effect').style.display = "none";
-                document.getElementById('exclamation').style.display = "none";
-                playSE('foul');
-
-                if (currentToolMode === 'rod') {
-                    playerData.currentCombo = 0;
-                } else {
-                    playerData.netCombo = 0;
-                }
-                registerMiss();
-                showResult(false, currentTargetFish, limitTime + 0.1);
-            }
-        }, limitTime * 1000);
-
-    }, randomDelay);
-}
 
 function foulAction() {
     clearTimeout(timerId);
@@ -2053,159 +1641,8 @@ function foulAction() {
     document.getElementById('status-text').style.color = "#ff3333";
 }
 
-function hitAction() {
-    clearTimeout(timeoutTimerId);
-    const endTime = Date.now();
-    reactionTime = (endTime - startTime) / 1000;
-    hideFishShadow();
-    document.getElementById('ripple-effect').style.display = "none";
-    document.getElementById('exclamation').style.display = "none";
 
-    let timeBonus = 1.0;
-    if (currentToolMode === 'rod') {
-        const rod = playerData.equippedRod;
-        if (rod === 'bronze' && currentLocation === 'deepsea') timeBonus = 1.4;
-        if (rod === 'legend' || rod === 'dragon_rod') timeBonus = 1.3;
-    } else {
-        const net = playerData.equippedNet || 'bug_net';
-        if (net === 'divine_net') timeBonus = 1.5;
-    }
 
-    let rawReqTime = currentTargetFish.reqTime;
-    if (rawReqTime < 0.350) rawReqTime = 0.350;
-
-    let easyBonus = playerData.easyMode ? 0.350 : 0.0;
-    const limitTime = (rawReqTime * timeBonus) + easyBonus;
-
-    // 規定時間内の入力に成功した場合
-    if (reactionTime <= limitTime) {
-        if (currentTargetFish.isBoss) {
-            startBossBattle(1);
-        } else if (currentTargetFish.isBig) {
-            startBattle();
-        } else {
-            finishCatch(true);
-        }
-    } else {
-        // 反応速度オーバー時の救済判定（アクセサリ効果）
-        let isSaved = false;
-        
-        // 竿モードかつ「丈夫な釣り糸(line_tough)」装備時、20%の確率で救済
-        if (currentToolMode === 'rod' && playerData.equippedRodAcc === 'line_tough') {
-            if (Math.random() < 0.20) isSaved = true;
-        }
-        // 網モードかつ「補強ネット(net_tough)」装備時、20%の確率で救済
-        else if (currentToolMode === 'net' && playerData.equippedNetAcc === 'net_tough') {
-            if (Math.random() < 0.20) isSaved = true;
-        }
-
-        if (isSaved) {
-            // 失敗を無効化して釣獲成功へ移行
-            document.getElementById('status-text').innerText = "装備効果！失敗を回避した！";
-            document.getElementById('status-text').style.color = "#00ffcc";
-
-            if (currentTargetFish.isBoss) {
-                startBossBattle(1);
-            } else if (currentTargetFish.isBig) {
-                startBattle();
-            } else {
-                finishCatch(true);
-            }
-            return;
-        }
-
-        // 救済発動なしの場合（通常失敗）
-        playSE('foul');
-        if (currentToolMode === 'rod') {
-            playerData.currentCombo = 0;
-        } else {
-            playerData.netCombo = 0;
-        }
-        
-        registerMiss();
-        showResult(false, currentTargetFish, reactionTime);
-    }
-}
-
-function startBattle() {
-    gameState = 'BATTLE';
-    battleGauge = 30;
-    updateStageBgm();
-    triggerVibration([300, 100, 300]);
-
-    document.getElementById('status-text').innerText = "叩け！叩け！叩け！";
-    document.getElementById('status-text').style.color = "#ff2200";
-    document.getElementById('mash-container').style.display = "flex";
-    updateGaugeUI();
-
-    playSE('signal');
-
-    let decay = currentTargetFish.decaySpeed || 1.2;
-    if (currentToolMode === 'rod') {
-        const rod = playerData.equippedRod;
-        if (rod === 'iron' || rod === 'legend' || rod === 'dragon_rod') decay *= 0.7;
-    }
-
-    clearInterval(battleIntervalId);
-    battleIntervalId = setInterval(() => {
-        if (gameState !== 'BATTLE') return;
-        
-        battleGauge -= decay;
-        if (battleGauge <= 0) {
-            battleGauge = 0;
-            clearInterval(battleIntervalId);
-            document.getElementById('mash-container').style.display = "none";
-            playSE('foul');
-
-            if (currentToolMode === 'rod') {
-                playerData.currentCombo = 0;
-            } else {
-                playerData.netCombo = 0;
-            }
-            
-            registerMiss();
-            showResult(false, currentTargetFish, reactionTime);
-        }
-        updateGaugeUI();
-    }, 100);
-}
-
-function battleTap() {
-    if (gameState !== 'BATTLE') return;
-
-    if (isBossBattle) {
-        handleBossTap();
-        return;
-    }
-
-    playSE('tap');
-
-    let power = currentTargetFish.tapPower || 11;
-    if (currentToolMode === 'rod') {
-        const rod = playerData.equippedRod;
-        if (rod === 'iron') power += 4;
-        if (rod === 'legend' || rod === 'dragon_rod') power += 6;
-        
-        // ベイトリール補正
-        if (playerData.equippedRodAcc === 'bait_reel') power += 5;
-    } else {
-        const net = playerData.equippedNet || 'bug_net';
-        if (net === 'steel_net' || net === 'divine_net') power += 8;
-
-        // 定置網補正
-        if (playerData.equippedNetReel === 'net_fixed') power += 5;
-    }
-
-    battleGauge += power;
-    
-    if (battleGauge >= 100) {
-        battleGauge = 100;
-        clearInterval(battleIntervalId);
-        document.getElementById('mash-container').style.display = "none";
-        finishCatch(true);
-    }
-    updateGaugeUI();
-}
 
 function updateGaugeUI() {
     document.getElementById('gauge-inner').style.width = `${battleGauge}%`;
@@ -2218,63 +1655,6 @@ function getExpByFish(fish) {
     return 10;
 }
 
-function finishCatch(isSuccess) {
-    if (isSuccess) {
-        playSE('success');
-
-        const earnedGold = currentTargetFish.price || 50;
-        const earnedExp = getExpByFish(currentTargetFish);
-
-        playerData.gold += earnedGold;
-        playerData.exp += earnedExp;
-
-        if (currentToolMode === 'rod') {
-            playerData.totalCatches = (playerData.totalCatches || 0) + 1;
-            playerData.currentCombo = (playerData.currentCombo || 0) + 1;
-        } else {
-            playerData.netCatches = (playerData.netCatches || 0) + 1;
-            playerData.netCombo = (playerData.netCombo || 0) + 1;
-        }
-
-        const oldLevel = playerData.level;
-        const newLevel = Math.floor(playerData.exp / 100) + 1;
-
-        if (newLevel > oldLevel) {
-            playerData.level = newLevel;
-            let unlockedMapName = "";
-            Object.keys(MAP_DATA).forEach(k => {
-                if (MAP_DATA[k].reqLevel === newLevel) {
-                    unlockedMapName = MAP_DATA[k].name;
-                }
-            });
-            pendingLevelUp = { level: newLevel, unlockedArea: unlockedMapName };
-        } else {
-            pendingLevelUp = null;
-        }
-
-        savePlayerData();
-        updateMenuUI();
-
-        let isFirstGet = false;
-
-        if (!caughtFish[currentTargetFish.id]) {
-            isFirstGet = true;
-            caughtFish[currentTargetFish.id] = {
-                unlocked: true,
-                bestTime: reactionTime,
-                isNew: true
-            };
-            localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
-        } else if (reactionTime < caughtFish[currentTargetFish.id].bestTime) {
-            caughtFish[currentTargetFish.id].bestTime = reactionTime;
-            localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
-        }
-
-        checkAndRegisterRanking(reactionTime, currentTargetFish);
-        checkAchievements();
-        showResult(true, currentTargetFish, reactionTime, earnedGold, earnedExp, isFirstGet);
-    }
-}
 
 function showLevelUpModal(lvl, unlockedArea) {
     const modal = document.getElementById('levelup-modal');
@@ -2295,73 +1675,12 @@ function closeLevelUpModal() {
     document.getElementById('levelup-modal').style.display = "none";
 }
 
-function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirstGet = false) {
-    gameState = 'RESULT';
-    updateStageBgm();
-    const modal = document.getElementById('result-modal');
-    const title = document.getElementById('result-title');
-    const img = document.getElementById('result-img');
-    const name = document.getElementById('result-name');
-    const priceText = document.getElementById('result-price');
-    const timeText = document.getElementById('result-time');
-    const nextBtn = document.getElementById('next-btn');
-    const newBadge = document.getElementById('result-new-badge');
-
-    img.style.animation = 'none';
-    img.offsetHeight; 
-    img.style.animation = null;
-
-    if (isSuccess) {
-        const verb = fish.toolType === 'net' ? '捕獲成功！' : '一本釣り成功！';
-        title.innerText = fish.isBig ? "超大物 GET!!" : verb;
-        title.style.color = "#ffd700";
-        name.innerText = fish.name;
-        priceText.style.display = "block";
-        priceText.innerText = `+${earnedGold} G 獲得！ (+${earnedExp} EXP)`;
-        img.style.display = "inline-block";
-        
-        img.src = fish.image;
-        img.onerror = () => { img.src = fish.fallbackSvg; };
-
-        timeText.innerText = `反応速度: ${time.toFixed(3)}秒`;
-
-        if (newBadge) {
-            newBadge.style.display = isFirstGet ? "inline-block" : "none";
-        }
-    } else {
-        title.innerText = "逃げられた…";
-        title.style.color = "#ff3333";
-        name.innerText = "";
-        priceText.style.display = "none";
-        img.style.display = "none";
-        timeText.innerText = `反応速度: ${time.toFixed(3)}秒`;
-
-        if (newBadge) newBadge.style.display = "none";
-    }
-
-    modal.style.display = "block";
-
-    nextBtn.disabled = true;
-    let count = 1.5;
-    nextBtn.innerText = `待機中 (${Math.ceil(count)}s)`;
-
-    const countdownInterval = setInterval(() => {
-        count -= 0.5;
-        if (count <= 0) {
-            clearInterval(countdownInterval);
-            nextBtn.disabled = false;
-            nextBtn.innerText = "次へ進む";
-        } else {
-            nextBtn.innerText = `待機中 (${Math.ceil(count)}s)`;
-        }
-    }, 500);
-}
 
 function closeResult() {
     document.getElementById('result-modal').style.display = "none";
     gameState = 'READY';
-    const actionVerb = currentToolMode === 'rod' ? '竿を振れ！' : '網を構えろ！';
-    document.getElementById('status-text').innerText = `画面を叩いて${actionVerb}`;
+    const actionVerb = currentToolMode === 'rod' ? 'タップで竿を振る' : 'タップで網を構える';
+    document.getElementById('status-text').innerText = `${actionVerb}`;
     document.getElementById('status-text').style.color = "#fff";
 
     if (pendingLevelUp) {
@@ -2371,12 +1690,6 @@ function closeResult() {
     }
 }
 
-function toggleGameDifficulty() {
-    playerData.easyMode = !playerData.easyMode;
-    savePlayerData();
-    updateDifficultyUI();
-    playWaterPlop();
-}
 
 function toggleUpdateBox() {
     const content = document.getElementById('update-content');
@@ -2391,18 +1704,6 @@ function toggleUpdateBox() {
     }
 }
 
-function updateDifficultyUI() {
-    const btn = document.getElementById('config-mode-btn');
-    if (btn) {
-        if (playerData.easyMode) {
-            btn.innerText = "モード: 簡単 (+0.35s)";
-            btn.style.background = "#0066aa";
-        } else {
-            btn.innerText = "モード: 標準";
-            btn.style.background = "#006644";
-        }
-    }
-}
 
 function loadPlayerData() {
     const saved = localStorage.getItem('retro_fishing_player_v1');
@@ -2417,26 +1718,6 @@ function loadPlayerData() {
 /* ===================================================
    神獣界 ボス専用バトルシステム
    =================================================== */
-function startBossBattle(phase) {
-    gameState = 'BATTLE';
-    isBossBattle = true;
-    bossPhase = phase;
-    bossStep = 1;
-    timingCount = 0;
-
-    updateStageBgm();
-    triggerVibration([300, 100, 300]);
-
-    const name = currentTargetFish.name;
-
-    if (name === "ミズチ") {
-        setupMashStep("【ターン " + bossPhase + "/2】画面を連打しろ！ (" + bossStep + "/3)");
-    } else if (name === "ゲンブ") {
-        setupTimingStep("【ターン " + bossPhase + "/2】「一閃」で捕まえろ！ (1/3)");
-    } else if (name === "リヴァイアタン") {
-        setupMashStep("【ターン " + bossPhase + "/2】連打で押し込め！");
-    }
-}
 
 function setupMashStep(titleText) {
     battleGauge = 20;
@@ -2597,6 +1878,7 @@ function failBossBattle() {
     }
     
     registerMiss();
+    failReason = 'boss';
     showResult(false, currentTargetFish, 0.999);
 }
 
@@ -2833,10 +2115,10 @@ function updateEquipScreenUI() {
         document.getElementById('equip-net-name').innerText = net.name;
     }
 
-    updateAccSlotUI('equippedRodAcc', 'equip-rodAcc-img', 'equip-rodAcc-name', '釣り糸等');
-    updateAccSlotUI('equippedBait', 'equip-bait-img', 'equip-bait-name', 'まき餌');
-    updateAccSlotUI('equippedNetAcc', 'equip-netAcc-img', 'equip-netAcc-name', '補強ネット');
-    updateAccSlotUI('equippedNetReel', 'equip-netReel-img', 'equip-netReel-name', '定置網');
+    updateAccSlotUI('equippedRodAcc', 'equip-rodAcc-img', 'equip-rodAcc-name', '竿の補助');
+    updateAccSlotUI('equippedBait', 'equip-bait-img', 'equip-bait-name', 'エサ');
+    updateAccSlotUI('equippedNetAcc', 'equip-netAcc-img', 'equip-netAcc-name', '網の補助');
+    updateAccSlotUI('equippedNetReel', 'equip-netReel-img', 'equip-netReel-name', '網の飾り');
 }
 
 function updateAccSlotUI(slotKey, imgId, nameId, defaultText) {
@@ -2877,16 +2159,16 @@ function openEquipSelectModal(slotType) {
         items = accKeys.map(k => ACC_DATA[k]).filter(item => item !== undefined);
 
         if (slotType === 'rodAcc') {
-            items = items.filter(i => i.id === 'line_tough' || i.id === 'bait_reel');
+            items = items.filter(i => accSlot(i) === 'rodAcc');
             currentEquipped = playerData.equippedRodAcc;
         } else if (slotType === 'bait') {
-            items = items.filter(i => i.id === 'maki_esa');
+            items = items.filter(i => accSlot(i) === 'bait');
             currentEquipped = playerData.equippedBait;
         } else if (slotType === 'netAcc') {
-            items = items.filter(i => i.id === 'net_tough');
+            items = items.filter(i => accSlot(i) === 'netAcc');
             currentEquipped = playerData.equippedNetAcc;
         } else if (slotType === 'netReel') {
-            items = items.filter(i => i.id === 'net_fixed');
+            items = items.filter(i => accSlot(i) === 'netReel');
             currentEquipped = playerData.equippedNetReel;
         }
     }
@@ -2905,7 +2187,7 @@ function openEquipSelectModal(slotType) {
         div.className = "equip-select-item";
         div.innerHTML = `
             <div style="display:flex; align-items:center; gap:8px;">
-                <img src="${data.icon}" style="width:32px; height:30px; object-fit:contain;" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'25\' y=\'70\' font-size=\'60\' fill=\'white\'>🎒</text></svg>'">
+                <img src="${data.icon}" style="width:32px; height:30px; object-fit:contain;" onerror="imgFallback(this)">
                 <span style="font-size:13px; font-weight:bold; color:#fff;">${data.name}</span>
             </div>
             <button class="btn" ${isEq ? 'disabled' : ''} onclick="selectEquipItem('${data.id}')">${isEq ? '装備中' : '装備'}</button>
@@ -2973,7 +2255,7 @@ function onLogoTap() {
         playSE('levelup');
 
         // 報酬として 1,000 G をプレゼント（※3000から1000へ変更）
-        playerData.gold += 1000;
+        playerData.gold += 300;
         savePlayerData();
 
         // 隠し実績の解除チェック
@@ -2985,7 +2267,7 @@ function onLogoTap() {
         }
 
         setTimeout(() => {
-            alert("✨ 隠しコマンド発動！ ✨\nロゴが虹色に覚醒し、ボーナス 1,000 G を獲得しました！");
+            alert("✨ 隠しコマンド発動！ ✨\nロゴが虹色に覚醒し、ボーナス 300 G を獲得しました！");
         }, 100);
     }
 }
@@ -3007,4 +2289,2950 @@ function updateTitleBackground() {
         // 昼用背景画像を設定
         titleElem.style.backgroundImage = "url('images/bg/bg_title.png')";
     }
+}
+
+/* ===================================================
+   Ver 2.6.0 追加・改良パート
+   ---------------------------------------------------
+   ・新ステージ／生き物／道具の追加は addons.js を編集してください
+   =================================================== */
+const APP_VERSION = "3.0.0";
+const CSS_VERSION = "30-g";
+const byId = (id) => document.getElementById(id);
+const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
+const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+let failReason = 'late';
+let lastLimit = 0;
+let waitToken = 0;
+let fakeBite = false;
+let tutorialStage = 0;      // 0:なし 1:竿(通常) 2:竿(大物) 3:網
+let forceTutorial = false;
+let forceNextFish = null;
+let zoromeCast = false;
+let frenzy = 0;
+let weather = 'clear';
+let recentCatches = [];
+let lastBonus = {};
+let lastCastSuccess = false;
+let netState = null;
+let netRaf = 0;
+let netRatio = 1;
+
+/* ===================================================
+   バランス調整値（ここを変えるとゴールド量を調整できます）
+   =================================================== */
+const BAL = {
+    comboPerStep: 0.01,   // 連続成功1回ごとの売値ボーナス
+    comboMax: 15,         // コンボボーナスの上限回数（+15%）
+    perfect: 1.15,        // PERFECT倍率
+    great: 1.05,          // GREAT倍率
+    frenzy: 1.5,          // 入れ食い倍率
+    zorome: 2,            // ゾロ目倍率
+    chestRate: 0.02,      // 宝箱の出現率
+    cap: 1.8,             // ボーナス合計の上限倍率（ゾロ目を除く）
+    missionScale: 50      // ミッション報酬のレベル補正（大きいほど控えめ）
+};
+
+/* ===================================================
+   実績追加（secret:true は条件が見えない隠し実績）
+   =================================================== */
+const _IC = { c: "images/trophy/trophy_copper.png", s: "images/trophy/trophy_silver.png", g: "images/trophy/trophy_gold.png" };
+Object.assign(ACHIEVEMENT_DATA, {
+    tutorial_done: { id: "tutorial_done", name: "はじめの一歩", icon: _IC.c, desc: "練習釣りをクリアした" },
+    perfect_10: { id: "perfect_10", name: "一閃の使い手", icon: _IC.c, desc: "PERFECTを累計10回出した" },
+    perfect_100: { id: "perfect_100", name: "神速の釣り人", icon: _IC.g, desc: "PERFECTを累計100回出した" },
+    combo_10: { id: "combo_10", name: "絶好調！", icon: _IC.s, desc: "10連続で成功した" },
+    big_10: { id: "big_10", name: "大物ハンター", icon: _IC.s, desc: "大物を累計10匹つかまえた" },
+    zorome: { id: "zorome", name: "ゾロ目の奇跡", icon: _IC.g, desc: "同じ生き物を3連続でつかまえた" },
+    mission_10: { id: "mission_10", name: "日課の達人", icon: _IC.s, desc: "デイリーミッションを累計10個達成した" },
+    ngacha_20: { id: "ngacha_20", name: "息抜き上手", icon: _IC.c, desc: "ノーマルガチャを累計20回まわした" },
+    secret_menu: { id: "secret_menu", name: "メニューの住人", icon: _IC.c, desc: "メニューの見出しを…", secret: true },
+    secret_level: { id: "secret_level", name: "がんばれ！", icon: _IC.c, desc: "レベルバーを…", secret: true },
+    secret_weather: { id: "secret_weather", name: "お天気の神様", icon: _IC.s, desc: "場所の表示を…", secret: true },
+    secret_gold: { id: "secret_gold", name: "金の亡者", icon: _IC.c, desc: "所持金を…", secret: true },
+    secret_zukan: { id: "secret_zukan", name: "なでなで名人", icon: _IC.c, desc: "図鑑の名前を…", secret: true },
+    secret_sound: { id: "secret_sound", name: "音量の探究者", icon: _IC.c, desc: "スピーカーを…", secret: true },
+});
+
+function unlockAch(id) {
+    const p = playerData;
+    if (!p.achievements) p.achievements = [];
+    if (!p.achievements.includes(id)) {
+        p.achievements.push(id);
+        savePlayerData();
+        enqueueAchievementToast(id);
+    }
+}
+
+const _checkAch = window.checkAchievements;
+window.checkAchievements = function () {
+    _checkAch();
+    const p = playerData;
+    [
+        ['tutorial_done', p.tutorialDone],
+        ['perfect_10', (p.perfectCount || 0) >= 10],
+        ['perfect_100', (p.perfectCount || 0) >= 100],
+        ['combo_10', (p.bestCombo || 0) >= 10],
+        ['big_10', (p.bigCount || 0) >= 10],
+        ['zorome', (p.zoromeCount || 0) >= 1],
+        ['mission_10', (p.missionClaims || 0) >= 10],
+        ['ngacha_20', (p.normalGachaCount || 0) >= 20]
+    ].forEach(([id, ok]) => { if (ok) unlockAch(id); });
+};
+
+
+/* ===================================================
+   サウンド（iPhone対策込み）
+   - iOSは audio.volume が効かないため、GainNode で音量・フェードを制御
+   - AudioContext が停止中(suspended/interrupted)のときは SE を溜めずに破棄
+   =================================================== */
+function audioResume() {
+    if (audioCtx && audioCtx.state !== 'running') {
+        try { const p = audioCtx.resume(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    }
+}
+const audioOK = () => !!audioCtx && audioCtx.state === 'running';
+
+function initAudio() {
+    if (!audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    }
+    if (!titleBgm) titleBgm = byId('title-bgm');
+    audioResume();
+}
+
+function playTone(freq, duration, type = 'square') {
+    if (!audioOK()) return;
+    try {
+        const t0 = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, t0);
+        gain.gain.exponentialRampToValueAtTime(0.01, t0 + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t0);
+        osc.stop(t0 + duration + 0.02);
+    } catch (e) {}
+}
+
+['playWaterPlop', 'playSplashSE'].forEach(n => {
+    const orig = window[n];
+    window[n] = function () {
+        if (!audioOK()) { audioResume(); return; }
+        return orig.apply(this, arguments);
+    };
+});
+
+const BGM_VOL = 0.02;
+const bgmTracks = {};
+const bgmFades = {};
+let bgmWant = null;
+
+function bgmGet(path) {
+    if (!bgmTracks[path]) {
+        const a = (path === 'sounds/title.mp3' && byId('title-bgm')) ? byId('title-bgm') : new Audio(path);
+        a.loop = true;
+        a.preload = 'auto';
+        a.setAttribute('playsinline', '');
+        a._vol = 0;
+        if (IS_IOS && audioCtx && !a._g) {
+            try {
+                const src = audioCtx.createMediaElementSource(a);
+                const g = audioCtx.createGain();
+                g.gain.value = 0;
+                src.connect(g);
+                g.connect(audioCtx.destination);
+                a._g = g;
+            } catch (e) {}
+        }
+        bgmTracks[path] = a;
+    }
+    return bgmTracks[path];
+}
+
+function bgmSetVol(a, v) {
+    a._vol = v;
+    if (a._g) a._g.gain.value = v; else a.volume = v;
+}
+
+function bgmFade(path, target, onDone) {
+    const a = bgmTracks[path];
+    if (!a) return;
+    clearInterval(bgmFades[path]);
+    bgmFades[path] = setInterval(() => {
+        let v = a._vol || 0;
+        v = v < target ? Math.min(target, v + 0.004) : Math.max(target, v - 0.004);
+        bgmSetVol(a, v);
+        if (v === target) {
+            clearInterval(bgmFades[path]);
+            delete bgmFades[path];
+            if (onDone) onDone();
+        }
+    }, 40);
+}
+
+function bgmStop(path) {
+    const a = bgmTracks[path];
+    if (!a || (a.paused && !bgmFades[path])) return;
+    bgmFade(path, 0, () => { if (bgmWant !== path) { a.pause(); a.currentTime = 0; } });
+}
+
+function pauseAllBgm() {
+    Object.keys(bgmTracks).forEach(p => { clearInterval(bgmFades[p]); delete bgmFades[p]; bgmTracks[p].pause(); });
+    const t = byId('title-bgm');
+    if (t) t.pause();
+}
+
+function playBgm(path) {
+    if (!soundEnabled || !path) return;
+    initAudio();
+    bgmWant = path;
+    Object.keys(bgmTracks).forEach(p => { if (p !== path) bgmStop(p); });
+    const a = bgmGet(path);
+    clearInterval(bgmFades[path]);
+    if (a.paused) {
+        bgmSetVol(a, 0);
+        const pr = a.play();
+        if (pr && pr.catch) pr.catch(() => {});
+    }
+    bgmFade(path, BGM_VOL);
+}
+
+function updateStageBgm() {
+    if (!soundEnabled) return;
+    let p;
+    if (gameState === 'TITLE' || gameState === 'MENU' || gameState === 'GACHA' || isZukanOpen) {
+        p = 'sounds/title.mp3';
+    } else if (gameState === 'BATTLE' || gameState === 'SPECIAL') {
+        p = 'sounds/boss.mp3';
+    } else {
+        const m = MAP_DATA[currentLocation];
+        p = m && m.sound;
+    }
+    playBgm(p);
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    initAudio();
+    if (soundEnabled) { updateStageBgm(); playWaterPlop(); }
+    else { bgmWant = null; pauseAllBgm(); }
+    updateSoundUI();
+}
+
+// アプリが裏に回ったら音を止め、戻ってきたら再開（iPhoneの音の残り対策）
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        pauseAllBgm();
+        if (audioCtx && audioCtx.state === 'running') { try { audioCtx.suspend(); } catch (e) {} }
+    } else {
+        audioResume();
+        if (soundEnabled) setTimeout(updateStageBgm, 200);
+    }
+});
+window.addEventListener('pagehide', pauseAllBgm);
+['touchstart', 'touchend', 'click', 'keydown'].forEach(ev =>
+    window.addEventListener(ev, () => { if (audioCtx) audioResume(); }, { passive: true }));
+
+function goToMenu() {
+    initAudio();
+    closeAllModals();
+    byId('title-screen').style.display = "none";
+    byId('menu-screen').style.display = "flex";
+    gameState = 'MENU';
+    updateMenuUI();
+    updateStageBgm();
+    playWaterPlop();
+}
+
+/* ===================================================
+   効果音（ジングルは同時に1つだけ／連打しても音が重ならない）
+   =================================================== */
+let jingleTimers = [];
+const lastSE = {};
+function playJingle(notes, step, dur, type) {
+    jingleTimers.forEach(clearTimeout);
+    jingleTimers = notes.map((f, i) => setTimeout(() => playTone(f, dur, type), i * step));
+}
+function playSE(type) {
+    if (!soundEnabled || !audioCtx) return;
+    const now = Date.now();
+    if (lastSE[type] && now - lastSE[type] < 90) return;
+    lastSE[type] = now;
+    if (type === 'signal') {
+        playSplashSE();
+        playTone(880, 0.15, 'sawtooth');
+        setTimeout(() => playTone(1760, 0.25, 'sawtooth'), 60);
+    } else if (type === 'success') {
+        playJingle([523, 659, 783, 1046], 80, 0.12, 'square');
+    } else if (type === 'foul') {
+        playTone(130, 0.35, 'sawtooth');
+    } else if (type === 'tap') {
+        playTone(400, 0.05, 'square');
+    } else if (type === 'levelup') {
+        playJingle([523, 659, 783, 1046, 1318, 1567], 70, 0.15, 'triangle');
+    }
+}
+
+/* ===================================================
+   演出ヘルパー
+   =================================================== */
+function shake() {
+    const c = byId('game-container');
+    c.classList.remove('shake');
+    void c.offsetWidth;
+    c.classList.add('shake');
+}
+
+function floatText(text, color, big, isHtml) {
+    const d = document.createElement('div');
+    d.className = 'float-text' + (big ? ' big' : '');
+    d.style.color = color || '#ffd700';
+    if (isHtml) d.innerHTML = text; else d.innerText = text;
+    byId('game-container').appendChild(d);
+    setTimeout(() => d.remove(), 1600);
+}
+
+function setStatus(text, color) {
+    const s = byId('status-text');
+    s.innerText = text;
+    s.style.color = color || '#fff';
+}
+
+function hideOmen() { const o = byId('omen-layer'); o.className = ''; o.innerText = ''; }
+function showOmen(text, big) { const o = byId('omen-layer'); o.className = 'on' + (big ? ' big' : ''); o.innerText = text; }
+
+/* ===================================================
+   天気
+   【天気が変わる条件】
+   ・釣り（またはつかまえ）の結果画面を閉じるたびに判定
+   ・晴れのとき：18%の確率で 雨／霧／夕焼け のどれか（均等）に変化
+   ・晴れ以外のとき：30%の確率で晴れに戻る
+   ・練習中は変化しない／ページを開き直すと晴れに戻る
+   =================================================== */
+const WEATHER = {
+    clear: { name: '晴れ', emoji: '', icon: '', desc: '', big: 1, gold: 1, exp: 1 },
+    rain: { name: '雨', emoji: '🌧', icon: 'images/weather/weather_rain.png', desc: '大物が出やすい', big: 1.6, gold: 1, exp: 1 },
+    fog: { name: '霧', emoji: '🌫', icon: 'images/weather/weather_fog.png', desc: '売値+10%', big: 1, gold: 1.1, exp: 1 },
+    sunset: { name: '夕焼け', emoji: '🌇', icon: 'images/weather/weather_sunset.png', desc: 'EXP×1.3', big: 1, gold: 1, exp: 1.3 }
+};
+function weatherIconHtml(w, size) {
+    const d = WEATHER[w];
+    if (!d || !d.icon) return '';
+    const s = size || 18;
+    return `<img class="weather-icon" src="${d.icon}" width="${s}" height="${s}" alt="${d.name}" onerror="this.replaceWith(document.createTextNode('${d.emoji}'))">`;
+}
+const noWeatherArea = (k) => ['underground', 'deepsea', 'shinju'].includes(k) || !!(MAP_DATA[k] && MAP_DATA[k].gacha);
+const weatherMods = () => (noWeatherArea(currentLocation) ? WEATHER.clear : (WEATHER[weather] || WEATHER.clear));
+
+function setWeather(w, announce) {
+    weather = w;
+    byId('weather-layer').className = 'w-' + w;
+    updateHud();
+    if (announce && w !== 'clear') floatText(weatherIconHtml(w, 28) + ' ' + WEATHER[w].name + '：' + WEATHER[w].desc, '#aef', true, true);
+}
+
+/* ===================================================
+   HUD（文字は最小限） / 直近3匹スロット
+   =================================================== */
+
+function renderSlots() {
+    let h = '';
+    for (let i = 0; i < 3; i++) {
+        const f = recentCatches[i];
+        h += `<div class="slot ${f ? 'filled' : 'empty'}">${f ? `<img src="${f.image}" onerror="this.style.display='none'">` : '?'}</div>`;
+    }
+    const box = byId('catch-slots');
+    box.innerHTML = h;
+    const r = recentCatches;
+    const reach = r.length >= 2 && r[r.length - 1].id === r[r.length - 2].id;
+    box.className = reach ? 'reach' : '';
+    box.dataset.label = reach ? '👀 リーチ！' : 'さいきんの3匹';
+}
+
+/* ===================================================
+   魚の向き（FISH_FACING: L=頭が左 / R=頭が右 / N=向きなし）
+   個別に直したい時は addons.js の setFacing() を使います
+   =================================================== */
+const getFacing = (f) => f.facing || (typeof FISH_FACING !== 'undefined' && FISH_FACING[f.id]) || 'N';
+
+
+
+
+/* ===================================================
+   魚の抽選（大物ピティ・天気・ゾロ目・練習）
+   =================================================== */
+
+/* ===================================================
+   竿：待機〜アタリ（反射神経ゲーム）
+   =================================================== */
+
+
+function showFakeBite(token) {
+    fakeBite = false;
+    showOmen('ぴくっ…？');
+    playWaterPlop();
+    timerId = setTimeout(() => {
+        if (waitToken !== token || gameState !== 'WAITING') return;
+        hideOmen();
+        setStatus("違った…", "#fff");
+        timerId = setTimeout(() => { if (gameState === 'WAITING') startWaiting(); }, 800);
+    }, 1100);
+}
+
+function doSignal() {
+    hideOmen();
+    gameState = 'SIGNAL';
+    startTime = Date.now();
+    byId('exclamation').style.display = "block";
+    setStatus("今だ！", "#ffd700");
+    playSE('signal');
+    triggerVibration(200);
+    const limit = calcLimit(currentTargetFish);
+    lastLimit = limit;
+    clearTimeout(timeoutTimerId);
+    timeoutTimerId = setTimeout(() => {
+        if (gameState !== 'SIGNAL') return;
+        hideFishShadow();
+        byId('ripple-effect').style.display = "none";
+        byId('exclamation').style.display = "none";
+        playSE('foul');
+        if (currentToolMode === 'rod') playerData.currentCombo = 0; else playerData.netCombo = 0;
+        registerMiss();
+        failReason = 'timeout';
+        showResult(false, currentTargetFish, null);
+    }, limit * 1000);
+}
+
+/* ===================================================
+   網：動く生き物を「輪」に入れてタップ（竿とは別のアクション）
+   ・魚影が横切る → 輪の中に入った瞬間にタップ
+   ・空振りは2回まで／大物は2回成功が必要（輪が小さく、速くなる）
+   =================================================== */
+const NET_RING = { bug_net: 34, tough_net: 40, iron_net: 46, steel_net: 54, divine_net: 66 };
+
+
+
+let netHintTimer = 0;
+function showNetHint(html, ms) {
+    const h = byId('net-hint');
+    h.innerHTML = html;
+    h.style.display = 'block';
+    clearTimeout(netHintTimer);
+    netHintTimer = setTimeout(() => { h.style.display = 'none'; }, ms);
+}
+function updatePips() {
+    const s = netState;
+    if (!s) return;
+    byId('net-pips').innerText = '●'.repeat(s.hit) + '○'.repeat(Math.max(0, s.need - s.hit)) + `　あと${Math.max(0, s.need - s.hit)}回`;
+}
+
+
+function stopNet() {
+    byId('game-container').classList.remove('net-mode');
+    cancelAnimationFrame(netRaf);
+    netState = null;
+    const ring = byId('net-ring');
+    if (ring) ring.style.display = 'none';
+    byId('net-hint').style.display = 'none';
+    byId('net-pips').style.display = 'none';
+    hideFishShadow();
+}
+
+function netFail() {
+    const s = netState;
+    if (!s) return;
+    const fish = s.fish;
+    if (playerData.equippedNetAcc === 'net_tough' && Math.random() < 0.2) {   // 補強ネットの救済
+        stopNet();
+        currentTargetFish = fish;
+        netRatio = reactionTime = 0.9;
+        setStatus("装備で救済！", "#00ffcc");
+        finishCatch(true);
+        return;
+    }
+    stopNet();
+    playSE('foul');
+    playerData.netCombo = 0;
+    registerMiss();
+    failReason = 'netmiss';
+    currentTargetFish = fish;
+    showResult(false, fish, null);
+}
+
+const _handleAction = window.handleAction;
+window.handleAction = function () {
+    if (gameState === 'NET') { initAudio(); netSwing(); return; }
+    return _handleAction.apply(this, arguments);
+};
+
+['foulAction', 'resetGameStateToReady', 'hitAction'].forEach(n => {
+    const orig = window[n];
+    window[n] = function () {
+        hideOmen();
+        if (n === 'resetGameStateToReady') stopNet();
+        return orig.apply(this, arguments);
+    };
+});
+
+// 練習中は失敗数を記録しない
+const _registerMiss = window.registerMiss;
+window.registerMiss = function () { if (!tutorialStage) _registerMiss(); };
+
+/* ===================================================
+   捕獲成功処理（バランス調整済み）
+   =================================================== */
+function finishCatchCore(isSuccess) {
+    if (!isSuccess) return;
+    playSE('success');
+    const fish = currentTargetFish;
+    const p = playerData;
+    const isNet = currentToolMode === 'net';
+    const ratio = isNet ? netRatio : reactionTime / calcLimit(fish);
+    const rm = fx().rankMul;
+    const rank = isNet ? (ratio <= 0.3 * rm ? 'PERFECT' : (ratio <= 0.6 * rm ? 'GREAT' : '')) : (ratio <= 0.5 * rm ? 'PERFECT' : (ratio <= 0.75 * rm ? 'GREAT' : ''));
+    const wm = weatherMods();
+
+    if (tutorialStage) {   // 練習：ごほうび・記録なし
+        lastBonus = { rank, practice: true };
+        showResult(true, fish, reactionTime, 0, 0, false);
+        return;
+    }
+
+    const wasSpecial = spWon; spWon = false;
+    const fxo = fx();
+    const gm = fxo.goldMul * (buffOn('gold') ? 1.5 : 1) * (buffOn('super') ? 2 : 1) * (wasSpecial ? 1.25 : 1);
+    const prevCombo = (isNet ? p.netCombo : p.currentCombo) || 0;
+    let mult = 1 + Math.min(prevCombo, BAL.comboMax) * BAL.comboPerStep;
+    if (rank === 'PERFECT') mult *= BAL.perfect; else if (rank === 'GREAT') mult *= BAL.great;
+    mult *= wm.gold;
+    const bonus = { rank, comboPct: Math.round(Math.min(prevCombo, BAL.comboMax) * BAL.comboPerStep * 100), weather: weather !== 'clear' ? weather : '', frenzy: frenzy > 0, zorome: zoromeCast, chest: 0, special: wasSpecial, gm: gm };
+    if (frenzy > 0) { mult *= BAL.frenzy; frenzy--; }
+    mult = Math.min(mult, BAL.cap);
+    if (zoromeCast) { mult *= BAL.zorome; zoromeCast = false; }
+
+    let earnedGold = Math.round((fish.price || 50) * mult * gm);
+    if (Math.random() < BAL.chestRate) { bonus.chest = Math.round((fish.price || 50) + 30); earnedGold += bonus.chest; }
+    const earnedExp = Math.round(getExpByFish(fish) * wm.exp * (buffOn('exp') ? 1.5 : 1) * (buffOn('super') ? 2 : 1) * fxo.expMul);
+
+    p.gold += earnedGold;
+    p.exp += earnedExp;
+    if (wasSpecial) p.specialWins = (p.specialWins || 0) + 1;
+    if (isNet) { p.netCatches = (p.netCatches || 0) + 1; p.netCombo = prevCombo + 1; }
+    else { p.totalCatches = (p.totalCatches || 0) + 1; p.currentCombo = prevCombo + 1; }
+    const combo = prevCombo + 1;
+    if (combo > (p.bestCombo || 0)) p.bestCombo = combo;
+    if (combo % 10 === 0) { frenzy = 3; bonus.newFrenzy = true; }
+    if (rank === 'PERFECT') p.perfectCount = (p.perfectCount || 0) + 1;
+    if (fish.isBig) { p.bigCount = (p.bigCount || 0) + 1; p.sinceBig = 0; } else { p.sinceBig = (p.sinceBig || 0) + 1; }
+
+    addMission('catch');
+    if (isNet) addMission('net');
+    if (fish.isBig) addMission('big');
+    if (rank === 'PERFECT') addMission('perfect');
+    addMission('combo', combo, true);
+
+    recentCatches.push(fish);
+    if (recentCatches.length > 3) recentCatches.shift();
+    const r = recentCatches;
+    if (r.length === 3 && r[0].id === r[1].id && r[1].id === r[2].id) {
+        const sorted = FISH_DATA.filter(f => f.location === currentLocation && (f.toolType || 'rod') === currentToolMode).sort((a, b) => b.price - a.price);
+        forceNextFish = sorted[0] || null;
+        p.zoromeCount = (p.zoromeCount || 0) + 1;
+        bonus.zoromeHit = true;
+        recentCatches = [];
+    } else if (r.length >= 2 && r[r.length - 1].id === r[r.length - 2].id) {
+        bonus.reach = true;
+    }
+
+    const oldLevel = p.level;
+    const newLevel = Math.floor(p.exp / 100) + 1;
+    if (newLevel > oldLevel) {
+        p.level = newLevel;
+        let unlocked = "";
+        Object.keys(MAP_DATA).forEach(k => { if (MAP_DATA[k].reqLevel === newLevel && !MAP_DATA[k].gacha) unlocked = MAP_DATA[k].name; });
+        pendingLevelUp = { level: newLevel, unlockedArea: unlocked };
+    } else {
+        pendingLevelUp = null;
+    }
+    savePlayerData();
+    updateMenuUI();
+
+    const _loc = fish.location, _wasDone = areaDone(_loc);
+    let isFirstGet = false;
+    if (!caughtFish[fish.id]) {
+        isFirstGet = true;
+        caughtFish[fish.id] = { unlocked: true, bestTime: reactionTime, isNew: true };
+    } else if (reactionTime < caughtFish[fish.id].bestTime) {
+        caughtFish[fish.id].bestTime = reactionTime;
+    }
+    localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
+
+    if (!_wasDone && areaDone(_loc)) { bonus.complete = MAP_DATA[_loc] ? MAP_DATA[_loc].name : ''; setTimeout(() => { floatText('🏅 ' + bonus.complete + ' コンプリート！', '#ffd700', true); playSE('levelup'); }, 500); }
+    lastBonus = bonus;
+    if (!isNet) checkAndRegisterRanking(reactionTime, fish);
+    checkAchievements();
+    renderSlots();
+    updateHud();
+    showResult(true, fish, reactionTime, earnedGold, earnedExp, isFirstGet);
+}
+
+/* ===================================================
+   リザルト（コンパクト表示）
+   =================================================== */
+function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirstGet = false) {
+    gameState = 'RESULT';
+    lastCastSuccess = isSuccess;
+    updateStageBgm();
+    const title = byId('result-title'), img = byId('result-img'), timeText = byId('result-time');
+    const rankEl = byId('result-rank'), bonusEl = byId('result-bonus'), nextBtn = byId('next-btn');
+    byId('result-hint').style.display = "none";
+
+    img.style.animation = 'none';
+    img.offsetHeight;
+    img.style.animation = null;
+    img.src = fish.image;
+    img.onerror = () => { img.src = fish.fallbackSvg; };
+    const isNet = fish.toolType === 'net';
+
+    if (isSuccess) {
+        const b = lastBonus || {};
+        title.innerText = isThing(fish) ? '見つけた！' : (fish.isBig ? "大物ゲット！" : (isNet ? 'つかまえた！' : '釣れた！'));
+        title.style.color = "#ffd700";
+        byId('result-name').innerText = fish.name;
+        byId('result-price').style.display = "block";
+        byId('result-price').innerText = b.practice ? "練習なので ごほうびなし" : `+${earnedGold} G　⭐+${earnedExp}`;
+        img.classList.remove('silhouette');
+        img.classList.add('clickable-fish');
+        timeText.innerText = isNet ? `🎯 ぴったり ${Math.max(0, Math.round((1 - time) * 100))}%` : `⚡ ${time.toFixed(2)}秒`;
+        rankEl.innerHTML = b.rank === 'PERFECT' ? `${fxi('rank_perfect', 20)} PERFECT!` : (b.rank === 'GREAT' ? `${fxi('rank_great', 20)} GREAT!` : '');
+        const chips = [];
+        if (b.comboPct) chips.push(`${fxi('combo', 14)}+${b.comboPct}%`);
+        if (b.weather) {
+            const wd = WEATHER[b.weather];
+            if (wd.gold > 1) chips.push(`${weatherIconHtml(b.weather, 14)}+${Math.round((wd.gold - 1) * 100)}%`);
+            else if (wd.exp > 1) chips.push(`${weatherIconHtml(b.weather, 14)}EXP×${wd.exp}`);
+        }
+        if (b.frenzy) chips.push(`${fxi('streak_frenzy', 14)}×${BAL.frenzy}`);
+        if (b.zorome) chips.push(`${fxi('zorome', 14)}×${BAL.zorome}`);
+        if (b.chest) chips.push(`${fxi('chest', 14)}+${b.chest}G`);
+        if (b.special) chips.push(`${fxi('special_win', 14)}特別な戦いに勝利！`);
+        if (b.gm && b.gm > 1.001 && !b.special) chips.push(`${fxi('tool_bonus', 14)}×${b.gm.toFixed(2)}`);
+        if (b.complete) chips.push(`${fxi('area_complete', 14)}${b.complete} コンプリート！`);
+        if (b.newFrenzy) chips.push(`${fxi('streak_frenzy', 14)}入れ食い突入！`);
+        if (b.zoromeHit) chips.push(`${fxi('zorome', 14)}ゾロ目！次は超大物`);
+        else if (b.reach) chips.push(`${fxi('reach', 14)}リーチ！`);
+        bonusEl.innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join('');
+        byId('result-new-badge').style.display = isFirstGet ? "inline-block" : "none";
+        if (fish.isBig) shake();
+    } else {
+        title.innerText = isThing(fish) ? "手に入らなかった…" : "逃げられた…";
+        title.style.color = "#ff5555";
+        byId('result-name').innerText = "？？？";
+        byId('result-price').style.display = "none";
+        img.classList.add('silhouette');
+        img.classList.remove('clickable-fish');
+        rankEl.innerHTML = "";
+        bonusEl.innerHTML = "";
+        byId('result-new-badge').style.display = "none";
+        zoromeCast = false;
+        const lim = lastLimit ? lastLimit.toFixed(2) : '';
+        const t = { timeout: `反応なし… 制限${lim}秒`, gauge: '連打が足りない…', boss: '力負け…', netmiss: '空振り… 輪に入った瞬間に！', special: '特別な戦いに敗れた…' }[failReason];
+        timeText.innerText = t || `遅すぎ… ${Number(time || 0).toFixed(2)}秒 / 制限${lim}秒`;
+        failReason = 'late';
+    }
+    byId('result-modal').style.display = "block";
+    nextBtn.disabled = true;
+    let count = 1.5;
+    nextBtn.innerText = `…`;
+    const iv = setInterval(() => {
+        count -= 0.5;
+        if (count <= 0) { clearInterval(iv); nextBtn.disabled = false; nextBtn.innerText = "次へ"; }
+    }, 500);
+}
+
+/* ===================================================
+   練習（チュートリアル）：竿→大物→網
+   =================================================== */
+const TUT_TEXT = {
+    1: "①タップで竿を振る → 「一閃！」で即タップ",
+    2: "②大物！うねりのあと「一閃！」→連打！",
+    3: "③網：魚が輪に入った瞬間にタップ！"
+};
+
+function showTutorial(text, ms) {
+    const b = byId('tutorial-banner');
+    b.innerText = text;
+    b.style.display = "block";
+    clearTimeout(showTutorial.t);
+    if (ms) showTutorial.t = setTimeout(() => { b.style.display = "none"; }, ms);
+}
+
+function endTutorial(done) {
+    tutorialStage = 0;
+    byId('tutorial-banner').style.display = "none";
+    if (done) {
+        let msg = "練習クリア！";
+        if (!playerData.tutorialDone) { playerData.gold += 200; msg += " +200G"; }
+        playerData.tutorialDone = true;
+        savePlayerData();
+        checkAchievements();
+        updateMenuUI();
+        showTutorial(msg + "　🏠でメニューへ戻れるよ", 5000);
+    }
+    setToolMode('rod');
+}
+
+const _closeResult = window.closeResult;
+window.closeResult = function () {
+    _closeResult();
+    if (tutorialStage) {
+        if (tutorialStage === 1) { if (lastCastSuccess) { tutorialStage = 2; } }
+        else if (tutorialStage === 2) { tutorialStage = 3; setToolMode('net'); }
+        else if (tutorialStage === 3) { if (lastCastSuccess) { endTutorial(true); updateHud(); return; } }
+        showTutorial(TUT_TEXT[tutorialStage]);
+    } else {
+        if (noWeatherArea(currentLocation)) { if (weather !== 'clear') setWeather('clear'); }
+        else if (weather === 'clear' && Math.random() < 0.18) setWeather(pickOne(['rain', 'fog', 'sunset']), true);
+        else if (weather !== 'clear' && Math.random() < 0.30) setWeather('clear');
+    }
+    updateHud();
+};
+
+const _startGame = window.startGameFromMenu;
+window.startGameFromMenu = function () {
+    if (extModalOpen()) return;
+    const noCatch = (playerData.totalCatches || 0) + (playerData.netCatches || 0) === 0;
+    if (!playerData.tutorialDone && (forceTutorial || noCatch)) {
+        forceTutorial = false;
+        tutorialStage = 1;
+        if (currentLocation !== 'sea') selectLocation('sea');
+        _startGame();
+        setToolMode('rod');
+        showTutorial(TUT_TEXT[1]);
+    } else {
+        tutorialStage = 0;
+        byId('tutorial-banner').style.display = "none";
+        _startGame();
+    }
+    updateHud();
+};
+
+function replayTutorial() {
+    playerData.tutorialDone = playerData.tutorialDone || false;
+    forceTutorial = true;
+    const wasDone = playerData.tutorialDone;
+    closeAllModals();
+    byId('menu-screen').style.display = "flex";
+    gameState = 'MENU';
+    if (wasDone) { tutorialStage = 1; if (currentLocation !== 'sea') selectLocation('sea'); _startGame(); setToolMode('rod'); showTutorial(TUT_TEXT[1]); }
+    else startGameFromMenu();
+}
+
+/* ===================================================
+   メニューへ戻りやすく
+   =================================================== */
+const _toMenuHeader = window.goToMenuFromHeader;
+window.goToMenuFromHeader = function () {
+    tutorialStage = 0;
+    stopNet();
+    byId('tutorial-banner').style.display = "none";
+    byId('btn-home').classList.remove('pulse');
+    playerData.knowsHome = true;
+    _toMenuHeader();
+    updateMenuUI();
+};
+
+function menuFromResult() {
+    pendingLevelUp = null;
+    goToMenuFromHeader();
+}
+
+const EXT_MODALS = ['mission-modal', 'zukan-area-modal', 'workshop-screen', 'ng-prize-modal', 'clear-modal'];
+const extModalOpen = () => EXT_MODALS.some(id => byId(id) && byId(id).style.display === 'flex');
+const _closeAll = window.closeAllModals;
+window.closeAllModals = function () {
+    _closeAll();
+    EXT_MODALS.forEach(id => { if (byId(id)) byId(id).style.display = 'none'; });
+};
+
+/* ===================================================
+   デイリーミッション
+   =================================================== */
+const MISSION_POOL = [
+    { id: 'catch10', name: '生き物を10匹つかまえる', key: 'catch', goal: 10, reward: 150 },
+    { id: 'catch25', name: '生き物を25匹つかまえる', key: 'catch', goal: 25, reward: 400 },
+    { id: 'big1', name: '大物を1匹つかまえる', key: 'big', goal: 1, reward: 250 },
+    { id: 'perfect3', name: 'PERFECTを3回出す', key: 'perfect', goal: 3, reward: 300 },
+    { id: 'combo5', name: '5連続で成功する', key: 'combo', goal: 5, reward: 200 },
+    { id: 'net5', name: '網で5匹つかまえる', key: 'net', goal: 5, reward: 200 },
+    { id: 'gacha1', name: 'ノーマルガチャを回す', key: 'gacha', goal: 1, reward: 100 }
+];
+const todayStr = () => new Date().toLocaleDateString('sv-SE');
+const missionReward = (m) => Math.round(m.reward * (1 + Math.min(playerData.level, 100) / BAL.missionScale));
+
+function ensureDaily() {
+    const d = playerData.daily;
+    if (d && d.date === todayStr()) return d;
+    const ids = MISSION_POOL.map(m => m.id).sort(() => Math.random() - 0.5).slice(0, 3);
+    playerData.daily = { date: todayStr(), list: ids, prog: {}, claimed: [] };
+    savePlayerData();
+    return playerData.daily;
+}
+
+function addMission(key, n = 1, isMax = false) {
+    const d = ensureDaily();
+    d.prog[key] = isMax ? Math.max(d.prog[key] || 0, n) : (d.prog[key] || 0) + n;
+}
+
+function claimableMissions() {
+    const d = ensureDaily();
+    return d.list.filter(id => {
+        const m = MISSION_POOL.find(x => x.id === id);
+        return m && !d.claimed.includes(id) && (d.prog[m.key] || 0) >= m.goal;
+    }).length;
+}
+
+function openMissions() { initAudio(); closeAllModals(); renderMissions(); byId('mission-modal').style.display = "flex"; playWaterPlop(); }
+function closeMissions() { byId('mission-modal').style.display = "none"; }
+
+function renderMissions() {
+    const d = ensureDaily();
+    const box = byId('mission-list');
+    box.innerHTML = "";
+    d.list.forEach(id => {
+        const m = MISSION_POOL.find(x => x.id === id);
+        const cur = Math.min(d.prog[m.key] || 0, m.goal);
+        const done = cur >= m.goal, claimed = d.claimed.includes(id);
+        const row = document.createElement('div');
+        row.className = 'mission-row';
+        row.innerHTML = `<div class="mission-info"><div>${m.name}</div><div class="mission-sub">${cur}/${m.goal}　${missionReward(m)} G</div></div>
+            <button class="btn" ${(!done || claimed) ? 'disabled' : ''} onclick="claimMission('${id}')">${claimed ? '済' : (done ? '受取' : '挑戦中')}</button>`;
+        box.appendChild(row);
+    });
+    const rb = byId('mission-reroll');
+    if (rb) { rb.disabled = playerData.gold < REROLL_COST; rb.innerText = `🔄 ミッションを引き直す（${REROLL_COST.toLocaleString()}G）`; }
+}
+
+function claimMission(id) {
+    const d = ensureDaily();
+    const m = MISSION_POOL.find(x => x.id === id);
+    if (!m || d.claimed.includes(id) || (d.prog[m.key] || 0) < m.goal) return;
+    d.claimed.push(id);
+    playerData.gold += missionReward(m);
+    playerData.missionClaims = (playerData.missionClaims || 0) + 1;
+    savePlayerData();
+    playSE('success');
+    renderMissions();
+    updateMenuUI();
+    checkAchievements();
+}
+
+/* ===================================================
+   ガチャ画面の切り替え（イベントガチャ ⇄ ノーマルガチャ）
+   ・ノーマルガチャはEXPを獲得しません
+   =================================================== */
+
+
+const _openGachaScreen = window.openGachaScreen;
+window.openGachaScreen = function () {
+    _openGachaScreen();
+    setGachaTab(playerData.gachaTab || 'ev');
+};
+function openNormalGacha() { openGachaScreen(); setGachaTab('ng'); }
+
+
+
+/* ===================================================
+   メニュー表示（バッジ）
+   =================================================== */
+const _updateMenuUI = window.updateMenuUI;
+window.updateMenuUI = function () {
+    _updateMenuUI();
+    applyHallOfFame();
+    const m = byId('btn-missions'), g = byId('btn-gacha');
+    if (m) { const c = claimableMissions(); m.innerText = c ? `ミッション ❗${c}` : 'ミッション'; }
+    if (g) g.innerText = playerData.freeGachaDate !== todayStr() ? 'ガチャ 🆓' : 'ガチャ';
+};
+
+/* ===================================================
+   初めての人向け：「遊び方」へ誘導（周りを暗くして矢印）
+   =================================================== */
+let guideOn = false;
+function ensureGuide() {
+    if (byId('guide-layer')) return;
+    const g = document.createElement('div');
+    g.id = 'guide-layer';
+    g.innerHTML = '<div id="guide-hole"></div><div id="guide-bubble">まずは「遊び方」を見てみよう！<div id="guide-arrow">👇</div></div>';
+    byId('game-container').appendChild(g);
+}
+
+function guideTick() {
+    ensureGuide();
+    const menu = byId('menu-screen');
+    const ctx = kbCtx();
+    const on = !playerData.hasSeenHowTo && menu.style.display === 'flex' && ctx && ctx.id === 'menu-screen';
+    const layer = byId('guide-layer');
+    if (on !== guideOn) { guideOn = on; layer.style.display = on ? 'block' : 'none'; }
+    if (!on) return;
+    const cr = byId('game-container').getBoundingClientRect();
+    const r = byId('btn-howto').getBoundingClientRect();
+    const hole = byId('guide-hole'), bub = byId('guide-bubble');
+    hole.style.left = `${r.left - cr.left - 5}px`;
+    hole.style.top = `${r.top - cr.top - 5}px`;
+    hole.style.width = `${r.width + 10}px`;
+    hole.style.height = `${r.height + 10}px`;
+    bub.style.left = `${Math.max(8, Math.min(cr.width - 228, r.left - cr.left + r.width / 2 - 110))}px`;
+    bub.style.top = `${Math.max(8, r.top - cr.top - 74)}px`;
+}
+setInterval(guideTick, 300);
+document.addEventListener('click', (e) => {
+    if (!guideOn || e.target.closest('#btn-howto')) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const h = byId('guide-hole');
+    h.classList.remove('wiggle'); void h.offsetWidth; h.classList.add('wiggle');
+}, true);
+
+/* ===================================================
+   隠し要素（どこをタップ／連打すると…？）
+   ・各1回だけ小さなごほうび＋隠し実績
+   =================================================== */
+
+function bindSecret(elId, need, windowMs, fn) {
+    const el = byId(elId);
+    if (!el) return;
+    let times = [];
+    el.addEventListener('click', () => {
+        const now = Date.now();
+        times = times.filter(t => now - t < windowMs);
+        times.push(now);
+        if (times.length >= need) { times = []; fn(el); }
+    });
+}
+
+function bindSecrets() {
+    bindSecret('menu-title', 7, 4000, () => giveSecret('secret_menu', 100, '📜 ひみつの住人'));
+    bindSecret('header-level-bar-inner', 5, 3000, () => giveSecret('secret_level', 50, '💪 がんばれ！'));
+    bindSecret('header-level', 5, 3000, () => giveSecret('secret_level', 50, '💪 がんばれ！'));
+    bindSecret('current-location-text', 5, 3000, () => {
+        const first = giveSecret('secret_weather', 0, '🌤 天気を操った！', { silentRepeat: true });
+        const w = pickOne(Object.keys(WEATHER).filter(k => k !== weather));
+        setTimeout(() => setWeather(w, true), first ? 1100 : 0);   // メッセージが重ならないようにずらす
+    });
+    bindSecret('header-gold', 10, 4000, () => giveSecret('secret_gold', 0, '💰 お金が大好き！'));
+    bindSecret('zukan-detail-title', 7, 4000, (el) => {
+        const img = byId('zukan-detail-img');
+        img.classList.remove('spin'); void img.offsetWidth; img.classList.add('spin');
+        giveSecret('secret_zukan', 100, '🐟 なでなで〜');
+    });
+    bindSecret('sound-btn', 10, 5000, () => giveSecret('secret_sound', 0, '🔊 音の探究者！'));
+    bindSecret('config-sound-btn', 10, 5000, () => giveSecret('secret_sound', 0, '🔊 音の探究者！'));
+}
+
+
+/* ===================================================
+   図鑑：エリア選択ウィンドウ／最後に開いたページを記憶／豆知識
+   =================================================== */
+function zukanAreaKeys() {
+    return Object.keys(MAP_DATA).filter(k => !!MAP_DATA[k].gacha === (currentZukanMainTab === 'gacha'));
+}
+
+function areaUnlocked(k) {
+    const m = MAP_DATA[k];
+    if (!m) return false;
+    return m.gacha ? !!(playerData.unlockedGachaMaps && playerData.unlockedGachaMaps.includes(k)) : playerData.level >= m.reqLevel;
+}
+
+const areaLabel = (k) => k === 'all' ? 'すべて' : (areaUnlocked(k) ? MAP_DATA[k].name : '？？？');
+
+function saveZukanState() {
+    const g = byId('zukan-grid');
+    playerData.zukanState = { tab: currentZukanMainTab, filter: currentFilter, scroll: g ? g.scrollTop : 0 };
+    savePlayerData();
+}
+
+function switchZukanCategory(cat, keepFilter) {
+    currentZukanMainTab = cat;
+    if (!keepFilter) currentFilter = 'all';
+    byId('zukan-tab-normal').className = `zukan-main-tab ${cat === 'normal' ? 'active' : ''}`;
+    byId('zukan-tab-gacha').className = `zukan-main-tab ${cat === 'gacha' ? 'active' : ''}`;
+    renderZukanSubFilterUI();
+    renderZukanGrid();
+    if (!keepFilter) saveZukanState();
+}
+
+function renderZukanSubFilterUI() {
+    const box = byId('zukan-sub-filter');
+    box.innerHTML = "";
+    const b = document.createElement('button');
+    b.className = 'zukan-area-btn';
+    b.innerHTML = `📍 エリア：<b>${currentFilter === 'all' ? 'すべて' : areaLabel(currentFilter)}${currentFilter !== 'all' && areaDone(currentFilter) ? ' ✅' : ''}</b> ▼`;
+    b.onclick = openZukanAreaModal;
+    box.style.display = 'flex'; box.style.gap = '6px';
+    b.style.flex = '1';
+    box.appendChild(b);
+    const n = Object.keys(caughtFish).filter(k => caughtFish[k] && caughtFish[k].isNew).length;
+    const c = document.createElement('button');
+    c.className = 'zukan-newclear-btn';
+    c.innerHTML = n ? `✔ NEWを消す<small>(${n})</small>` : '✔ NEWなし';
+    c.disabled = !n;
+    c.onclick = clearZukanNew;
+    box.appendChild(c);
+}
+
+function openZukanAreaModal() {
+    const list = byId('zukan-area-list');
+    list.innerHTML = "";
+    const keys = ['all'].concat(zukanAreaKeys());
+    keys.forEach(k => {
+        const fl = FISH_DATA.filter(f => k === 'all' ? zukanAreaKeys().includes(f.location) : f.location === k);
+        const got = fl.filter(f => caughtFish[f.id] && caughtFish[f.id].unlocked).length;
+        const row = document.createElement('button');
+        row.className = `zukan-area-row ${currentFilter === k ? 'active' : ''}`;
+        row.innerHTML = `<span>${areaLabel(k)}${k !== 'all' && fl.length && got >= fl.length ? ' ✅' : ''}</span><small>${got}/${fl.length}</small>`;
+        if (k !== 'all' && fl.length && got >= fl.length) row.classList.add('done');
+        row.onclick = () => {
+            currentFilter = k;
+            closeZukanAreaModal();
+            renderZukanSubFilterUI();
+            renderZukanGrid();
+            byId('zukan-grid').scrollTop = 0;
+            saveZukanState();
+        };
+        list.appendChild(row);
+    });
+    byId('zukan-area-modal').style.display = "flex";
+}
+function closeZukanAreaModal() { byId('zukan-area-modal').style.display = "none"; }
+
+function openZukan() {
+    initAudio();
+    isZukanOpen = true;
+    resetGameStateToReady();
+    closeAllModals();
+    updateStageBgm();
+    const st = playerData.zukanState || {};
+    switchZukanCategory(st.tab === 'gacha' ? 'gacha' : 'normal', false);
+    if (st.filter && st.filter !== 'all' && zukanAreaKeys().includes(st.filter)) {
+        currentFilter = st.filter;
+        renderZukanSubFilterUI();
+        renderZukanGrid();
+    }
+    byId('zukan-modal').style.display = "flex";
+    byId('zukan-grid').scrollTop = st.scroll || 0;
+}
+
+const _closeZukan = window.closeZukan;
+window.closeZukan = function () { saveZukanState(); closeZukanAreaModal(); _closeZukan(); };
+
+function openZukanDetail(fish) {
+    const locName = MAP_DATA[fish.location] ? MAP_DATA[fish.location].name : "不明";
+    const isNet = fish.toolType === 'net';
+    byId('zukan-detail-title').innerText = `【${fish.name}】`;
+    const img = byId('zukan-detail-img');
+    img.classList.remove('spin');
+    img.src = fish.image;
+    img.onerror = () => { img.src = fish.fallbackSvg; };
+    const tri = (typeof FISH_TRIVIA !== 'undefined' && FISH_TRIVIA[fish.id]) ? `\n\n💡 豆知識\n${FISH_TRIVIA[fish.id]}` : '';
+    byId('zukan-detail-desc').innerText = `[${locName}／${isNet ? '網' : '竿'}]\n${fish.desc.replace('【網限定】', '')}${tri}`;
+    byId('zukan-detail-price').innerText = `買取価格: ${fish.price} G`;
+    const best = caughtFish[fish.id].bestTime;
+    byId('zukan-detail-time').innerText = isNet
+        ? (best <= 1 ? `ベスト：ぴったり ${Math.round((1 - best) * 100)}%` : '')
+        : `最速記録: ${best.toFixed(3)}秒`;
+    if (caughtFish[fish.id].isNew) {
+        caughtFish[fish.id].isNew = false;
+        localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
+        renderZukanGrid();
+    }
+    byId('zukan-detail-modal').style.display = "flex";
+}
+
+/* ===================================================
+   追加しやすくするためのAPI（使い方は addons.js / 追加素材リスト.md）
+   =================================================== */
+const SIZE_DEFAULT = {
+    small: { shadowImage: 'images/shadows/shadow_small.png', shadowWidth: 60, shadowHeight: 25, reqTime: 1.0, weight: 30 },
+    midi: { shadowImage: 'images/shadows/shadow_midi.png', shadowWidth: 90, shadowHeight: 35, reqTime: 0.8, weight: 20 },
+    big: { shadowImage: 'images/shadows/shadow_big.png', shadowWidth: 130, shadowHeight: 45, reqTime: 0.6, weight: 8, isBig: true, tapPower: 8, decaySpeed: 1.3 },
+    biggest: { shadowImage: 'images/shadows/shadow_biggest.png', shadowWidth: 180, shadowHeight: 60, reqTime: 0.45, weight: 3, isBig: true, tapPower: 6, decaySpeed: 1.5 }
+};
+function addArea(key, def, after) {
+    const entry = Object.assign({ reqLevel: 1 }, def);
+    if (!after || !MAP_DATA[after]) { MAP_DATA[key] = entry; return; }
+    // after で指定したエリアの次に並べる（マップ一覧・図鑑の並び順）
+    const keys = Object.keys(MAP_DATA), snap = {};
+    keys.forEach(k => { snap[k] = MAP_DATA[k]; delete MAP_DATA[k]; });
+    keys.forEach(k => { MAP_DATA[k] = snap[k]; if (k === after) MAP_DATA[key] = entry; });
+}
+// 既存の生き物を別のエリアへ引っ越し（{ 新しい場所: [名前, ...] }）。海からの移動用
+function relocateFish(map) {
+    Object.keys(map).forEach(loc => map[loc].forEach(name => {
+        const f = FISH_DATA.find(x => x.name === name && x.location === 'sea');
+        if (f) f.location = loc; else console.warn('relocateFish: 見つかりません', name);
+    }));
+}
+// 画像ファイルが存在する時だけ追加（画像を置いたら自動で登場）
+function addFishWhenImage(list) {
+    list.forEach(f => {
+        const im = new Image();
+        im.onload = () => {
+            if (FISH_DATA.some(x => x.id === f.id)) return;
+            addFish([f]);
+            if (isZukanOpen) renderZukanGrid();
+        };
+        im.src = f.image;
+    });
+}
+function addFish(list) {
+    list.forEach(f => {
+        const d = SIZE_DEFAULT[f.size || 'small'];
+        const item = Object.assign({ toolType: 'rod' }, d, f);
+        if (item.toolType === 'net' && !item.netSize) item.netSize = item.size || 'small';
+        if (item.toolType === 'net' && !f.shadowWidth) { item.shadowWidth = Math.round(d.shadowWidth * 0.8); item.shadowHeight = Math.round(d.shadowHeight * 1.2); }
+        FISH_DATA.push(item);
+    });
+}
+function addRod(id, def) { ROD_DATA[id] = Object.assign({ id, price: 0 }, def); }
+function addNet(id, def) { NET_DATA[id] = Object.assign({ id, price: 0, targetSize: ['small', 'midi'] }, def); if (def.ring) NET_RING[id] = def.ring; }
+function addAcc(id, def) { ACC_DATA[id] = Object.assign({ id, price: 0 }, def); }
+function addTrivia(map) { Object.assign(FISH_TRIVIA, map); }
+function setFacing(map) { Object.assign(FISH_FACING, map); }
+function addAchievement(id, def) { ACHIEVEMENT_DATA[id] = Object.assign({ id, icon: _IC.c }, def); }
+
+/* ===================================================
+   起動時の初期化
+   =================================================== */
+function bindZukanScroll() {
+    let t = 0;
+    byId('zukan-grid').addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(saveZukanState, 400); });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    ensureDaily();
+    renderSlots();
+    setWeather('clear');
+    updateHud();
+    updateMenuUI();
+    bindSecrets();
+    bindZukanScroll();
+    if (!playerData.knowsHome) byId('btn-home').classList.add('pulse');
+    byId('version-label').innerText = 'Ver ' + APP_VERSION;
+});
+
+
+/* ===================================================
+   Ver 3.0.0 追加・改良パート
+   ・画像先読み／魚影を実物サイズに／3段階の難易度
+   ・特別な捕まえ方（ミニゲーム）／道具の効果の見直し
+   ・ノーマルガチャ刷新／工房（強化・ブースト）／殿堂入り
+   =================================================== */
+
+/* ---------- 画像の先読み（魚影が遅れて出る問題の対策） ---------- */
+const imgCache = {};
+function preloadImg(src) {
+    if (!src) return Promise.resolve(null);
+    if (imgCache[src]) return imgCache[src].p;
+    const im = new Image();
+    im.decoding = 'async';
+    const p = new Promise(res => {
+        im.onload = () => { (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(() => res(im)); };
+        im.onerror = () => res(null);
+    });
+    imgCache[src] = { im, p };
+    im.src = src;
+    return p;
+}
+function preloadArea(loc) {
+    FISH_DATA.filter(f => f.location === loc).forEach(f => preloadImg(f.image));
+    const m = MAP_DATA[loc];
+    if (m) preloadImg(m.bg);
+}
+function startBackgroundPreload() {
+    if (navigator.connection && navigator.connection.saveData) return;
+    const areas = [currentLocation].concat(Object.keys(MAP_DATA).filter(k => k !== currentLocation));
+    const q = [];
+    areas.forEach(a => FISH_DATA.filter(f => f.location === a).forEach(f => q.push(f.image)));
+    let i = 0, active = 0;
+    const pump = () => {
+        while (active < 3 && i < q.length) {
+            const s = q[i++];
+            if (imgCache[s]) continue;
+            active++;
+            preloadImg(s).then(() => { active--; setTimeout(pump, 40); });
+        }
+    };
+    pump();
+}
+const _selectLocation = window.selectLocation;
+window.selectLocation = function (k) {
+    _selectLocation.apply(this, arguments);
+    preloadArea(currentLocation);
+    if (noWeatherArea(currentLocation) && weather !== 'clear') setWeather('clear');
+};
+
+/* ---------- 魚影のサイズ（実物サイズに比例・巨大なものは上限） ---------- */
+const sizeClassOf = (f) => { const s = f.shadowImage || ''; return s.includes('biggest') ? 'biggest' : s.includes('big') ? 'big' : s.includes('midi') ? 'midi' : 'small'; };
+const getCm = (f) => f.cm || (typeof FISH_CM !== 'undefined' && FISH_CM[f.id]) || ({ small: 20, midi: 50, big: 200, biggest: 600 }[f.size || sizeClassOf(f)] || 30);
+function shadowDim(fish) {
+    const w = Math.max(34, Math.min(220, Math.round(36 * Math.pow(Math.max(getCm(fish), 0.1) / 3, 0.28))));
+    const im = imgCache[fish.image] && imgCache[fish.image].im;
+    const ratio = (im && im.naturalWidth) ? im.naturalHeight / im.naturalWidth : ((fish.shadowHeight / fish.shadowWidth) || 0.5);
+    return { w, h: Math.max(24, Math.min(240, Math.round(w * ratio))) };
+}
+function setCm(map) { Object.assign(FISH_CM, map); }
+
+let shadowToken = 0;
+function prepareShadow(fish, topY) {
+    const s = byId('fish-shadow');
+    s.style.display = "none";
+    s.style.backgroundColor = "transparent";
+    s.style.borderRadius = "0";
+    s.style.backgroundSize = "100% 100%";
+    s.style.backgroundRepeat = "no-repeat";
+    s.classList.add('navy-shadow');
+    s.style.top = `${topY}px`;
+    s.style.transform = 'none';
+    const face = getFacing(fish);
+    const dir = face === 'L' ? -1 : (face === 'R' ? 1 : (Math.random() < 0.5 ? -1 : 1));
+    const ready = preloadImg(fish.image).then(() => {
+        const d = shadowDim(fish);
+        s.style.width = `${d.w}px`;
+        s.style.height = `${d.h}px`;
+        s.style.backgroundImage = `url('${fish.image}')`;
+        s.style.display = "block";
+        return d;
+    });
+    return { dir, ready };
+}
+
+function setupFishShadow(fish) {
+    const s = byId('fish-shadow');
+    const token = ++shadowToken;
+    const topY = Math.random() * 60 + 340;
+    const { dir, ready } = prepareShadow(fish, topY);
+    cancelAnimationFrame(shadowAnimId);
+    ready.then(d => {
+        if (token !== shadowToken || !(gameState === 'WAITING' || gameState === 'SIGNAL')) return;
+        s.style.top = `${topY + (80 - d.h / 2)}px`;
+        let posX = dir > 0 ? -d.w - 20 : 500;
+        const loop = () => {
+            posX += 2.2 * dir;
+            if (dir > 0 && posX > 500) posX = -d.w - 20;
+            if (dir < 0 && posX < -d.w - 20) posX = 500;
+            s.style.left = `${posX}px`;
+            s.style.transform = `translateY(${Math.sin(posX * 0.04) * 6}px)`;
+            if (token === shadowToken && (gameState === 'WAITING' || gameState === 'SIGNAL')) shadowAnimId = requestAnimationFrame(loop);
+        };
+        shadowAnimId = requestAnimationFrame(loop);
+    });
+}
+
+/* ---------- 難易度（簡単／通常／難しい） ---------- */
+const DIFF = {
+    easy: { name: '簡単', limitAdd: 0.35, limitMul: 1, minLimit: 0.3, ring: 1.4, netSpeed: 0.85, fake: 0.05, fakeLv: 3, decay: 0.8, power: 1.1, big: 1, sp: 0.8, hp: 0 },
+    normal: { name: '通常', limitAdd: 0, limitMul: 1, minLimit: 0.3, ring: 1, netSpeed: 1, fake: 0.12, fakeLv: 3, decay: 1, power: 1, big: 1, sp: 1, hp: 0 },
+    hard: { name: '難しい', limitAdd: 0, limitMul: 0.8, minLimit: 0.28, ring: 0.75, netSpeed: 1.35, fake: 0.28, fakeLv: 1, decay: 1.35, power: 0.9, big: 1.2, sp: 1.3, hp: -1 }
+};
+const diffKey = () => playerData.difficulty || (playerData.easyMode ? 'easy' : 'normal');
+const D = () => DIFF[diffKey()] || DIFF.normal;
+function setDifficulty(k) {
+    playerData.difficulty = k;
+    playerData.easyMode = (k === 'easy');
+    savePlayerData();
+    updateDifficultyUI();
+    playWaterPlop();
+}
+function updateDifficultyUI() {
+    ['easy', 'normal', 'hard'].forEach(k => {
+        const b = byId('cfg-diff-' + k);
+        if (b) b.classList.toggle('active', diffKey() === k);
+    });
+}
+
+/* ---------- 道具の効果（ここで一括管理。強化レベル・難易度も反映） ---------- */
+function upgLv(id) { return (playerData.upgrades && playerData.upgrades[id]) || 0; }
+function fx() {
+    const p = playerData, o = { limitMul: 1, limitAdd: 0, tapAdd: 0, decayMul: 1, bigMul: 1, rareMul: 1, goldMul: 1, waitMul: 1, ring: 1, netSlow: 1, netNeed1: false, spLeniency: 1, fakeMul: 1, rankMul: 1, spHp: 0, expMul: 1, swingsAdd: 0 };
+    const slots = currentToolMode === 'rod' ? [p.equippedRodAcc, p.equippedBait] : [p.equippedNetAcc, p.equippedNetReel];
+    const has = (id) => slots.includes(id);
+    if (currentToolMode === 'rod') {
+        const rod = p.equippedRod || 'wood', gachaArea = !!(MAP_DATA[currentLocation] && MAP_DATA[currentLocation].gacha);
+        if (rod === 'iron') { o.tapAdd += 4; o.decayMul *= 0.7; o.limitAdd += 0.03; }
+        if (rod === 'gold') { o.bigMul *= 1.5; o.rareMul *= 1.4; o.goldMul *= 1.05; }
+        if (rod === 'bronze' && currentLocation === 'deepsea') { o.limitMul *= 1.4; o.decayMul *= 0.75; }
+        if (rod === 'legend') { o.limitMul *= 1.3; o.tapAdd += 6; o.decayMul *= 0.7; o.bigMul *= 1.4; o.goldMul *= 1.1; }
+        if (rod === 'god_beast_rod') { o.limitMul *= 1.4; o.tapAdd += 14; o.decayMul *= 0.55; o.bigMul *= 1.6; o.goldMul *= 1.15; o.spLeniency *= 1.35; }
+        if (rod === 'dragon_rod') { o.limitMul *= 1.3; if (gachaArea) o.bigMul *= 2.0; }
+        const lv = upgLv(rod);
+        o.limitAdd += 0.02 * lv; o.goldMul *= 1 + 0.02 * lv; o.tapAdd += 0.5 * lv;
+        if (p.equippedRodAcc === 'bait_reel') o.tapAdd += 5;
+        if (p.equippedBait === 'maki_esa') o.waitMul *= 0.8;
+    } else {
+        const net = p.equippedNet || 'bug_net';
+        o.ring *= 1 + 0.03 * upgLv(net);
+        o.goldMul *= 1 + 0.02 * upgLv(net);
+        if (net === 'iron_net') o.goldMul *= 1.03;
+        if (net === 'steel_net') { o.goldMul *= 1.08; o.spLeniency *= 1.15; }
+        if (net === 'divine_net') { o.netSlow *= 0.8; o.netNeed1 = true; o.goldMul *= 1.15; o.spLeniency *= 1.4; }
+        if (p.equippedNetReel === 'net_fixed' || p.equippedNetAcc === 'net_fixed') { o.ring *= 1.15; o.spLeniency *= 1.1; }
+    }
+    // ---- アクセサリー（追加分）----
+    if (has('float')) o.fakeMul *= 0.3;
+    if (has('scope') || has('net_scope')) o.rankMul *= 1.25;
+    if (has('compass')) o.spHp += 1;
+    if (has('glow_bait')) o.bigMul *= 1.3;
+    if (has('gold_lure') || has('net_gold')) o.goldMul *= 1.08;
+    if (has('exp_bait')) o.expMul *= 1.15;
+    if (has('net_pole')) o.swingsAdd += 1;
+    if (has('lantern')) o.netSlow *= 0.88;
+    if (has('net_buoy')) o.ring *= 1.08;
+    return o;
+}
+// 道具の説明文を、実際の効果に合わせて更新
+Object.assign(ROD_DATA.wood, { desc: "初期装備の質素な竿。特別な能力はない。" });
+Object.assign(ROD_DATA.iron, { desc: "連打+4・連打ゲージの減りが30%ゆっくり。反応の猶予+0.03秒。" });
+Object.assign(ROD_DATA.gold, { desc: "大物の出現率1.5倍・レア魚が出やすい。売値+5%。" });
+Object.assign(ROD_DATA.bronze, { desc: "深海エリアで使える竿（青銅・伝説・神獣のみ）。深海では反応の猶予1.4倍・連打ゲージの減りが25%ゆっくり。" });
+Object.assign(ROD_DATA.legend, { desc: "深海でも使える。全エリアで反応の猶予1.3倍・連打+6・大物1.4倍・売値+10%。" });
+Object.assign(ROD_DATA.god_beast_rod, { desc: "深海・神獣界でも使える最強の竿。反応の猶予1.4倍・連打+14・ゲージ減り45%減・大物1.6倍・売値+15%・特別な戦いが楽になる。" });
+Object.assign(ROD_DATA.dragon_rod, { desc: "全ガチャエリアで待ち時間なし＋大物2倍。反応の猶予1.3倍。" });
+Object.assign(NET_DATA.bug_net, { desc: "初期装備の小さな網。輪が小さく、大きな獲物は苦手。" });
+Object.assign(NET_DATA.tough_net, { desc: "輪がやや大きい。普通サイズまでなら捕まえやすい。" });
+Object.assign(NET_DATA.iron_net, { desc: "輪が大きい。大きな獲物も狙える。売値+3%。" });
+Object.assign(NET_DATA.steel_net, { desc: "輪がとても大きい。売値+8%・特別な戦いが少し楽に。" });
+Object.assign(NET_DATA.divine_net, { desc: "最強の網。輪が最大・魚の動き20%ゆっくり・大物も1回で捕獲・売値+15%・特別な戦いが楽に。" });
+Object.assign(ACC_DATA.maki_esa, { desc: "装備中、魚がかかるまでの待ち時間が20%短くなる。" });
+Object.assign(ACC_DATA.line_tough, { desc: "竿用。反応が遅れた時、20%の確率で失敗を無効にする。" });
+Object.assign(ACC_DATA.net_tough, { desc: "網用。空振りした時、20%の確率で捕獲成功にする。" });
+Object.assign(ACC_DATA.bait_reel, { desc: "竿用。連打パワー+5。" });
+Object.assign(ACC_DATA.net_fixed, { desc: "網用。輪が15%大きくなる。" });
+
+function calcLimit(fish) {
+    const f = fx(), d = D();
+    const L = Math.max(fish.reqTime, 0.350) * f.limitMul * d.limitMul + f.limitAdd + d.limitAdd + (tutorialStage ? 0.35 : 0);
+    return Math.max(L, d.minLimit);
+}
+
+/* ---------- バフ・消耗アイテム（ノーマルガチャ／工房） ---------- */
+const BUFFS = {
+    gold: { name: 'ゴールド×1.5', ico: '💰' }, exp: { name: 'EXP×1.5', ico: '⭐' },
+    frenzy: { name: '入れ食い', ico: '⚡' }, big: { name: '大物チャンス', ico: '🌟' }, super: { name: 'スーパー(金×2/EXP×2)', ico: '👑' }
+};
+const buffLeft = (k) => Math.max(0, ((playerData.buffs && playerData.buffs[k]) || 0) - Date.now());
+const buffOn = (k) => buffLeft(k) > 0;
+function addBuff(k, min) {
+    if (!playerData.buffs) playerData.buffs = {};
+    playerData.buffs[k] = Math.min(Math.max(playerData.buffs[k] || 0, Date.now()) + min * 60000, Date.now() + 60 * 60000);   // 重ねがけは最大60分まで
+}
+function addItem(k, n) {
+    if (!playerData.items) playerData.items = {};
+    playerData.items[k] = (playerData.items[k] || 0) + n;
+}
+const itemCount = (k) => (playerData.items && playerData.items[k]) || 0;
+
+setInterval(() => { if (typeof updateHud === 'function' && byId('status-hud')) updateHud(); }, 20000);
+
+/* ---------- 魚の抽選（道具・バフ・難易度を反映） ---------- */
+function getRandomFish() {
+    const mode = currentToolMode;
+    const pool = FISH_DATA.filter(f => f.location === currentLocation && (f.toolType || "rod") === mode);
+    if (tutorialStage) {
+        const sea = (t) => FISH_DATA.filter(f => ['sea', 'sea2', 'sea3'].includes(f.location) && (f.toolType || 'rod') === t);
+        const f = tutorialStage === 1 ? sea('rod').find(x => !x.isBig) : tutorialStage === 2 ? sea('rod').find(x => x.isBig) : sea('net').find(x => !x.isBig);
+        if (f) return f;
+    }
+    zoromeCast = false;
+    if (forceNextFish) {
+        const f = forceNextFish;
+        forceNextFish = null;
+        if (f.location === currentLocation && (f.toolType || 'rod') === mode) { zoromeCast = true; return f; }
+    }
+    if (pool.length === 0) return FISH_DATA.find(f => f.location === currentLocation) || FISH_DATA[0];
+    const o = fx(), wm = weatherMods();
+    const bigBonus = (1 + Math.min(2, (playerData.sinceBig || 0) * 0.12)) * o.bigMul * (buffOn('big') ? 2 : 1) * D().big;
+    const wts = pool.map(f => f.weight * (f.isBig ? bigBonus * wm.big : (f.weight <= 8 ? o.rareMul : 1)));
+    let r = Math.random() * wts.reduce((a, b) => a + b, 0);
+    for (let i = 0; i < pool.length; i++) { if (r < wts[i]) return pool[i]; r -= wts[i]; }
+    return pool[0];
+}
+
+/* ---------- 竿：待機〜アタリ ---------- */
+function startWaiting() {
+    if (currentToolMode === 'net') { startNetting(); return; }
+    gameState = 'WAITING';
+    currentTargetFish = getRandomFish();
+    preloadImg(currentTargetFish.image);
+    const token = ++waitToken;
+    setStatus("…", "#fff");
+    byId('exclamation').style.display = "none";
+    hideOmen();
+    const ripple = byId('ripple-effect');
+    ripple.style.display = "block";
+    ripple.style.left = "40%";
+    ripple.style.top = "70%";
+    playWaterPlop();
+    setupFishShadow(currentTargetFish);
+
+    const m = MAP_DATA[currentLocation], o = fx(), dd = D();
+    const slow = !!(m && m.gacha && playerData.equippedRod !== m.matchRod && playerData.equippedRod !== 'dragon_rod');
+    let d = slow ? Math.floor(Math.random() * 4000) + 8000 : Math.floor(Math.random() * 2500) + 2000;
+    let wm = o.waitMul;
+    if (itemCount('bait') > 0 && !tutorialStage) { playerData.items.bait--; wm *= 0.8; savePlayerData(); }
+    if (frenzy > 0) wm *= 0.8;
+    if (buffOn('frenzy') || buffOn('super')) wm *= 0.8;
+    d = Math.max(Math.floor(d * Math.max(wm, 0.55)), 1800);   // 重ねても速くなりすぎない（最短1.8秒）
+
+    const big = !!currentTargetFish.isBig;
+    fakeBite = !tutorialStage && !big && playerData.level >= dd.fakeLv && Math.random() < dd.fake * o.fakeMul;
+    const at = (ms, fn) => setTimeout(() => { if (waitToken === token && gameState === 'WAITING') fn(); }, ms);
+    if (big) {
+        at(d * 0.4, () => { showOmen('🌊 うねり…！', true); shake(); triggerVibration([80, 60, 80]); playTone(90, 0.5, 'sawtooth'); });
+        at(d * 0.75, () => { showOmen('⚠ 来る…！！', true); shake(); playTone(70, 0.4, 'sawtooth'); });
+    } else if (!fakeBite) {
+        at(d * 0.55, () => { showOmen('ぴくっ'); setTimeout(() => { if (waitToken === token) hideOmen(); }, 800); });
+    }
+    timerId = setTimeout(() => {
+        if (gameState !== 'WAITING') return;
+        if (fakeBite) showFakeBite(token); else doSignal();
+    }, d);
+}
+
+function hitAction() {
+    clearTimeout(timeoutTimerId);
+    reactionTime = (Date.now() - startTime) / 1000;
+    hideFishShadow();
+    byId('ripple-effect').style.display = "none";
+    byId('exclamation').style.display = "none";
+    hideOmen();
+    const limit = calcLimit(currentTargetFish);
+    const proceed = () => {
+        if (currentTargetFish.isBoss) startBossBattle(1);
+        else if (currentTargetFish.isBig) startBattle();
+        else finishCatch(true);
+    };
+    if (reactionTime <= limit) { proceed(); return; }
+    if (currentToolMode === 'rod' && playerData.equippedRodAcc === 'line_tough' && Math.random() < 0.20) {
+        setStatus("装備の力で回避！", "#00ffcc");
+        proceed();
+        return;
+    }
+    playSE('foul');
+    playerData.currentCombo = 0;
+    registerMiss();
+    showResult(false, currentTargetFish, reactionTime);
+}
+
+function startBattle() {
+    if (isSpecialFish(currentTargetFish)) { startSpecial(); return; }
+    gameState = 'BATTLE';
+    battleGauge = 30;
+    updateStageBgm();
+    triggerVibration([300, 100, 300]);
+    setStatus("連打！", "#ff2200");
+    byId('mash-container').style.display = "flex";
+    updateGaugeUI();
+    playSE('signal');
+    const decay = (currentTargetFish.decaySpeed || 1.2) * fx().decayMul * D().decay;
+    clearInterval(battleIntervalId);
+    battleIntervalId = setInterval(() => {
+        if (gameState !== 'BATTLE') return;
+        battleGauge -= decay;
+        if (battleGauge <= 0) {
+            battleGauge = 0;
+            clearInterval(battleIntervalId);
+            byId('mash-container').style.display = "none";
+            playSE('foul');
+            if (currentToolMode === 'rod') playerData.currentCombo = 0; else playerData.netCombo = 0;
+            registerMiss();
+            failReason = 'gauge';
+            showResult(false, currentTargetFish, reactionTime);
+        }
+        updateGaugeUI();
+    }, 100);
+}
+
+function battleTap() {
+    if (gameState !== 'BATTLE') return;
+    playSE('tap');
+    const power = ((currentTargetFish.tapPower || 11) + fx().tapAdd) * D().power;
+    battleGauge += power;
+    if (battleGauge >= 100) {
+        battleGauge = 100;
+        clearInterval(battleIntervalId);
+        byId('mash-container').style.display = "none";
+        finishCatch(true);
+    }
+    updateGaugeUI();
+}
+
+/* ---------- 網：輪の中でタップ（道具・難易度・先読み対応） ---------- */
+function startNetting() {
+    gameState = 'NET';
+    byId('game-container').classList.add('net-mode');
+    const fish = currentTargetFish = getRandomFish();
+    const W = byId('game-screen').clientWidth || 400;
+    const topY = Math.random() * 50 + 350;
+    const { dir, ready } = prepareShadow(fish, topY);
+    const o = fx(), dd = D();
+    const eq = playerData.equippedNet || 'bug_net';
+    const net = NET_DATA[eq] || NET_DATA.bug_net;
+    const mismatch = (fish.netSize && net.targetSize && !net.targetSize.includes(fish.netSize)) ? 0.75 : 1;
+    const r = (NET_RING[eq] || 34) * o.ring * dd.ring * (tutorialStage ? 1.4 : 1) * (fish.isBig ? 0.85 : 1) * mismatch;
+    netState = {
+        fish, dir, W, r, sw: 80, cx: W / 2, cy: topY + 20, x: dir > 0 ? -400 : W + 400, last: 0, loading: true,
+        speed: (140 + 60 / Math.max(fish.reqTime, 0.4)) * (fish.isBig ? 1.15 : 1) * dd.netSpeed * o.netSlow * (tutorialStage ? 0.8 : 1),
+        swings: 2 + o.swingsAdd, need: fish.isBig ? (o.netNeed1 ? 1 : 2) : 1, hit: 0, ratioSum: 0, busy: false, delay: fish.isBig ? 1500 : 400
+    };
+    const ring = byId('net-ring');
+    ring.className = '';
+    ring.style.display = 'none';
+    const pips = byId('net-pips');
+    pips.style.display = 'none';
+    byId('net-hint').style.display = 'none';
+    setStatus(fish.isBig ? "大物！" : "🥅", fish.isBig ? "#ffd700" : "#fff");
+    playWaterPlop();
+    cancelAnimationFrame(netRaf);
+    ready.then(d => {
+        const s = netState;
+        if (!s || s.fish !== fish || gameState !== 'NET') return;
+        s.sw = d.w; s.cy = topY + d.h / 2; s.x = dir > 0 ? -d.w : W; s.loading = false;
+        byId('fish-shadow').style.left = `${s.x}px`;
+        ring.style.display = 'block';
+        ring.style.width = ring.style.height = `${r * 2}px`;
+        ring.style.left = `${s.cx - r}px`;
+        ring.style.top = `${s.cy - r}px`;
+        if (fish.isBig && s.need > 1) {
+            ring.classList.add('big');
+            showNetHint('⚠ 大物！ 輪に入ったら <b>2回</b> タップ！<br><small>1回目のあと、もう一度泳いでくるよ</small>', 3200);
+            shake(); triggerVibration([60, 40, 60]);
+            pips.style.display = 'block';
+            pips.style.left = `${s.cx - 65}px`;
+            pips.style.top = `${s.cy - r - 34}px`;
+            updatePips();
+        } else if (fish.isBig) {
+            showNetHint('✨ 神獣の網！ 大物も<b>1回</b>でOK！', 2200);
+        }
+        netRaf = requestAnimationFrame(netLoop);
+    });
+}
+
+function netLoop(t) {
+    const s = netState;
+    if (!s || gameState !== 'NET') return;
+    const dt = s.last ? Math.min((t - s.last) / 1000, 0.05) : 0.016;
+    s.last = t;
+    if (s.delay > 0) { s.delay -= dt * 1000; netRaf = requestAnimationFrame(netLoop); return; }
+    s.x += s.dir * s.speed * dt;
+    const el = byId('fish-shadow');
+    el.style.left = `${s.x}px`;
+    el.style.transform = `translateY(${Math.sin(s.x * 0.05) * 5}px)`;
+    if ((s.dir > 0 && s.x > s.W + 10) || (s.dir < 0 && s.x < -s.sw - 10)) { netFail(); return; }
+    netRaf = requestAnimationFrame(netLoop);
+}
+
+function netSwing() {
+    const s = netState;
+    if (!s || s.busy || s.delay > 0 || s.loading) return;
+    const ring = byId('net-ring');
+    const tol = s.r + Math.min(s.sw * 0.15, 22);
+    const dist = Math.abs(s.x + s.sw / 2 - s.cx);
+    ring.classList.remove('swing', 'ok', 'ng');
+    void ring.offsetWidth;
+    playSplashSE();
+    triggerVibration(40);
+    if (dist <= tol) {
+        s.hit++;
+        s.ratioSum += dist / tol;
+        if (s.need > 1) updatePips();
+        ring.classList.add('swing', 'ok');
+        if (s.hit >= s.need) {
+            s.busy = true;
+            netRatio = s.ratioSum / s.hit;
+            reactionTime = netRatio;
+            cancelAnimationFrame(netRaf);
+            setTimeout(() => {
+                if (!netState) return;
+                const fish = netState.fish;
+                stopNet();
+                currentTargetFish = fish;
+                finishCatch(true);
+            }, 350);
+        } else {
+            s.r *= 0.85; s.speed *= 1.25;
+            s.x = s.dir > 0 ? -s.sw : s.W;
+            s.delay = 900;
+            byId('fish-shadow').style.left = `${s.x}px`;
+            ring.style.width = ring.style.height = `${s.r * 2}px`;
+            ring.style.left = `${s.cx - s.r}px`;
+            ring.style.top = `${s.cy - s.r}px`;
+            setStatus("あと1回！", "#00ffcc");
+            showNetHint("✨ 命中！ もう一度来るよ！<br><b>もう1回</b>タップ！", 2200);
+        }
+    } else {
+        s.swings--;
+        ring.classList.add('swing', 'ng');
+        playSE('tap');
+        if (s.swings <= 0) { netFail(); } else { s.speed *= 1.2; setStatus("もう1回！", "#ff9966"); }
+    }
+}
+
+/* ---------- 特別な捕まえ方（各エリアで最も希少な生き物・神獣界のボス） ---------- */
+const SP_KINDS = ['timing', 'follow', 'dodge', 'rhythm', 'charge'];
+const SP_SEQ = { 237: ['dodge', 'simon', 'charge', 'odd', 'rhythm'], 238: ['timing', 'match', 'follow', 'sort', 'dodge'], 239: ['run', 'rhythm', 'deliver', 'shell', 'charge', 'pop'] };
+const SP_OVERRIDE = {};
+let spCache = { n: -1, map: {} };
+function rarestMap() {
+    if (spCache.n === FISH_DATA.length) return spCache.map;
+    const groups = {};
+    FISH_DATA.forEach(f => { const k = f.location + '|' + (f.toolType || 'rod'); (groups[k] = groups[k] || []).push(f); });
+    const m = {};
+    Object.keys(groups).forEach(k => {
+        const g = groups[k];
+        if (g.length < 3) return;
+        g.sort((a, b) => a.weight - b.weight || b.price - a.price);
+        m[g[0].id] = true;
+    });
+    spCache = { n: FISH_DATA.length, map: m };
+    return m;
+}
+const isSpecialFish = (f) => !!f && (!!f.isBoss || !!rarestMap()[f.id]);
+const SP_AREA_KIND = { volcano: 'run', honey: 'match', holy: 'simon', ryugu: 'shell', ruins: 'sort', poison: 'deliver', milkyway: 'odd', eldorado: 'pop' };
+const spKindOf = (f) => SP_OVERRIDE[f.id] || SP_AREA_KIND[f.location] || SP_KINDS[(f.id * 7 + 3) % SP_KINDS.length];
+function setSpecial(map) { Object.assign(SP_OVERRIDE, map); }
+
+const SP_INFO = {
+    timing: { ico: '🎯', name: 'タイミング', text: (n) => `動く線が、光る場所に来た瞬間にタップ！<br>3回成功で捕獲。ミスが${n.lives}回で失敗。` },
+    follow: { ico: '👆', name: 'おいかけ', text: () => '光る輪を、指でなぞって追いかけよう！<br>輪はランダムに動く。中にいるとゲージがたまる。（PC：矢印キー）' },
+    dodge: { ico: '💣', name: '大砲をよけろ', text: () => '指を左右に動かして、飛んでくる大砲の弾をよけよう！<br>時間まで耐えれば捕獲。（PC：←→キー）' },
+    rhythm: { ico: '🎵', name: 'リズム', text: (n) => `縮む輪が、中の丸にぴったり重なる瞬間にタップ！<br>輪は全部で5回。${n.need}回成功で捕獲。` },
+    run: { ico: '🏃', name: 'ダッシュ！間欠泉', text: (n) => `長押しで走ってゴールをめざそう！<br>信号が<b>赤</b>の間は止まる（間欠泉が噴き出す）。赤で走るとミス。ミス${n.lives}回で失敗。（PC：Zキー長押し）` },
+    deliver: { ico: '💊', name: '解毒薬を届けろ', text: (n) => `上を動く<b>解毒薬</b>を、「助けて！」と光る生き物の真上でタップして落とそう！<br>${n.deliverNeed}回成功で捕獲。ミス${n.lives}回で失敗。（PC：Zキー）` },
+    match: { ico: '🃏', name: 'ハニカム神経衰弱', text: (n) => `カードの絵を覚えて、同じ絵の<b>ペア</b>を4組そろえよう！<br>ミス${n.lives + 2}回で失敗。` },
+    simon: { ico: '🔮', name: 'ひかりの記憶', text: (n) => `光った順番を覚えて、同じ順にタップ！<br>だんだん長くなる。4回クリアで捕獲。ミス${n.lives}回で失敗。` },
+    shell: { ico: '🐚', name: '貝殻あて', text: (n) => `真珠が入った貝殻を、目で追おう！<br>シャッフルが止まったら、真珠のある貝殻をタップ。3回当てれば捕獲。ミス${n.lives}回で失敗。` },
+    sort: { ico: '🗿', name: '石板ならべ', text: () => '2枚をタップして入れかえ、<b>1→5</b>の順に並べよう！<br>入れかえられる回数には限りがある。' },
+    odd: { ico: '🌠', name: 'まちがい探し', text: (n) => `ひとつだけ違う星を探してタップ！<br>3問。ミス${n.lives}回で失敗。時間切れもミス。` },
+    pop: { ico: '⛏', name: '黄金のもぐら', text: (n) => `穴から出る<b>黄金の魚</b>だけをタップ！ 爆弾はさわらないで！<br>ミス${n.lives}回で失敗。` },
+    charge: { ico: '💪', name: 'ためうち', text: (n) => `長押しでゲージをため、<b>緑の所</b>で指を離そう！<br>チャンスは5回。${n.chargeNeed}回成功で捕獲。（PC：Zキー長押し）` }
+};
+let spState = null, spRaf = 0, spGame = null, spLast = 0;
+const spKeys = {};
+const SP_BASE = {
+    'sp-bar': 'position:absolute;height:36px;background:#0b2a40;border:3px solid #d8b66a;border-radius:8px;',
+    'sp-bar tall': 'position:absolute;height:48px;background:#0b2a40;border:3px solid #d8b66a;border-radius:8px;',
+    'sp-zone': 'position:absolute;top:0;bottom:0;background:rgba(255,226,122,.55);border:2px solid #ffe27a;border-radius:4px;',
+    'sp-zone good': 'position:absolute;top:0;bottom:0;background:rgba(60,220,120,.6);border:2px solid #5f8;border-radius:4px;',
+    'sp-marker': 'position:absolute;top:-6px;bottom:-6px;width:6px;margin-left:-3px;background:#fff;border-radius:3px;',
+    'sp-fill': 'position:absolute;left:0;top:0;bottom:0;width:0;background:#7fc4ff;border-radius:3px;opacity:.85;',
+    'sp-target': 'position:absolute;border:4px dashed #ffe27a;border-radius:50%;background:rgba(255,226,122,.15);',
+    'sp-cursor': 'position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px #4aa3ff;z-index:3;',
+    'sp-heart': 'position:absolute;width:24px;height:24px;background:#ff4466;clip-path:polygon(50% 100%,0 40%,10% 10%,30% 0,50% 20%,70% 0,90% 10%,100% 40%);',
+    'sp-haz': 'position:absolute;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#bbb,#444 55%,#111);box-shadow:0 0 6px rgba(0,0,0,.8);',
+    'sp-orb': 'position:absolute;border:3px solid #ffe27a;border-radius:50%;background:rgba(255,226,122,.2);',
+    'sp-ring': 'position:absolute;border:4px solid #fff;border-radius:50%;pointer-events:none;'
+};
+const spEl = (cls, parent, css) => {
+    const e = document.createElement('div');
+    e.className = cls;
+    if (SP_BASE[cls]) e.style.cssText = SP_BASE[cls];   // style.css が古くても最低限表示されるように
+    if (css) Object.assign(e.style, css);
+    if (parent) parent.appendChild(e);
+    return e;
+};
+
+
+
+const THING_AREAS = ['ryugu'];
+const isThing = (f) => !!f && (THING_AREAS.includes(f.location) || !!f.thing);
+
+function spCardHtml(ico, name, body, ok) {
+    return `<div style="font-size:54px;line-height:1;">${ico}</div>
+        <div style="font-size:26px;font-weight:bold;color:#ffe9a0;text-shadow:2px 2px 0 #000;">⚓ ${name} ⚓</div>
+        <div style="font-size:16px;line-height:1.7;color:#fff;background:rgba(255,244,214,.12);border:3px solid #d8b66a;border-radius:10px;padding:10px 12px;">${body}</div>
+        ${ok ? '<div style="margin-top:6px;padding:10px 22px;font-size:18px;font-weight:bold;background:#c0392b;border:3px solid #ffd700;border-radius:10px;color:#fff;">タップではじめる</div>' : ''}`;
+}
+
+const spApi = {
+    get stage() { return byId('sp-stage'); },
+    get W() { return byId('sp-stage').clientWidth || 320; },
+    get H() { return byId('sp-stage').clientHeight || 240; },
+    say(t) { byId('sp-say').innerHTML = t; },
+    prog(p) { byId('sp-prog-in').style.width = Math.max(0, Math.min(100, p * 100)) + '%'; },
+    hearts(n) { byId('sp-hearts').innerText = n > 0 ? '❤'.repeat(n) : '💔'; },
+    hudText(s) { byId('sp-hearts').innerText = s; },
+    flash(t, c) { const f = byId('sp-flash'); f.innerText = t; f.style.color = c || '#fff'; f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); },
+    win() { spStageEnd(true); },
+    lose() { spStageEnd(false); }
+};
+
+function startBossBattle() { startSpecial(); }
+
+function spClearFlash() { const f = byId('sp-flash'); if (f) { f.classList.remove('on'); f.innerText = ''; } }
+
+function startSpecial() {
+    const fish = currentTargetFish;
+    const seq = (SP_SEQ[fish.id] || [spKindOf(fish)]).slice();
+    spState = { fish, seq, idx: 0 };
+    gameState = 'SPECIAL';
+    clearInterval(battleIntervalId);
+    byId('mash-container').style.display = "none";
+    hideFishShadow();
+    updateStageBgm();
+    triggerVibration([200, 80, 200]);
+    ensureSpLayer();
+    spClearFlash();
+    byId('sp-layer').style.display = 'flex';
+    byId('sp-layer').scrollTop = 0;
+    spRunStage();
+}
+
+function spInfoNums(kind) {
+    const dd = D();
+    const sp = dd.sp * (spState && spState.seq.length > 1 ? 1.25 : 1);
+    const need = sp > 1.1 ? 4 : (sp < 0.9 ? 2 : 3);
+    return { lives: 3 + dd.hp + fx().spHp, need: need, chargeNeed: sp > 1.1 ? 4 : 3, deliverNeed: sp > 1.1 ? 6 : (sp < 0.9 ? 4 : 5) };
+}
+
+function spRunStage() {
+    const kind = spState.seq[spState.idx];
+    const fish = spState.fish;
+    const info = SP_INFO[kind];
+    byId('sp-title').innerHTML = `⚓ ${info.ico} ${fish.name}${spState.seq.length > 1 ? `　ターン ${spState.idx + 1}/${spState.seq.length}` : ''} ⚓`;
+    const st = byId('sp-stage');
+    st.innerHTML = '';
+    spGame = null;
+    spApi.say('');
+    spApi.prog(0);
+    spApi.hearts(0);
+    const seen = (playerData.spSeen = playerData.spSeen || {});
+    const card = byId('sp-card');
+    if (!seen[kind] || spState.idx === 0 && spState.seq.length > 1 && !seen['boss']) {
+        seen[kind] = true;
+        if (spState.seq.length > 1) seen['boss'] = true;
+        savePlayerData();
+        card.innerHTML = spCardHtml(info.ico, info.name, `${isThing(fish) ? `${fish.name}を手に入れるには、試練を乗りこえなければ！` : `${fish.name}が本気で抵抗してきた！`}<br>${info.text(spInfoNums(kind))}`, true);
+        card.style.display = 'flex';
+        spState.waitCard = true;
+    } else {
+        card.innerHTML = spCardHtml(info.ico, info.name, `<b style="font-size:22px;color:#ffe27a;">${isThing(fish) ? fish.name + 'への挑戦！' : fish.name + 'との勝負！'} READY…</b>`, false);
+        card.style.display = 'flex';
+        spState.waitCard = false;
+        setTimeout(spCardOk, 900);
+    }
+}
+
+function spCardOk() {
+    if (!spState || gameState !== 'SPECIAL' || spGame) return;
+    byId('sp-card').style.display = 'none';
+    const kind = spState.seq[spState.idx];
+    const o = fx(), dd = D();
+    const P = { sp: dd.sp * (spState.seq.length > 1 ? 1.25 : 1), len: o.spLeniency * (spState.seq.length > 1 ? 0.9 : 1), hp: 3 + dd.hp + o.spHp };
+    spGame = SPG[kind](spApi, P);
+    spLast = 0;
+    cancelAnimationFrame(spRaf);
+    spRaf = requestAnimationFrame(spTick);
+}
+
+function spTick(t) {
+    if (!spGame || gameState !== 'SPECIAL') return;
+    const dt = spLast ? Math.min((t - spLast) / 1000, 0.05) : 0.016;
+    spLast = t;
+    spGame.update && spGame.update(dt);
+    if (spGame) spRaf = requestAnimationFrame(spTick);
+}
+
+function spStageEnd(win) {
+    if (!spGame) return;
+    spGame = null;
+    cancelAnimationFrame(spRaf);
+    spApi.flash(win ? 'SUCCESS!' : 'FAILED…', win ? '#ffe27a' : '#ff6666');
+    playSE(win ? 'success' : 'foul');
+    setTimeout(() => {
+        if (!spState) return;
+        if (win && spState.idx + 1 < spState.seq.length) { spState.idx++; spRunStage(); return; }
+        const fish = spState.fish;
+        spClearFlash();
+        byId('sp-layer').style.display = 'none';
+        spState = null;
+        currentTargetFish = fish;
+        if (win) { spWon = true; finishCatch(true); }
+        else {
+            if (currentToolMode === 'rod') playerData.currentCombo = 0; else playerData.netCombo = 0;
+            registerMiss();
+            failReason = 'special';
+            showResult(false, fish, null);
+        }
+    }, 900);
+}
+
+function spAction() { if (spState && spState.waitCard && byId('sp-card').style.display !== 'none') { spCardOk(); return; } if (spGame && spGame.act) spGame.act(); }
+window.addEventListener('keydown', (e) => {
+    if (gameState !== 'SPECIAL') return;
+    if (e.code.startsWith('Arrow')) { spKeys[e.code] = true; e.preventDefault(); if (!e.repeat && spGame && spGame.keyPress) spGame.keyPress(e.code); }
+    if (e.code === 'KeyZ' && !e.repeat) { if (spCardShown()) spCardOk(); else if (spGame) { spGame.keyDown ? spGame.keyDown() : (spGame.down && spGame.down(spGame.px || 0, spGame.py || 0)); } e.preventDefault(); }
+}, true);
+window.addEventListener('keyup', (e) => {
+    spKeys[e.code] = false;
+    if (gameState === 'SPECIAL' && e.code === 'KeyZ' && spGame && spGame.up) spGame.up();
+}, true);
+const spCardShown = () => byId('sp-card') && byId('sp-card').style.display !== 'none';
+
+const SPG = {};
+SPG.timing = function (a, P) {
+    const BW = a.W - 40, bar = spEl('sp-bar', a.stage, { left: '20px', top: `${a.H / 2 - 18}px`, width: BW + 'px' });
+    const zone = spEl('sp-zone', bar), mk = spEl('sp-marker', bar);
+    const need = 3; let hits = 0, lives = P.hp, x = 0, dir = 1, zx = 0, zw = 0;
+    const speed = BW / (1.5 / P.sp);
+    const newZone = () => { zw = Math.max(34, BW * 0.22 * P.len / Math.pow(P.sp, 0.7) * Math.pow(0.88, hits)); zx = Math.random() * (BW - zw); zone.style.left = zx + 'px'; zone.style.width = zw + 'px'; };
+    newZone(); a.hearts(lives); a.say(`光る所でタップ！ ${need}回成功（ミス${lives}回で失敗）`);
+    const g = {
+        update(dt) { x += dir * speed * (1 + hits * 0.12) * dt; if (x >= BW) { x = BW; dir = -1; } if (x <= 0) { x = 0; dir = 1; } mk.style.left = x + 'px'; },
+        act() {
+            if (x >= zx && x <= zx + zw) { hits++; a.prog(hits / need); a.flash('ナイス！', '#7fff7f'); playSE('tap'); if (hits >= need) return a.win(); newZone(); }
+            else { lives--; a.hearts(lives); a.flash('ミス…', '#ff7777'); playSE('foul'); if (lives <= 0) return a.lose(); }
+        },
+        down() { g.act(); }, keyDown() { g.act(); }
+    };
+    return g;
+};
+SPG.follow = function (a, P) {
+    const W = a.W, H = a.H, r = 38 * P.len / Math.pow(P.sp, 0.4);
+    const tg = spEl('sp-target', a.stage, { width: 2 * r + 'px', height: 2 * r + 'px' }), cur = spEl('sp-cursor', a.stage);
+    let t = 0, gauge = 25, px = W / 2, py = H / 2, time = 13 * (P.sp < 1 ? 1.2 : 1);
+    let tx = W / 2, ty = H / 2, vx = 0, vy = 0, wx = W / 2, wy = H / 2, wt = 0;
+    a.say('光る輪を 指で追いかけよう！'); a.prog(gauge / 100);
+    const g = {
+        px, py,
+        update(dt) {
+            t += dt; time -= dt;
+            const k = 260 * dt;
+            if (spKeys.ArrowLeft) px -= k; if (spKeys.ArrowRight) px += k; if (spKeys.ArrowUp) py -= k; if (spKeys.ArrowDown) py += k;
+            px = Math.max(0, Math.min(W, px)); py = Math.max(0, Math.min(H, py));
+            wt -= dt;   // ランダムな目的地へ、急に向きを変えながら動く
+            if (wt <= 0) { wx = r + Math.random() * (W - 2 * r); wy = r + Math.random() * (H - 2 * r); wt = (0.5 + Math.random() * 1.1) / P.sp; }
+            const sp = 150 * P.sp, ddx = wx - tx, ddy = wy - ty, dl = Math.hypot(ddx, ddy) || 1;
+            vx += (ddx / dl * sp - vx) * Math.min(1, 3.2 * dt); vy += (ddy / dl * sp - vy) * Math.min(1, 3.2 * dt);
+            tx = Math.max(r, Math.min(W - r, tx + vx * dt)); ty = Math.max(r, Math.min(H - r, ty + vy * dt));
+            tg.style.left = (tx - r) + 'px'; tg.style.top = (ty - r) + 'px';
+            cur.style.left = (px - 8) + 'px'; cur.style.top = (py - 8) + 'px';
+            const inside = Math.hypot(px - tx, py - ty) <= r;
+            tg.classList.toggle('on', inside);
+            gauge += (inside ? 30 : -16 * P.sp) * dt;
+            gauge = Math.max(0, Math.min(100, gauge));
+            a.prog(gauge / 100); a.say(`あと ${Math.max(0, Math.ceil(time))} 秒`);
+            if (gauge >= 100) a.win(); else if (time <= 0) a.lose();
+        },
+        down(x, y) { px = x; py = y; }, move(x, y) { px = x; py = y; }
+    };
+    return g;
+};
+SPG.dodge = function (a, P) {
+    const W = a.W, H = a.H, total = 9 * (P.sp < 1 ? 0.85 : (P.sp > 1.1 ? 1.1 : 1));
+    const heart = spEl('sp-heart', a.stage, { top: (H - 34) + 'px' });
+    let px = W / 2, tx = null, time = total, hp = P.hp, inv = 0, spawn = 0.4, n = 0; const haz = [];
+    a.hearts(hp); a.say('よけつづけろ！');
+    const add = (x, v) => { const e = spEl('sp-haz', a.stage, { left: (x - 11) + 'px', top: '-24px' }); haz.push({ e, x, y: -24, v }); };
+    const g = {
+        update(dt) {
+            time -= dt; inv -= dt; spawn -= dt;
+            const k = 280 * dt;
+            if (spKeys.ArrowLeft) { px -= k; tx = null; } if (spKeys.ArrowRight) { px += k; tx = null; }
+            if (tx !== null) px += (tx - px) * Math.min(1, 14 * dt);
+            px = Math.max(12, Math.min(W - 12, px));
+            heart.style.left = (px - 12) + 'px'; heart.style.opacity = inv > 0 && Math.floor(inv * 12) % 2 ? 0.3 : 1;
+            if (spawn <= 0) {
+                n++; spawn = 0.62 / P.sp; const v = 150 * P.sp;
+                if (n % 5 === 0) { const gap = Math.random() * (W - 120) + 60; for (let x = 20; x < W; x += 36) if (Math.abs(x - gap) > 54 * P.len) add(x, v * 0.85); }
+                else add(Math.random() * (W - 30) + 15, v);
+            }
+            for (let i = haz.length - 1; i >= 0; i--) {
+                const h = haz[i]; h.y += h.v * dt; h.e.style.top = h.y + 'px';
+                if (inv <= 0 && Math.hypot(h.x - px, h.y + 11 - (H - 22)) < 20) {
+                    hp--; inv = 1.2; a.hearts(hp); a.flash('ヒット！', '#ff7777'); playSE('foul'); triggerVibration(120);
+                    if (hp <= 0) return a.lose();
+                }
+                if (h.y > H + 30) { h.e.remove(); haz.splice(i, 1); }
+            }
+            a.prog(1 - time / total);
+            const left = Math.max(0, Math.ceil(time)); if (left !== g._left) { g._left = left; a.say(`あと ${left} 秒 よけつづけろ！`); }
+            if (time <= 0) a.win();
+        },
+        down(x) { tx = x; }, move(x) { if (tx !== null) tx = x; }, up() { }
+    };
+    return g;
+};
+SPG.rhythm = function (a, P) {
+    const W = a.W, H = a.H, beats = 5, need = P.sp > 1.1 ? 4 : (P.sp < 0.9 ? 2 : 3), dur = 1.05 / P.sp, R0 = 90, tr = 26, win = 15 * P.len;
+    let beat = -1, wait = 0.5, t = 0, good = 0, active = false, cx = W / 2, cy = H / 2, done = 0;
+    const target = spEl('sp-orb', a.stage, { width: 2 * tr + 'px', height: 2 * tr + 'px' }), ring = spEl('sp-ring', a.stage);
+    target.style.display = ring.style.display = 'none';
+    const hud = () => { a.say(`輪は5回。 ${need}回成功で捕獲！`); a.hudText(`成功 ${good}/${need}　残り ${Math.max(0, beats - done)}回`); a.prog(done / beats); };
+    hud();
+    const nextBeat = () => {
+        beat++; if (beat >= beats) { return good >= need ? a.win() : a.lose(); }
+        cx = 60 + Math.random() * (W - 120); cy = 60 + Math.random() * (H - 120);
+        target.style.left = (cx - tr) + 'px'; target.style.top = (cy - tr) + 'px'; target.style.display = 'block';
+        ring.style.width = ring.style.height = 2 * R0 + 'px'; ring.style.left = (cx - R0) + 'px'; ring.style.top = (cy - R0) + 'px';
+        ring.style.display = 'block'; t = 0; active = true;
+    };
+    const judge = (ok) => {
+        if (!active) return; active = false;
+        if (ok) { good++; a.flash('GOOD!', '#7fff7f'); playSE('tap'); } else { a.flash('MISS', '#ff7777'); playSE('foul'); }
+        done++; hud(); target.style.display = ring.style.display = 'none'; wait = 0.55;
+    };
+    const g = {
+        update(dt) {
+            if (!active) { wait -= dt; if (wait <= 0) nextBeat(); return; }
+            t += dt; const rr = R0 - (R0 - tr) * (t / dur);
+            ring.style.width = ring.style.height = 2 * rr + 'px'; ring.style.left = (cx - rr) + 'px'; ring.style.top = (cy - rr) + 'px';
+            if (t > dur + 0.18) judge(false);
+        },
+        act() { if (!active) return; const rr = R0 - (R0 - tr) * (t / dur); judge(Math.abs(rr - tr) <= win * 0.8 && t > dur * 0.4); },
+        down() { g.act(); }, keyDown() { g.act(); }
+    };
+    return g;
+};
+SPG.charge = function (a, P) {
+    const BW = a.W - 40, bar = spEl('sp-bar tall', a.stage, { left: '20px', top: `${a.H / 2 - 24}px`, width: BW + 'px' });
+    const zone = spEl('sp-zone good', bar), fill = spEl('sp-fill', bar);
+    let tries = 5, ok = 0, v = 0, holding = false, zx = 0, zw = 0;
+    const need = P.sp > 1.1 ? 4 : 3, rate = 70 * P.sp;
+    const newZone = () => { zw = Math.max(10, 22 * P.len / Math.pow(P.sp, 0.7)); zx = 35 + Math.random() * (95 - zw - 35); zone.style.left = zx + '%'; zone.style.width = zw + '%'; };
+    const hud = () => { a.say(`長押しでためて 緑で離す！ ${need}回成功で捕獲`); a.hudText(`成功 ${ok}/${need}　残り ${tries}回`); a.prog(ok / need); };
+    newZone(); hud();
+    const release = () => {
+        holding = false;
+        if (v >= zx && v <= zx + zw) { ok++; a.flash('ばっちり！', '#7fff7f'); playSE('success'); } else { a.flash('はずれ…', '#ff7777'); playSE('foul'); }
+        tries--; v = 0; fill.style.width = '0%'; hud();
+        if (ok >= need) return a.win(); if (tries <= 0 || ok + tries < need) return a.lose(); newZone();
+    };
+    const g = {
+        update(dt) { if (holding) { v += rate * dt; fill.style.width = Math.min(v, 100) + '%'; if (v >= 100) { v = 100; release(); } } },
+        down() { if (!holding) { holding = true; v = 0; } }, keyDown() { g.down(); },
+        up() { if (holding) release(); }
+    };
+    return g;
+};
+
+/* ---------- 捕獲成功の入口（特別な生き物は特別な戦いへ） ---------- */
+let spWon = false;
+function finishCatch(isSuccess) {
+    if (isSuccess && !spWon && !tutorialStage && isSpecialFish(currentTargetFish)) { startSpecial(); return; }
+    finishCatchCore(isSuccess);
+}
+
+const _handleAction30 = window.handleAction;
+window.handleAction = function () {
+    if (gameState === 'SPECIAL') { initAudio(); spAction(); return; }
+    if (gameState === 'READY' && kbCtx()) return;   // レベルアップ等のウィンドウが開いている間は、外側をタップしても釣りを始めない
+    return _handleAction30.apply(this, arguments);
+};
+
+/* ---------- お守り（ガチャで入手）：失敗を身代わりに ---------- */
+const _showResult30 = showResult;
+window.showResult = function (isSuccess, fish) {
+    if (!isSuccess && !tutorialStage && itemCount('charm') > 0) {
+        playerData.items.charm--;
+        savePlayerData();
+        stopNet();
+        hideFishShadow();
+        byId('exclamation').style.display = 'none';
+        byId('mash-container').style.display = 'none';
+        failReason = 'late';
+        gameState = 'READY';
+        setStatus('🧿 お守りが身代わりに！', '#00ffcc');
+        floatText('🧿 お守りで失敗を回避！', '#00ffcc', true);
+        playSE('success');
+        updateHud();
+        return;
+    }
+    return _showResult30.apply(this, arguments);
+};
+
+/* ===================================================
+   ノーマルガチャ（刷新）：ゴールド＋バフ＋アイテム。1回300G
+   =================================================== */
+const NG_COST = 600;
+const NG_POOL = [
+    { w: 30, tier: 0, ico: '🪙', label: '+150G', fx: 'coin_s', gold: 150 },
+    { w: 15, tier: 1, ico: '🪙', label: '+300G', fx: 'coin_m', gold: 300 },
+    { w: 10, tier: 2, ico: '🧿', label: 'お守り×1', fx: 'item_charm', item: ['charm', 1], desc: '失敗を1回だけ無かったことに' },
+    { w: 10, tier: 2, ico: '🪱', label: '特製まき餌×5', fx: 'item_bait', item: ['bait', 5], desc: '次の5回は待ち時間が短くなる' },
+    { w: 10, tier: 2, ico: '⚡', label: '入れ食い10分', fx: 'buff_frenzy', buff: ['frenzy', 10], desc: '待ち時間が短くなる' },
+    { w: 8, tier: 3, ico: '💰', label: 'ゴールド×1.5（10分）', fx: 'buff_gold', buff: ['gold', 10] },
+    { w: 8, tier: 3, ico: '⭐', label: 'EXP×1.5（10分）', fx: 'buff_exp', buff: ['exp', 10] },
+    { w: 5, tier: 3, ico: '🌟', label: '大物チャンス10分', fx: 'buff_big', buff: ['big', 10], desc: '大物が出やすい' },
+    { w: 3, tier: 4, ico: '💎', label: '+1000G', fx: 'coin_l', gold: 1000 },
+    { w: 1, tier: 5, ico: '👑', label: 'スーパーブースト15分', fx: 'buff_super', buff: ['super', 15], desc: '金×2・EXP×2・待ち時間短縮' }
+];
+const NG_TIER_LABEL = ['', '', 'レア', 'スーパーレア', 'ウルトラ', 'レジェンド'];
+
+function setGachaTab(tab) {
+    playerData.gachaTab = tab;
+    byId('gacha-screen').classList.toggle('ng-mode', tab === 'ng');
+    byId('gtab-ev').classList.toggle('active', tab === 'ev');
+    byId('gtab-ng').classList.toggle('active', tab === 'ng');
+    if (tab === 'ng') renderNormalGacha();
+    savePlayerData();
+}
+function renderNormalGacha() {
+    const free = playerData.freeGachaDate !== todayStr();
+    byId('gacha-gold').innerText = playerData.gold;
+    const b = byId('ng-free-btn');
+    b.disabled = !free;
+    b.innerHTML = free ? '🆓<small>今日の無料</small>' : '🆓<small>明日また</small>';
+    let h = '';
+    Object.keys(BUFFS).forEach(k => { if (buffOn(k)) h += `<span class="ng-buff">${fxi('buff_' + k, 16, BUFFS[k].ico)} ${BUFFS[k].name} 残り${Math.ceil(buffLeft(k) / 60000)}分</span>`; });
+    if (itemCount('charm') > 0) h += `<span class="ng-buff">${fxi('item_charm', 16)} お守り×${itemCount('charm')}</span>`;
+    if (itemCount('bait') > 0) h += `<span class="ng-buff">${fxi('item_bait', 16)} 特製まき餌×${itemCount('bait')}</span>`;
+    byId('ng-buffs').innerHTML = h || '<span class="ng-buff dim">いまは効果なし</span>';
+}
+function showNgPrizes() {
+    const total = NG_POOL.reduce((s, x) => s + x.w, 0);
+    byId('ng-prize-list').innerHTML = NG_POOL.map(x => `<div class="ng-prize-row tier${x.tier}"><span>${fxi(x.fx, 22, x.ico)} ${x.label}</span><small>${(x.w / total * 100).toFixed(0)}%</small></div>`).join('') +
+        `<div class="ng-prize-note">10連は「レア」以上が1つ確定。1回${NG_COST}G／10連${NG_COST * 10}G。毎日1回は無料。<br>ゴールド以外は、ゲームを始めると自動で使われます。</div>`;
+    byId('ng-prize-modal').style.display = 'flex';
+}
+function closeNgPrizes() { byId('ng-prize-modal').style.display = 'none'; }
+
+let ngBusy = false;
+function closeNgResult() { const r = byId('ng-result'); if (r) { r.style.display = 'none'; } }
+
+/* ===================================================
+   工房：ゴールドの使い道（道具の強化・ブースト購入）
+   =================================================== */
+const UPG_MAX = 10;
+const upgCost = (lv) => Math.round(2500 * Math.pow(lv + 1, 1.6) / 100) * 100;
+const SHOP_BOOST = [
+    { id: 'b_frenzy', fx: 'buff_frenzy', ico: '⚡', name: '入れ食い10分', desc: '待ち時間が短くなる', price: 4000, act: () => addBuff('frenzy', 10) },
+    { id: 'b_gold', fx: 'buff_gold', ico: '💰', name: 'ゴールド×1.5（10分）', desc: '売値が1.5倍', price: 8000, act: () => addBuff('gold', 10) },
+    { id: 'b_exp', fx: 'buff_exp', ico: '⭐', name: 'EXP×1.5（10分）', desc: 'レベルが上がりやすい', price: 5000, act: () => addBuff('exp', 10) },
+    { id: 'b_big', fx: 'buff_big', ico: '🌟', name: '大物チャンス10分', desc: '大物が出やすい', price: 5000, act: () => addBuff('big', 10) },
+    { id: 'b_charm', fx: 'item_charm', ico: '🧿', name: 'お守り×3', desc: '失敗を3回まで無かったことに', price: 3000, act: () => addItem('charm', 3) },
+    { id: 'b_bait', fx: 'item_bait', ico: '🪱', name: '特製まき餌×5', desc: '次の5回は待ち時間が短くなる', price: 2500, act: () => addItem('bait', 5) }
+];
+let wsTab = 'upg';
+function buyUpgrade(id) {
+    const lv = upgLv(id);
+    if (lv >= UPG_MAX || playerData.gold < upgCost(lv)) return;
+    playerData.gold -= upgCost(lv);
+    if (!playerData.upgrades) playerData.upgrades = {};
+    playerData.upgrades[id] = lv + 1;
+    playerData.upgradeCount = (playerData.upgradeCount || 0) + 1;
+    savePlayerData(); playSE('levelup'); setWsTab('upg'); updateMenuUI(); checkAchievements();
+}
+function buyBoost(id) {
+    const b = SHOP_BOOST.find(x => x.id === id);
+    if (!b || playerData.gold < b.price) return;
+    playerData.gold -= b.price;
+    b.act();
+    savePlayerData(); playSE('success'); setWsTab('boost'); updateMenuUI(); updateHud();
+}
+
+/* ===================================================
+   実績：ヒント表示／エリア名のネタバレ防止／全実績達成の特別演出
+   =================================================== */
+const ACH_HINTS = {
+    comp_sea: '広くて青い場所の住人を、全員そろえよう', comp_river: '流れる水辺の住人を、全員そろえよう', comp_swamp: 'ぬかるむ水辺の住人を、全員そろえよう',
+    comp_lake: '静かな水面の住人を、全員そろえよう', comp_snow: '凍える場所の住人を、全員そろえよう', comp_underground: '光の届かない洞窟の住人を、全員そろえよう',
+    comp_deepsea: '一番深い青の底の住人を、全員そろえよう', comp_volcano: '熱くて赤い場所の住人を、全員そろえよう', comp_honey: 'あまーい場所の住人を、全員そろえよう',
+    comp_holy: '清らかな光の場所の住人を、全員そろえよう', comp_ryugu: '伝説のお城の宝を、全部そろえよう', comp_ruins: '太古の時代の生き物を、全員そろえよう',
+    comp_poison: '危険な色の水辺の住人を、全員そろえよう', comp_milkyway: '夜空の彼方の住人を、全員そろえよう', comp_eldorado: '輝く伝説の地の住人を、全員そろえよう',
+    comp_shinju: '神々の世界の住人を、全員そろえよう', all_maps: 'いろいろな場所へ冒険に出かけよう'
+};
+Object.keys(ACH_HINTS).forEach(k => { if (ACHIEVEMENT_DATA[k]) ACHIEVEMENT_DATA[k].hint = ACH_HINTS[k]; });
+const SECRET_HINTS = {
+    secret_logo: 'タイトルのロゴは、くすぐったがり屋さん。',
+    secret_menu: '「メインメニュー」の文字を、せっせと叩いてみよう。',
+    secret_level: 'ゲーム中のレベル表示は、はげましてほしそう。',
+    secret_weather: '釣り場の名前をつつくと、空模様が変わるかも？',
+    secret_gold: '所持金をじっと見つめて、何度もつついてみよう。',
+    secret_zukan: '図鑑で生き物の名前を、なでてあげよう。',
+    secret_sound: 'スピーカーのボタンを、たくさん鳴らしてみよう。'
+};
+Object.keys(SECRET_HINTS).forEach(k => { if (ACHIEVEMENT_DATA[k]) ACHIEVEMENT_DATA[k].shint = SECRET_HINTS[k]; });
+ACHIEVEMENT_DATA.all_clear = { id: 'all_clear', name: '爆釣一閃の伝説', icon: _IC.g, desc: 'すべての実績を達成した', hint: 'すべての実績をそろえた時、何かが起こる…', secret: false };
+ACHIEVEMENT_DATA.special_5 = { id: 'special_5', name: '勝負師', icon: _IC.s, desc: '特別な戦いに5回勝った', hint: '希少な生き物は、普通には捕まらない…' };
+ACHIEVEMENT_DATA.upgrade_10 = { id: 'upgrade_10', name: '工房の常連', icon: _IC.c, desc: '道具を合計10回強化した', hint: 'ゴールドの使い道は、工房にある' };
+
+
+const _checkAch30 = window.checkAchievements;
+window.checkAchievements = function () {
+    _checkAch30();
+    const p = playerData;
+    if ((p.specialWins || 0) >= 5) unlockAch('special_5');
+    if ((p.upgradeCount || 0) >= 10) unlockAch('upgrade_10');
+    const ids = Object.keys(ACHIEVEMENT_DATA).filter(k => k !== 'all_clear');
+    if (!p.achievements.includes('all_clear') && ids.every(k => p.achievements.includes(k))) {
+        unlockAch('all_clear');
+        p.gold += 100000;
+        p.hallOfFame = true;
+        savePlayerData();
+        applyHallOfFame();
+        setTimeout(() => showClearModal(false), 1500);
+    }
+};
+function applyHallOfFame() {
+    // 実績「爆釣一閃の伝説」を持っていれば、データをリセットして実績を引き継いだ後も殿堂入りの証を表示する
+    if (!playerData.hallOfFame && (playerData.achievements || []).includes('all_clear')) { playerData.hallOfFame = true; savePlayerData(); }
+    document.body.classList.toggle('hof', !!playerData.hallOfFame);
+    const t = byId('menu-title');
+    if (t) t.innerText = playerData.hallOfFame ? '👑 メインメニュー 👑' : 'メインメニュー';
+}
+function showClearModal(again) {
+    let m = byId('clear-modal');
+    if (!m) {
+        m = spEl('modal', byId('game-container'));
+        m.id = 'clear-modal';
+        byId('game-container').appendChild(m);
+    }
+    m.innerHTML = `<div class="clear-confetti">${Array.from({ length: 24 }, (_, i) => `<i style="left:${(i * 4.3) % 100}%;animation-delay:${(i % 8) * 0.25}s;background:hsl(${i * 37},90%,60%)"></i>`).join('')}</div>
+        <div class="clear-title">👑 殿堂入り 👑</div>
+        <div class="clear-sub">爆釣一閃の伝説</div>
+        <div class="clear-text">すべての実績を達成しました！<br>あなたはもう、立派な「釣り神」です。<br>ここまで遊んでくれて、本当にありがとう！</div>
+        <div class="clear-reward">${again ? '殿堂入りの証：メニューが金色に輝いています' : '🎁 ごほうび +100,000G<br>✨ 殿堂入りの証：メニューが金色に！'}</div>
+        <button class="btn" onclick="closeClearModal()">閉じる</button>`;
+    m.style.display = 'flex';
+    if (!again) playSE('levelup');
+}
+function closeClearModal() { const m = byId('clear-modal'); if (m) m.style.display = 'none'; updateMenuUI(); }
+
+/* ===================================================
+   エリアコンプリート通知／アイコン
+   =================================================== */
+const areaDone = (k) => { try { return isAreaCompleted(k); } catch (e) { return false; } };
+
+window.addEventListener('DOMContentLoaded', () => {
+    applyLocationBg();
+    preloadArea(currentLocation);
+    setTimeout(startBackgroundPreload, 1500);
+    updateDifficultyUI();
+    applyHallOfFame();
+    if (byId('ws-gold')) byId('ws-gold').innerText = playerData.gold;
+    const cssVer = getComputedStyle(document.documentElement).getPropertyValue('--css-ver').trim().replace(/['"]/g, '');
+    if (cssVer !== CSS_VERSION) {
+        document.body.insertAdjacentHTML('afterbegin', '<div style="position:fixed;left:0;right:0;top:0;z-index:99999;background:#a00;color:#fff;padding:8px 12px;font-size:13px;line-height:1.5;">⚠ style.css が古いままです。最新の style.css に入れ替えてください。（表示が崩れる原因になります）</div>');
+    }
+});
+
+/* ===================================================
+   キーボード操作（PC向け）
+   ↑↓←→：選択移動 / Z：決定（釣り上げ） / X・Esc：戻る
+   =================================================== */
+const KB_CTX = [
+    { id: 'zoom-modal', zoom: true, back: () => closeZoomModal() },
+    { id: 'levelup-modal', back: () => closeLevelUpModal() },
+    { id: 'equip-select-modal', back: () => closeEquipSelectModal() },
+    { id: 'zukan-detail-modal', back: () => closeZukanDetail() },
+    { id: 'zukan-area-modal', back: () => closeZukanAreaModal() },
+    { id: 'ng-prize-modal', back: () => closeNgPrizes() },
+    { id: 'workshop-screen', back: () => closeWorkshop() },
+    { id: 'clear-modal', back: () => closeClearModal() },
+    { id: 'gacha-notice-modal', back: () => closeGachaNotice() },
+    { id: 'gacha-list-modal', back: () => closeGachaListModal() },
+    { id: 'ranking-modal', back: () => closeRankingModal() },
+    { id: 'config-modal', back: () => closeConfigModal() },
+    { id: 'achievement-modal', back: () => closeAchievements() },
+    { id: 'mission-modal', back: () => closeMissions() },
+    { id: 'equip-screen', back: () => closeEquipScreen() },
+    { id: 'zukan-modal', back: () => closeZukan() },
+    { id: 'map-modal', back: () => closeMapModal() },
+    { id: 'howto-modal', back: () => closeHowToPlay() },
+    { id: 'shop-screen', back: () => closeShop() },
+    { id: 'gacha-screen', back: () => closeGachaScreen() },
+    { id: 'result-modal', result: true, prefer: '#next-btn', back: () => { if (!byId('next-btn').disabled) closeResult(); } },
+    { id: 'menu-screen', prefer: 'button[onclick="startGameFromMenu()"]' },
+    { id: 'title-screen', title: true }
+];
+const KB_SEL = 'button, [onclick], .zukan-card.discovered';
+let kbMode = false, kbFocus = null, kbCtxId = 'game', kbMoved = false;
+const kbMemory = {};
+
+function kbCtx() {
+    return KB_CTX.find(c => { const el = byId(c.id); return el && getComputedStyle(el).display !== 'none'; }) || null;
+}
+
+function kbCands(ctx) {
+    const root = ctx ? byId(ctx.id) : null;
+    const list = ctx ? [...root.querySelectorAll(KB_SEL)] : [...document.querySelectorAll('.ui-header button, .tool-mode-btn')];
+    return list.filter(el => {
+        if (el === root || el.tagName === 'IMG' || el.classList.contains('locked')) return false;
+        if (el.disabled && el.id !== 'next-btn') return false;
+        if (!el.getClientRects().length) return false;
+        const cs = getComputedStyle(el);
+        return cs.visibility !== 'hidden' && cs.pointerEvents !== 'none';
+    });
+}
+
+function kbReading(list) {
+    return list.slice().sort((a, b) => {
+        const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        return Math.abs(ra.top - rb.top) < 8 ? ra.left - rb.left : ra.top - rb.top;
+    });
+}
+
+function kbSet(el) {
+    if (kbFocus) kbFocus.classList.remove('kb-focus');
+    kbFocus = el;
+    if (el) {
+        el.classList.add('kb-focus');
+        el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+}
+
+function kbAutoFocus(ctx) {
+    if (!ctx) { kbSet(null); return; }
+    const c = kbCands(ctx);
+    if (!c.length) { kbSet(null); return; }
+    let el = null;
+    const pref = (ctx.id === 'menu-screen' && typeof guideOn !== 'undefined' && guideOn) ? '#btn-howto' : ctx.prefer;
+    if (pref) el = c.find(x => x.matches(pref));
+    const mem = kbMemory[ctx.id];
+    if (!el && mem !== undefined && c[mem]) el = c[mem];
+    kbSet(el || kbReading(c)[0]);
+}
+
+function kbMove(dir) {
+    const ctx = kbCtx(), c = kbCands(ctx);
+    if (!c.length) return;
+    kbMoved = true;
+    if (!kbFocus || !c.includes(kbFocus)) { if (ctx) kbAutoFocus(ctx); else kbSet(kbReading(c)[0]); return; }
+    const cr = kbFocus.getBoundingClientRect();
+    const cx = cr.left + cr.width / 2, cy = cr.top + cr.height / 2;
+    let best = null, bs = Infinity;
+    c.forEach(el => {
+        if (el === kbFocus) return;
+        const r = el.getBoundingClientRect();
+        const dx = r.left + r.width / 2 - cx, dy = r.top + r.height / 2 - cy;
+        let main, cross;
+        if (dir === 'left') { main = -dx; cross = Math.abs(dy); }
+        else if (dir === 'right') { main = dx; cross = Math.abs(dy); }
+        else if (dir === 'up') { main = -dy; cross = Math.abs(dx); }
+        else { main = dy; cross = Math.abs(dx); }
+        if (main <= 2) return;
+        const score = main + cross * 2.2;
+        if (score < bs) { bs = score; best = el; }
+    });
+    if (!best && (dir === 'up' || dir === 'down')) {
+        const sorted = kbReading(c);
+        best = dir === 'down' ? sorted[0] : sorted[sorted.length - 1];
+    }
+    if (best) {
+        kbSet(best);
+        if (ctx) kbMemory[ctx.id] = c.indexOf(best);
+        playTone(520, 0.04, 'square');
+    }
+}
+
+function kbEnable() {
+    if (!kbMode) { kbMode = true; document.body.classList.add('kb-mode'); }
+}
+
+function kbOK() {
+    const ctx = kbCtx();
+    if (!ctx) {                       // ゲーム画面：ヘッダー選択中なら決定、それ以外は釣り操作
+        if (kbFocus) kbFocus.click(); else handleAction();
+        return;
+    }
+    if (ctx.title) { goToMenu(); return; }
+    if (ctx.zoom) { closeZoomModal(); return; }
+    if (ctx.result) {                 // 連打中の誤操作を防ぐため、初期状態では「次へ進む」のみ
+        const next = byId('next-btn');
+        if (!kbMoved || !kbFocus) { if (!next.disabled) closeResult(); return; }
+        if (!kbFocus.disabled) kbFocus.click();
+        return;
+    }
+    if (!kbFocus || !kbCands(ctx).includes(kbFocus)) { kbAutoFocus(ctx); return; }
+    kbMemory[ctx.id] = kbCands(ctx).indexOf(kbFocus);
+    kbFocus.click();
+}
+
+function kbBack() {
+    const ctx = kbCtx();
+    if (!ctx) {
+        if (kbFocus) { kbSet(null); return; }
+        if (gameState === 'READY') goToMenuFromHeader();
+        return;
+    }
+    if (ctx.back) ctx.back();
+}
+
+window.addEventListener('keydown', (e) => {
+    if (gameState === 'SPECIAL') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const dirs = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+    if (dirs[e.code] || e.code === 'KeyZ' || e.code === 'KeyX' || e.code === 'Escape') {
+        if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
+    }
+    if (dirs[e.code]) {
+        e.preventDefault();
+        kbEnable();
+        kbMove(dirs[e.code]);
+    } else if (e.code === 'KeyZ') {
+        if (e.repeat) return;
+        kbEnable();
+        kbOK();
+    } else if (e.code === 'KeyX' || e.code === 'Escape') {
+        if (e.repeat) return;
+        kbEnable();
+        kbBack();
+    }
+});
+
+['pointerdown', 'touchstart'].forEach(ev => window.addEventListener(ev, () => {
+    if (kbMode) { kbMode = false; document.body.classList.remove('kb-mode'); }
+}, true));
+
+// 画面（モーダル）が切り替わったら選択位置を整える
+setInterval(() => {
+    const ctx = kbCtx();
+    const id = ctx ? ctx.id : 'game';
+    if (id !== kbCtxId) {
+        kbCtxId = id;
+        kbMoved = false;
+        kbSet(null);
+        if (kbMode) kbAutoFocus(ctx);
+    } else if (kbFocus && kbMode && (!kbFocus.isConnected || !kbFocus.getClientRects().length)) {
+        const mem = kbMemory[id];
+        kbSet(null);
+        const c = kbCands(ctx);
+        kbSet(c[mem] || kbReading(c)[0] || null);
+    }
+}, 120);
+
+function spinNormal(mode) {
+    if (ngBusy) return;
+    const times = mode === 10 ? 10 : 1;
+    if (mode === 'free') {
+        if (playerData.freeGachaDate === todayStr()) return;
+    } else if (playerData.gold < times * NG_COST) { alert("ゴールドが足りません！"); return; }
+    ngBusy = true;
+    if (mode === 'free') playerData.freeGachaDate = todayStr(); else playerData.gold -= times * NG_COST;
+    const total = NG_POOL.reduce((s, x) => s + x.w, 0), out = [];
+    for (let i = 0; i < times; i++) {
+        let r = Math.random() * total, it = NG_POOL[0];
+        for (const x of NG_POOL) { if (r < x.w) { it = x; break; } r -= x.w; }
+        if (times === 10 && i === 9 && !out.some(o => o.tier >= 2)) it = NG_POOL[2 + Math.floor(Math.random() * 3)];
+        out.push(it);
+    }
+    let g = 0;
+    out.forEach(o => {
+        if (o.gold) g += o.gold;
+        if (o.item) addItem(o.item[0], o.item[1]);
+        if (o.buff) addBuff(o.buff[0], o.buff[1]);
+    });
+    playerData.gold += g;
+    playerData.normalGachaCount = (playerData.normalGachaCount || 0) + times;
+    addMission('gacha', times);
+    savePlayerData();
+    updateMenuUI();
+    const best = Math.max(...out.map(o => o.tier));
+    const scr = byId('gacha-screen'), res = byId('ng-result'), fl = byId('ng-flash');
+    res.style.display = 'none';
+    scr.classList.add('ng-shake');
+    playTone(300, 0.1, 'square'); setTimeout(() => playTone(420, 0.1, 'square'), 120); setTimeout(() => playTone(560, 0.12, 'square'), 240);
+    setTimeout(() => {
+        scr.classList.remove('ng-shake');
+        fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
+        playSE(best >= 3 ? 'levelup' : 'success');
+        const grid = out.map((o, i) => `<div class="ng-card tier${o.tier}" style="animation-delay:${i * 0.09}s"><div class="ng-ico">${fxi(o.fx, times === 1 ? 64 : 34, o.ico)}</div><div class="ng-name">${o.label}</div>${o.desc && times === 1 ? `<div class="ng-desc">${o.desc}</div>` : ''}${o.tier >= 2 ? `<div class="ng-rank">${NG_TIER_LABEL[o.tier]}</div>` : ''}</div>`).join('');
+        res.innerHTML = `${best >= 4 ? '<div class="ng-jackpot">✨ 大当たり！ ✨</div>' : ''}${g ? `<div class="ng-total">ゴールド <b>+${g}</b> G</div>` : ''}<div class="ng-grid ${times === 1 ? 'single' : ''}">${grid}</div><button class="btn ng-close" onclick="closeNgResult()">OK</button>`;
+        res.style.display = 'block';
+        res.scrollTop = 0;
+        renderNormalGacha();
+        checkAchievements();
+        updateHud();
+        ngBusy = false;
+    }, 800);
+}
+
+function openWorkshop() {
+    initAudio();
+    closeAllModals();
+    byId('menu-screen').style.display = 'none';
+    byId('workshop-screen').style.display = 'flex';
+    setWsTab(wsTab);
+    playWaterPlop();
+}
+function closeWorkshop() {
+    byId('workshop-screen').style.display = 'none';
+    byId('menu-screen').style.display = 'flex';
+    gameState = 'MENU';
+    updateMenuUI();
+}
+function setWsTab(tab) {
+    wsTab = tab;
+    byId('ws-tab-upg').classList.toggle('active', tab === 'upg');
+    byId('ws-tab-boost').classList.toggle('active', tab === 'boost');
+    byId('ws-gold').innerText = playerData.gold.toLocaleString();
+    const box = byId('ws-list');
+    box.innerHTML = '';
+    const head = (txt) => { const h = document.createElement('div'); h.className = 'wk-sec'; h.innerText = txt; box.appendChild(h); };
+    if (tab === 'upg') {
+        byId('ws-note').innerText = 'ゴールドで道具を強化！ 最大 +10 まで。強化するほど効果が上がります。';
+        const row = (kind, id, d) => {
+            const lv = upgLv(id), max = lv >= UPG_MAX;
+            const eq = (kind === 'rod' ? playerData.equippedRod : playerData.equippedNet) === id;
+            const eff = kind === 'rod' ? `売値+${lv * 2}% ・ 反応+${(lv * 0.02).toFixed(2)}秒 ・ 連打+${(lv * 0.5).toFixed(1)}` : `輪+${lv * 3}% ・ 売値+${lv * 2}%`;
+            const e = document.createElement('div');
+            e.className = 'ws-row';
+            e.innerHTML = `<img width="44" height="44" src="${d.icon}" onerror="this.style.visibility='hidden'"><div class="ws-info"><b>${d.name}</b> <span class="ws-lv">+${lv}/${UPG_MAX}</span>${eq ? '<span class="ws-eq">装備中</span>' : ''}<small>${eff}</small></div>
+                <button class="btn" ${max || playerData.gold < upgCost(lv) ? 'disabled' : ''} onclick="buyUpgrade('${id}')">${max ? 'MAX' : upgCost(lv).toLocaleString() + 'G'}</button>`;
+            box.appendChild(e);
+        };
+        head('🎣 竿');
+        (playerData.ownedRods || []).forEach(id => ROD_DATA[id] && row('rod', id, ROD_DATA[id]));
+        head('🥅 網');
+        (playerData.ownedNets || []).forEach(id => NET_DATA[id] && row('net', id, NET_DATA[id]));
+    } else {
+        const act = Object.keys(BUFFS).filter(buffOn).map(k => `${BUFFS[k].ico}${BUFFS[k].name} 残り${Math.ceil(buffLeft(k) / 60000)}分`);
+        if (itemCount('charm') > 0) act.push(`🧿お守り×${itemCount('charm')}`);
+        if (itemCount('bait') > 0) act.push(`🪱特製まき餌×${itemCount('bait')}`);
+        byId('ws-note').innerText = act.length ? '使用中：' + act.join(' ／ ') : '買ったブーストは、すぐに効果がはじまります。';
+        SHOP_BOOST.forEach(b => {
+            const e = document.createElement('div');
+            e.className = 'ws-row';
+            e.innerHTML = `<div class="ws-ico">${fxi(b.fx, 36, b.ico)}</div><div class="ws-info"><b>${b.name}</b><small>${b.desc}</small></div>
+                <button class="btn" ${playerData.gold < b.price ? 'disabled' : ''} onclick="buyBoost('${b.id}')">${b.price.toLocaleString()}G</button>`;
+            box.appendChild(e);
+        });
+    }
+}
+
+function applyLocationBg() {
+    const map = MAP_DATA[currentLocation];
+    if (!map) return;
+    byId('game-container').style.backgroundImage = `url('${map.bg}')` + (map.bgFallback ? `, url('${map.bgFallback}')` : '');
+    byId('current-location-text').innerText = `【${map.name}】`;
+}
+
+/* 図鑑の並び：竿 → 網。同じ種類の中では エリア順 → （とりにくい・大きい・高い生き物ほど後ろ） */
+function zukanScore(f) { return Math.log((f.price || 1) + 1) + 0.7 * Math.log(getCm(f) + 1) - 0.9 * Math.log((f.weight || 1) + 1); }
+function zukanCompare(a, b) {
+    const keys = Object.keys(MAP_DATA);
+    const ta = (a.toolType === 'net') ? 1 : 0, tb = (b.toolType === 'net') ? 1 : 0;
+    if (ta !== tb) return ta - tb;
+    const ia = keys.indexOf(a.location), ib = keys.indexOf(b.location);
+    if (ia !== ib) return ia - ib;
+    return zukanScore(a) - zukanScore(b) || a.id - b.id;
+}
+
+/* 実績の並び：関連するものを塊にして表示（絵巻コンプリート・データリセット・2周目クリアは最後） */
+const ACH_GROUPS = [
+    ['はじめの一歩', ['tutorial_done', 'first_catch']],
+    ['🎣 竿で釣る', ['fisherman', 'king_fisher', 'combo_master', 'combo_10']],
+    ['🥅 網で捕まえる', ['net_first', 'net_apprentice', 'net_master', 'net_combo_master']],
+    ['⚡ 腕前', ['perfect_10', 'perfect_100', 'big_10', 'zorome', 'special_5']],
+    ['📊 通算', ['thousand_catches', 'miss_master']],
+    ['💰 お金・道具', ['rich_man', 'ultra_rich', 'buy_all_shop', 'comp_all_rods', 'comp_all_nets', 'upgrade_10']],
+    ['📅 ミッション・ガチャ', ['mission_10', 'ngacha_20']],
+    ['🗺 エリア', ['all_maps']],
+    ['📖 エリアの図鑑コンプリート', ['comp_sea', 'comp_river', 'comp_swamp', 'comp_lake', 'comp_snow', 'comp_underground', 'comp_deepsea', 'comp_volcano', 'comp_honey', 'comp_holy', 'comp_ryugu', 'comp_ruins', 'comp_poison', 'comp_milkyway', 'comp_eldorado', 'comp_shinju']],
+    ['🔍 ひみつ', ['secret_logo', 'secret_menu', 'secret_level', 'secret_weather', 'secret_gold', 'secret_zukan', 'secret_sound']],
+    ['👑 最終章', ['all_clear', 'zukan_master', 'hero_reincarnation', 'returned_friend']]
+];
+function achOrder() {
+    const used = new Set(), out = [];
+    ACH_GROUPS.forEach(([title, ids]) => {
+        const list = ids.filter(id => ACHIEVEMENT_DATA[id]);
+        list.forEach(id => used.add(id));
+        out.push([title, list]);
+    });
+    const rest = Object.keys(ACHIEVEMENT_DATA).filter(id => !used.has(id));   // 新しく追加した実績は「その他」へ（最終章の手前）
+    if (rest.length) out.splice(out.length - 1, 0, ['その他', rest]);
+    return out;
+}
+function renderAchievementList() {
+    const keys = Object.keys(ACHIEVEMENT_DATA), got = playerData.achievements || [];
+    const percent = keys.length ? Math.floor((got.length / keys.length) * 100) : 0;
+    byId('achievement-progress-num').innerText = `${percent}% (${got.length}/${keys.length})`;
+    byId('achievement-progress-bar-inner').style.width = `${percent}%`;
+    const list = byId('achievement-list');
+    list.innerHTML = playerData.hallOfFame ? '<button class="btn hof-btn" onclick="showClearModal(true)">👑 殿堂入りの間をみる</button>' : '';
+    achOrder().forEach(([title, ids]) => {
+        if (!ids.length) return;
+        const h = document.createElement('div');
+        h.className = 'ach-group';
+        h.innerText = `${title}　${ids.filter(id => got.includes(id)).length}/${ids.length}`;
+        list.appendChild(h);
+        ids.forEach(key => {
+            const ach = ACHIEVEMENT_DATA[key], ok = got.includes(key);
+            const item = document.createElement('div');
+            item.className = `achievement-item ${ok ? 'unlocked' : ''}`;
+            const locked = (ach.secret || ach.shint) ? ('ひみつ… 🔍 ' + (ach.shint || '')) : (ach.hint || ach.desc);
+            item.innerHTML = `<img class="achievement-icon" src="${ach.icon}" alt="Trophy"><div class="achievement-info">
+                <span class="achievement-name">${ok ? ach.name : "？？？？？"}</span><span class="achievement-desc">${ok ? ach.desc : (ach.hint ? '💡 ' : '') + locked}</span></div>`;
+            list.appendChild(item);
+        });
+    });
+}
+
+/* イベントガチャ：演出つき・結果は画面中央に表示 */
+let evBusy = false;
+const _spinGacha = spinGacha;
+window.spinGacha = function (count) {
+    if (evBusy) return;
+    const cost = count === 10 ? 10000 : 1000;
+    if (playerData.gold < cost) { alert("ゴールドが足りません！"); return; }
+    evBusy = true;
+    const scr = byId('gacha-screen'), fl = byId('ev-flash');
+    byId('gacha-result-area').style.display = 'none';
+    scr.classList.add('ev-shake');
+    [260, 330, 400, 470, 540, 620].forEach((f, i) => setTimeout(() => playTone(f, 0.09, 'square'), i * 130));
+    setTimeout(() => {
+        scr.classList.remove('ev-shake');
+        fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
+        _spinGacha(count);
+        showGachaResultFx();
+        evBusy = false;
+    }, 900);
+};
+function closeGachaResult() { byId('gacha-result-area').style.display = 'none'; }
+function showGachaResultFx() {
+    const area = byId('gacha-result-area');
+    area.style.display = 'flex';
+    const cards = [...area.querySelectorAll('.gacha-result-card')];
+    cards.forEach((c, i) => { c.style.animationDelay = `${0.25 + i * 0.12}s`; });
+    const rank = cards.some(c => c.classList.contains('super-rare')) ? 3 : (cards.some(c => c.classList.contains('rare')) ? 2 : 1);
+    const ban = byId('gr-banner');
+    ban.className = 'rank' + rank;
+    ban.innerText = rank === 3 ? '🌈 超・大当たり！！ 🌈' : (rank === 2 ? '✨ レア獲得！ ✨' : 'さあ、次こそ…！');
+    const fx = byId('gr-fx');
+    fx.innerHTML = '';
+    if (rank >= 2) {
+        const em = rank === 3 ? ['🌈', '✨', '⭐', '💎'] : ['✨', '⭐'];
+        for (let i = 0; i < (rank === 3 ? 26 : 14); i++) {
+            const s = document.createElement('span');
+            s.innerText = pickOne(em);
+            s.style.left = Math.random() * 100 + '%';
+            s.style.animationDelay = (Math.random() * 1.2) + 's';
+            s.style.fontSize = (14 + Math.random() * 16) + 'px';
+            fx.appendChild(s);
+        }
+    }
+    area.querySelector('.gr-panel').scrollTop = 0;
+    if (rank === 3) shake();
+}
+
+/* ===================================================
+   ボーナスエフェクト画像（images/effects/ に置くと自動で使われます。無い時は絵文字）
+   =================================================== */
+const FX_ICONS = {
+    buff_frenzy: '⚡', buff_gold: '💰', buff_exp: '⭐', buff_big: '🌟', buff_super: '👑',
+    item_charm: '🧿', item_bait: '🪱', coin_s: '🪙', coin_m: '💰', coin_l: '💎',
+    combo: '🔥', streak_frenzy: '⚡', rank_perfect: '✨', rank_great: '👍', chest: '📦',
+    reach: '👀', zorome: '🎰', special_win: '✨', area_complete: '🏅', tool_bonus: '🛠'
+};
+function fxi(key, size, emoji) {
+    const e = emoji || FX_ICONS[key] || '★';
+    const s = size || 18;
+    return `<img class="fxi" src="images/effects/${key}.png" width="${s}" height="${s}" alt="" onerror="this.replaceWith(document.createTextNode('${e}'))">`;
+}
+function updateHud() {
+    const c = (currentToolMode === 'rod' ? playerData.currentCombo : playerData.netCombo) || 0;
+    let h = '';
+    if (c >= 2) h += `<div class="hud-chip combo">${fxi('combo', 16)}${c}</div>`;
+    if (weather !== 'clear' && !noWeatherArea(currentLocation)) h += `<div class="hud-chip">${weatherIconHtml(weather, 16)}${WEATHER[weather].name}</div>`;
+    if (frenzy > 0) h += `<div class="hud-chip frenzy">${fxi('streak_frenzy', 16)}×${frenzy}</div>`;
+    Object.keys(BUFFS).forEach(k => { if (buffOn(k)) h += `<div class="hud-chip buff">${fxi('buff_' + k, 16)}${Math.ceil(buffLeft(k) / 60000)}分</div>`; });
+    if (itemCount('charm') > 0) h += `<div class="hud-chip buff">${fxi('item_charm', 16)}×${itemCount('charm')}</div>`;
+    if (itemCount('bait') > 0) h += `<div class="hud-chip buff">${fxi('item_bait', 16)}×${itemCount('bait')}</div>`;
+    byId('status-hud').innerHTML = h;
+}
+
+function giveSecret(id, gold, msg, opt) {
+    if (!playerData.secrets) playerData.secrets = {};
+    if (playerData.secrets[id]) { if (!(opt && opt.silentRepeat)) floatText('…もう知ってるね！', '#ccc'); return false; }
+    playerData.secrets[id] = true;
+    playerData.gold += gold;
+    savePlayerData();
+    updateMenuUI();
+    playSE('levelup');
+    floatText(`${msg}${gold ? `　+${gold}G` : ''}`, '#ffd700', true);
+    unlockAch(id);
+    return true;
+}
+
+/* ---------- ミニゲームの枠（海賊船・水のデザイン。images/minigames/ の画像があれば重ねて使用） ---------- */
+function ensureSpLayer() {
+    if (byId('sp-layer')) return;
+    const L = spEl('', byId('game-container'));
+    L.id = 'sp-layer';
+    L.style.cssText = 'display:none;position:absolute;left:0;top:0;right:0;bottom:0;z-index:70;background:rgba(2,14,30,.88);align-items:center;justify-content:center;';
+    const water = "url('images/minigames/stage_water.png') center/cover no-repeat, radial-gradient(circle at 15% 85%,rgba(255,255,255,.16) 0 5px,transparent 6px), radial-gradient(circle at 82% 68%,rgba(255,255,255,.13) 0 4px,transparent 5px), radial-gradient(circle at 55% 92%,rgba(255,255,255,.13) 0 6px,transparent 7px), linear-gradient(#0f6a8c,#073a58 60%,#04243a)";
+    L.innerHTML = `<div class="sp-box" style="position:relative;width:94%;max-width:380px;background:url('images/minigames/frame_board.png') center/100% 100% no-repeat, repeating-linear-gradient(90deg,#6a4322 0 22px,#5b391c 22px 24px);border:5px solid #2f1c0c;box-shadow:inset 0 0 0 3px #d8b66a,0 0 24px rgba(0,0,0,.8);border-radius:14px;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;overflow:hidden;">
+        <div class="sp-title" id="sp-title" style="font-size:19px;color:#3b2410;text-align:center;font-weight:bold;background:url('images/minigames/title_ribbon.png') center/100% 100% no-repeat, linear-gradient(#f0cf7a,#b88a2c);border:3px solid #6a4a1a;border-radius:8px;padding:3px 8px;text-shadow:0 1px 0 #fff3c4;"></div>
+        <div class="sp-say" id="sp-say" style="font-size:14px;color:#3b2410;text-align:center;min-height:20px;background:rgba(255,244,214,.93);border-radius:6px;padding:3px 6px;font-weight:bold;"></div>
+        <div style="position:relative;">
+            <div class="sp-stage" id="sp-stage" style="position:relative;width:100%;height:250px;background:${water};border:3px solid #d8b66a;border-radius:10px;overflow:hidden;touch-action:none;user-select:none;"></div>
+        </div>
+        <div class="sp-foot" style="display:flex;align-items:center;gap:8px;min-height:22px;"><div class="sp-hearts" id="sp-hearts" style="min-width:60px;font-size:13px;color:#ffe9b0;white-space:nowrap;text-shadow:1px 1px 0 #000;"></div><div class="sp-prog" style="flex:1;height:14px;background:#0b2a40;border:3px solid #d8b66a;border-radius:8px;overflow:hidden;"><div id="sp-prog-in" style="height:100%;width:0;background:linear-gradient(90deg,#2ec4b6,#ffd27a);"></div></div></div>
+        <div class="sp-card" id="sp-card" style="display:none;position:absolute;left:0;top:0;right:0;bottom:0;z-index:5;background:linear-gradient(#0b3a58,#041a2c);flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;"></div>
+        <div class="sp-flash" id="sp-flash" style="position:absolute;left:0;right:0;top:40%;text-align:center;font-size:34px;font-weight:bold;opacity:0;pointer-events:none;z-index:6;"></div></div>`;
+    const st = byId('sp-stage');
+    const pos = (e) => { const r = st.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    st.addEventListener('pointerdown', e => { if (!spGame) return; try { st.setPointerCapture(e.pointerId); } catch (x) {} const [x, y] = pos(e); spGame.down && spGame.down(x, y); e.preventDefault(); });
+    st.addEventListener('pointermove', e => { if (!spGame) return; const [x, y] = pos(e); spGame.move && spGame.move(x, y); });
+    ['pointerup', 'pointercancel'].forEach(n => st.addEventListener(n, e => { if (spGame && spGame.up) spGame.up(); }));
+    byId('sp-card').addEventListener('pointerdown', () => spCardOk());
+}
+
+/* ===================================================
+   新ミニゲーム（ガチャエリアごとに別の仕掛け）
+   火山：とびらをまもれ（FNAF風）／はちみつ：神経衰弱／聖なる泉：光の記憶／竜宮城：貝殻あて
+   古代遺跡：石板ならべ／毒沼：毒のバルブ（ライツアウト）／天の川：まちがい探し／黄金郷：黄金のもぐら
+   =================================================== */
+const SPT_CELL = 'display:flex;align-items:center;justify-content:center;border-radius:14px;font-size:34px;user-select:none;background:linear-gradient(#1f86a3,#0d4f6c);border:3px solid #d8b66a;box-shadow:inset 0 0 10px rgba(255,255,255,.28),0 2px 0 #06222f;color:#fff;transition:transform .12s,background .2s,opacity .2s;box-sizing:border-box;line-height:1;';
+function spGridBox(a, cols, rows, gap) {
+    return spEl('', a.stage, { position: 'absolute', left: '10px', right: '10px', top: '10px', bottom: '10px', display: 'grid', gridTemplateColumns: `repeat(${cols},1fr)`, gridTemplateRows: `repeat(${rows},1fr)`, gap: (gap || 8) + 'px' });
+}
+function spCell(box, html, extra) { const e = document.createElement('div'); e.style.cssText = SPT_CELL + (extra || ''); e.innerHTML = html || ''; box.appendChild(e); return e; }
+function spHit(cells, x, y) {
+    const sr = byId('sp-stage').getBoundingClientRect();
+    for (let i = 0; i < cells.length; i++) {
+        const r = cells[i].getBoundingClientRect(), l = r.left - sr.left, tp = r.top - sr.top;
+        if (x >= l && x <= l + r.width && y >= tp && y <= tp + r.height) return i;
+    }
+    return -1;
+}
+function mgImg(name, emoji, size) { return `<img src="images/minigames/${name}.png" width="${size}" height="${size}" alt="" style="object-fit:contain;image-rendering:pixelated;pointer-events:none;" onerror="this.replaceWith(document.createTextNode('${emoji}'))">`; }
+// キーボード（矢印で選択・Zで決定）
+function spCursor(g, cells, cols, press) {
+    let cur = 0;
+    const mark = () => cells.forEach((c, i) => { c.style.outline = i === cur ? '4px solid #fff' : 'none'; c.style.outlineOffset = '-4px'; });
+    g.keyPress = (code) => {
+        const n = cells.length;
+        if (code === 'ArrowLeft') cur = (cur + n - 1) % n; else if (code === 'ArrowRight') cur = (cur + 1) % n;
+        else if (code === 'ArrowUp') cur = (cur - cols + n) % n; else if (code === 'ArrowDown') cur = (cur + cols) % n;
+        mark();
+    };
+    g.keyDown = () => press(cur);
+    g.down = (x, y) => { const i = spHit(cells, x, y); if (i >= 0) press(i); };
+    return g;
+}
+
+
+SPG.match = function (a, P) {
+    const icons = ['🍯', '🐝', '🌼', '🍓'], deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
+    const box = spGridBox(a, 4, 2, 8), cells = deck.map(d => spCell(box, d));
+    let phase = 'show', timer = 2.6 / P.sp, open = [], matched = 0, lock = 0, lives = P.hp + 2;
+    const down = (i) => { cells[i].innerHTML = '❓'; cells[i].style.background = 'linear-gradient(#a9792e,#6a431a)'; };
+    a.hearts(lives); a.say('絵を覚えて！ すぐ裏返るよ'); a.prog(0);
+    const press = (i) => {
+        if (phase !== 'play' || lock > 0 || open.includes(i) || cells[i]._m) return;
+        cells[i].innerHTML = deck[i]; cells[i].style.background = 'linear-gradient(#ffe9a0,#d8a53c)'; open.push(i); playSE('tap');
+        if (open.length === 2) lock = 0.7;
+    };
+    const g = {
+        update(dt) {
+            if (phase === 'show') { timer -= dt; if (timer <= 0) { cells.forEach((c, i) => down(i)); phase = 'play'; a.say('同じ絵を2枚ずつそろえよう！'); } return; }
+            if (lock > 0) {
+                lock -= dt;
+                if (lock <= 0) {
+                    const [p, q] = open; open = [];
+                    if (deck[p] === deck[q]) { cells[p]._m = cells[q]._m = true; cells[p].style.background = cells[q].style.background = 'linear-gradient(#7be0a0,#2a9a5a)'; matched++; a.prog(matched / 4); a.flash('ペア！', '#7fff7f'); playSE('success'); if (matched >= 4) a.win(); }
+                    else { down(p); down(q); lives--; a.hearts(lives); a.flash('ちがう…', '#ff7777'); playSE('foul'); if (lives <= 0) a.lose(); }
+                }
+            }
+        }
+    };
+    return spCursor(g, cells, 4, press);
+};
+
+SPG.simon = function (a, P) {
+    const cols = [['#3a8dff', '🔵'], ['#ffd23a', '🟡'], ['#ff6bd0', '🟣'], ['#3aff8a', '🟢']], freq = [392, 494, 587, 784];
+    const box = spGridBox(a, 2, 2, 10), cells = cols.map(([c, e]) => spCell(box, e, `background:${c};opacity:.5;font-size:46px;`));
+    let round = 0, seq = [], pos = 0, phase = 'gap', timer = 0.9, showIdx = 0, lit = -1, lives = P.hp;
+    const light = (i, on) => { cells[i].style.opacity = on ? 1 : 0.5; cells[i].style.transform = on ? 'scale(1.06)' : 'none'; if (on) playTone(freq[i], 0.25, 'triangle'); };
+    const start = (fresh) => {
+        if (fresh) { if (!seq.length) seq = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)]; else seq.push(Math.floor(Math.random() * 4)); }   // 前の順番のまま、1つ足す
+        phase = 'show'; showIdx = 0; lit = -1; timer = 0.7; a.say(`光る順番を覚えて…（${seq.length}こ）`);
+    };
+    a.hearts(lives); a.prog(0); a.say('よく見ていてね');
+    const press = (i) => {
+        if (phase !== 'input') return;
+        light(i, true); setTimeout(() => light(i, false), 180);
+        if (i === seq[pos]) {
+            pos++;
+            if (pos >= seq.length) { round++; a.prog(round / 4); a.flash('せいかい！', '#7fff7f'); if (round >= 4) return a.win(); phase = 'gap'; timer = 0.9; }
+        } else {
+            lives--; a.hearts(lives); a.flash('ちがう！', '#ff7777'); playSE('foul');
+            if (lives <= 0) return a.lose(); phase = 'gap'; timer = 0.9; g._replay = true;
+        }
+    };
+    const g = {
+        update(dt) {
+            timer -= dt;
+            if (phase === 'gap' && timer <= 0) { start(!g._replay); g._replay = false; return; }
+            if (phase === 'show' && timer <= 0) {
+                if (lit >= 0) { light(lit, false); lit = -1; timer = 0.2; }
+                else if (showIdx < seq.length) { lit = seq[showIdx++]; light(lit, true); timer = 0.55 / P.sp; }
+                else { phase = 'input'; pos = 0; a.say('同じ順番にタップ！'); }
+            }
+        }
+    };
+    return spCursor(g, cells, 2, press);
+};
+
+SPG.shell = function (a, P) {
+    const W = a.W, H = a.H, xs = [W * 0.2, W * 0.5, W * 0.8], baseTop = H * 0.42;
+    const sh = [0, 1, 2].map(i => { const e = spEl('', a.stage, { position: 'absolute', top: baseTop + 'px', width: '84px', height: '70px', marginLeft: '-42px', left: xs[i] + 'px', fontSize: '60px', textAlign: 'center', lineHeight: '70px', transition: `left ${0.3 / P.sp}s ease-in-out, top .3s`, userSelect: 'none' }); e.innerHTML = mgImg('shell', '🐚', 64); return { e, slot: i }; });
+    const pearl = spEl('', a.stage, { position: 'absolute', top: (baseTop + 30) + 'px', width: '30px', height: '30px', marginLeft: '-15px', fontSize: '26px', textAlign: 'center', lineHeight: '30px', opacity: 0, transition: 'opacity .2s' });
+    pearl.innerHTML = mgImg('pearl', '⚪', 28);
+    let round = 0, lives = P.hp, phase = 'idle', timer = 0.5, swaps = 0, pearlShell = 0;
+    const place = () => { sh.forEach(s => { s.e.style.left = xs[s.slot] + 'px'; }); pearl.style.left = xs[sh[pearlShell].slot] + 'px'; };
+    const lift = (s, up) => { s.e.style.top = (up ? baseTop - 34 : baseTop) + 'px'; };
+    const begin = () => { sh.forEach((s, i) => { s.slot = i; lift(s, false); }); pearlShell = Math.floor(Math.random() * 3); place(); pearl.style.opacity = 1; lift(sh[pearlShell], true); phase = 'show'; timer = 1.2; swaps = 3 + round * 2 + (P.sp > 1.1 ? 2 : 0); a.say('真珠の場所を覚えて！'); };
+    a.hearts(lives); a.prog(0);
+    const g = {
+        update(dt) {
+            timer -= dt;
+            if (phase === 'idle' && timer <= 0) { begin(); return; }
+            if (phase === 'show' && timer <= 0) { lift(sh[pearlShell], false); pearl.style.opacity = 0; phase = 'shuffle'; timer = 0.35; a.say('目で追って…'); return; }
+            if (phase === 'shuffle' && timer <= 0) {
+                if (swaps <= 0) { phase = 'pick'; a.say('真珠はどれ？ タップ！'); return; }
+                const i = Math.floor(Math.random() * 3); let j = (i + 1 + Math.floor(Math.random() * 2)) % 3;
+                const A = sh.find(s => s.slot === i), B = sh.find(s => s.slot === j);
+                A.slot = j; B.slot = i; swaps--; place(); timer = 0.38 / P.sp;
+            }
+            if (phase === 'result' && timer <= 0) { if (round >= 3) return a.win(); phase = 'idle'; timer = 0.3; }
+        },
+        down(x) {
+            if (phase !== 'pick') return;
+            let best = -1, bd = 60; sh.forEach((s, i) => { const d = Math.abs(xs[s.slot] - x); if (d < bd) { bd = d; best = i; } });
+            if (best < 0) return;
+            phase = 'result'; timer = 1.1; pearl.style.left = xs[sh[pearlShell].slot] + 'px'; pearl.style.opacity = 1; lift(sh[pearlShell], true);
+            if (best === pearlShell) { round++; a.prog(round / 3); a.flash('あたり！', '#7fff7f'); playSE('success'); }
+            else { lift(sh[best], true); lives--; a.hearts(lives); a.flash('はずれ…', '#ff7777'); playSE('foul'); if (lives <= 0) { phase = 'dead'; return a.lose(); } }
+        },
+        keyPress(code) { g._k = ((g._k || 1) + (code === 'ArrowRight' ? 1 : code === 'ArrowLeft' ? 2 : 0)) % 3; },
+        keyDown() { g.down(xs[g._k === undefined ? 1 : g._k]); }
+    };
+    return g;
+};
+
+
+
+SPG.odd = function (a, P) {
+    const dims = [[3, 3], [4, 4], [5, 4]], syms = [['⭐', '🌟'], ['🌙', '🌛'], ['💫', '✨']];
+    let r = 0, lives = P.hp, cells = [], odd = 0, time = 0, limit = 7 / P.sp, box = null;
+    const g = { update(dt) { time -= dt; if (time <= 0) miss(); } };
+    const build = () => {
+        a.stage.innerHTML = ''; const [c, rw] = dims[r]; box = spGridBox(a, c, rw, 6);
+        cells = []; odd = Math.floor(Math.random() * c * rw);
+        for (let i = 0; i < c * rw; i++) cells.push(spCell(box, i === odd ? syms[r][1] : syms[r][0], `font-size:${c > 4 ? 22 : 28}px;`));
+        time = limit; a.say(`ちがう星はどれ？（${r + 1}/3問）`); a.hearts(lives); a.prog(r / 3);
+        spCursor(g, cells, c, press);
+    };
+    const miss = () => { lives--; a.hearts(lives); a.flash('ちがう！', '#ff7777'); playSE('foul'); if (lives <= 0) return a.lose(); build(); };
+    const press = (i) => { if (i === odd) { r++; playSE('success'); if (r >= 3) { a.prog(1); return a.win(); } build(); } else miss(); };
+    build();
+    return g;
+};
+
+SPG.pop = function (a, P) {
+    const box = spGridBox(a, 3, 3, 8), cells = Array.from({ length: 9 }, () => spCell(box, '', 'background:radial-gradient(#2a1a0c,#0c0702);border-color:#8a6a2a;'));
+    const need = P.sp > 1.1 ? 9 : (P.sp < 0.9 ? 6 : 8); let score = 0, lives = P.hp, time = 26, spawn = 0.5; const items = Array(9).fill(null);
+    const clear = (i) => { items[i] = null; cells[i].innerHTML = ''; cells[i].style.background = 'radial-gradient(#2a1a0c,#0c0702)'; };
+    a.hearts(lives); a.prog(0); a.say(`黄金の魚を${need}匹！ 爆弾はNG`);
+    const press = (i) => {
+        const it = items[i]; if (!it) return;
+        if (it.t === 'gold') { score++; a.prog(score / need); playSE('tap'); clear(i); if (score >= need) a.win(); }
+        else { lives--; a.hearts(lives); a.flash('ドカーン！', '#ff7777'); playSE('foul'); triggerVibration(120); clear(i); if (lives <= 0) a.lose(); }
+    };
+    const g = {
+        update(dt) {
+            time -= dt; spawn -= dt;
+            if (spawn <= 0) {
+                const free = items.map((v, i) => v ? -1 : i).filter(i => i >= 0);
+                if (free.length) {
+                    const i = pickOne(free), gold = Math.random() < 0.72;
+                    items[i] = { t: gold ? 'gold' : 'bomb', life: 1.1 / P.sp };
+                    cells[i].innerHTML = gold ? mgImg('gold_fish', '🐟', 44) : mgImg('bomb', '💣', 44);
+                    cells[i].style.background = gold ? 'linear-gradient(#ffe27a,#c8901a)' : 'linear-gradient(#6a2a2a,#2a0a0a)';
+                }
+                spawn = 0.55 / P.sp;
+            }
+            items.forEach((it, i) => { if (it) { it.life -= dt; if (it.life <= 0) clear(i); } });
+            a.hudText(`のこり ${Math.max(0, Math.ceil(time))}秒　${score}/${need}`);
+            if (time <= 0) a.lose();
+        }
+    };
+    return spCursor(g, cells, 3, press);
+};
+
+SPG.run = function (a, P) {
+    const W = a.W, H = a.H, trackY = H * 0.6, x0 = 28, x1 = W - 46;
+    spEl('', a.stage, { position: 'absolute', left: (x0 - 6) + 'px', width: (x1 - x0 + 40) + 'px', top: (trackY + 30) + 'px', height: '10px', borderRadius: '6px', background: 'linear-gradient(#8a6a3a,#4a3418)' });
+    spEl('', a.stage, { position: 'absolute', left: 0, right: 0, bottom: 0, height: '34px', background: 'linear-gradient(#ff7a1a,#b3200a)', opacity: 0.85 });
+    const goal = spEl('', a.stage, { position: 'absolute', left: (x1 + 4) + 'px', top: (trackY - 24) + 'px', fontSize: '34px' }); goal.innerText = '🏁';
+    const runner = spEl('', a.stage, { position: 'absolute', top: (trackY - 20) + 'px', fontSize: '38px', transition: 'left .06s linear' }); runner.innerHTML = mgImg('runner', '🏃', 40);
+    const lamp = spEl('', a.stage, { position: 'absolute', left: (W / 2 - 46) + 'px', top: '14px', width: '92px', height: '40px', borderRadius: '20px', border: '3px solid #d8b66a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 'bold', color: '#fff' });
+    let pos = 0, phase = 'go', timer = (1.6 + Math.random()) / 1, holding = false, hp = P.hp, penal = false, time = 24 / Math.pow(P.sp, 0.6);
+    const setPhase = (p) => {
+        phase = p; penal = false;
+        if (p === 'go') { timer = (1.4 + Math.random() * 1.1); lamp.style.background = '#2fbf5a'; lamp.innerText = 'GO!'; }
+        else if (p === 'warn') { timer = 0.6 / P.sp; lamp.style.background = '#e8b81c'; lamp.innerText = 'もうすぐ！'; }
+        else { timer = (1.0 + Math.random() * 0.7) * (P.sp > 1.1 ? 1.2 : 1); lamp.style.background = '#d62a2a'; lamp.innerText = 'ストップ！'; }
+    };
+    setPhase('go'); a.hearts(hp); a.prog(0);
+    const g = {
+        update(dt) {
+            time -= dt; timer -= dt;
+            if (timer <= 0) setPhase(phase === 'go' ? 'warn' : (phase === 'warn' ? 'stop' : 'go'));
+            if (holding) {
+                if (phase === 'stop') {
+                    if (!penal) { penal = true; hp--; a.hearts(hp); pos = Math.max(0, pos - 0.1); a.flash('あちち！', '#ff7777'); playSE('foul'); triggerVibration(120); if (hp <= 0) return a.lose(); }
+                } else pos = Math.min(1, pos + dt * 0.19);
+            }
+            runner.style.left = (x0 + (x1 - x0) * pos) + 'px';
+            runner.style.transform = holding && phase !== 'stop' ? `translateY(${Math.sin(time * 18) * 3}px)` : 'none';
+            a.prog(pos);
+            a.say(phase === 'stop' ? '赤！ 手をはなして止まれ！' : (holding ? '走れ走れ！' : '長押しで走る！'));
+            if (pos >= 1) a.win(); else if (time <= 0) a.lose();
+        },
+        down() { holding = true; }, up() { holding = false; }, keyDown() { holding = true; }
+    };
+    return g;
+};
+
+SPG.deliver = function (a, P) {
+    const W = a.W, H = a.H, sw = (W - 20) / 3, need = P.sp > 1.1 ? 6 : (P.sp < 0.9 ? 4 : 5);
+    const slots = [0, 1, 2].map(i => { const e = spEl('', a.stage, { position: 'absolute', left: (10 + i * sw + 4) + 'px', width: (sw - 8) + 'px', bottom: '12px', height: '84px', borderRadius: '14px', border: '3px solid #d8b66a', background: 'linear-gradient(#3b6a2a,#1d3a14)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontSize: '34px', transition: 'background .2s, transform .2s' }); e.innerHTML = '🐟'; return e; });
+    const tray = spEl('', a.stage, { position: 'absolute', top: '20px', width: '44px', height: '44px', marginLeft: '-22px', fontSize: '34px', textAlign: 'center', lineHeight: '44px' }); tray.innerHTML = mgImg('potion', '💊', 40);
+    const drop = spEl('', a.stage, { position: 'absolute', width: '44px', height: '44px', marginLeft: '-22px', fontSize: '34px', textAlign: 'center', lineHeight: '44px', opacity: 0, transition: 'top .32s ease-in' }); drop.innerHTML = mgImg('potion', '💊', 40);
+    let x = W * 0.2, dir = 1, wanted = 0, score = 0, lives = P.hp, cool = 0, falling = null; const speed = W / (1.5 / P.sp);
+    const want = () => { wanted = Math.floor(Math.random() * 3); slots.forEach((s, i) => { s.style.background = i === wanted ? 'linear-gradient(#7a2a6a,#401040)' : 'linear-gradient(#3b6a2a,#1d3a14)'; s.style.transform = i === wanted ? 'scale(1.05)' : 'none'; s.innerHTML = i === wanted ? '😵<div style="font-size:12px;font-weight:bold;">助けて！</div>' : '🐟'; }); };
+    want(); a.hearts(lives); a.prog(0); a.say(`光る生き物の真上でタップ！ ${need}回成功で捕獲`);
+    const g = {
+        update(dt) {
+            x += dir * speed * dt; if (x >= W - 24) { x = W - 24; dir = -1; } if (x <= 24) { x = 24; dir = 1; }
+            tray.style.left = x + 'px';
+            cool -= dt;
+            if (falling) { falling.t -= dt; if (falling.t <= 0) {
+                const idx = Math.max(0, Math.min(2, Math.floor((falling.x - 10) / sw)));
+                drop.style.opacity = 0; falling = null;
+                if (idx === wanted) { score++; a.prog(score / need); a.flash('ありがとう！', '#7fff7f'); playSE('success'); if (score >= need) return a.win(); }
+                else { lives--; a.hearts(lives); a.flash('ちがう！', '#ff7777'); playSE('foul'); if (lives <= 0) return a.lose(); }
+                want(); cool = 0.3;
+            } }
+        },
+        down() { g.drop(); }, keyDown() { g.drop(); },
+        drop() { if (falling || cool > 0) return; drop.style.transition = 'none'; drop.style.left = x + 'px'; drop.style.top = '64px'; drop.style.opacity = 1; void drop.offsetWidth; drop.style.transition = 'top .32s ease-in'; drop.style.top = (H - 110) + 'px'; falling = { x, t: 0.34 }; playSE('tap'); }
+    };
+    return g;
+};
+
+SPG.sort = function (a, P) {
+    const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ'], k = P.sp < 0.9 ? 4 : (P.sp > 1.1 ? 7 : 5);
+    const W = a.W, gap = 8, tw = (W - 20 - gap * 4) / 5, th = Math.min(120, tw * 1.55), top = (a.H - th) / 2 + 14;
+    const slotX = (i) => 10 + i * (tw + gap);
+    let vals = [1, 2, 3, 4, 5], sel = -1, cur = 0, busy = 0;
+    for (let n = 0; n < k; n++) { const i = Math.floor(Math.random() * 4); [vals[i], vals[i + 1]] = [vals[i + 1], vals[i]]; }
+    if (vals.every((v, i) => v === i + 1)) { [vals[0], vals[1]] = [vals[1], vals[0]]; }
+    let moves = k + (P.sp < 0.9 ? 6 : (P.sp > 1.1 ? 2 : 4));
+    const goal = spEl('', a.stage, { position: 'absolute', left: '10px', right: '10px', top: '14px', textAlign: 'center', fontSize: '15px', color: '#ffe9a0', textShadow: '1px 1px 0 #000' }); goal.innerText = 'ᚠ → ᚢ → ᚦ → ᚨ → ᚱ';
+    const tabs = {};   // 石板（数字ごと）。位置が変わると、左右にすべるように動く
+    for (let v = 1; v <= 5; v++) {
+        const e = spEl('', a.stage, { position: 'absolute', top: top + 'px', width: tw + 'px', height: th + 'px', borderRadius: '10px', border: '3px solid #bba777', background: 'linear-gradient(#9b988f,#55524c)', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 0 10px rgba(255,255,255,.25),0 3px 0 #2a2824', transition: 'left .3s cubic-bezier(.3,1.5,.5,1), transform .2s, border-color .2s, box-shadow .2s', userSelect: 'none' });
+        e.innerHTML = `<div style="font-size:30px;line-height:1.1;">${runes[v - 1]}</div><div style="font-size:18px;">${v}</div>`;
+        tabs[v] = e;
+    }
+    const place = () => {
+        vals.forEach((v, i) => { const e = tabs[v]; e.style.left = slotX(i) + 'px'; const ok = v === i + 1; e.style.borderColor = ok ? '#7be0a0' : '#bba777'; e.style.boxShadow = ok ? '0 0 12px #7be0a0,inset 0 0 10px rgba(255,255,255,.25),0 3px 0 #2a2824' : 'inset 0 0 10px rgba(255,255,255,.25),0 3px 0 #2a2824'; e.style.transform = (i === sel) ? 'translateY(-14px) scale(1.06)' : 'none'; e.style.outline = (g._kb && i === cur) ? '4px solid #fff' : 'none'; });
+        a.hudText(`のこり ${moves}回`);
+    };
+    const press = (i) => {
+        if (busy > 0) return;
+        if (sel < 0) { sel = i; playSE('tap'); place(); return; }
+        if (sel === i) { sel = -1; place(); return; }
+        if (Math.abs(sel - i) !== 1) { sel = i; place(); return; }
+        const s = sel; [vals[s], vals[i]] = [vals[i], vals[s]]; sel = -1; moves--; busy = 0.32; playSE('tap');
+        const A = tabs[vals[s]], B = tabs[vals[i]];
+        A.style.transform = 'translateY(-16px)'; B.style.transform = 'translateY(14px)';   // 片方は浮き、片方は沈みながら入れかわる
+        place(); A.style.transform = 'translateY(-16px)'; B.style.transform = 'translateY(14px)';
+        setTimeout(() => { place(); }, 190);
+        const done = vals.filter((v, n) => v === n + 1).length; a.prog(done / 5);
+        if (done === 5) { busy = 9; setTimeout(() => a.win(), 450); }
+        else if (moves <= 0) { busy = 9; a.flash('回数切れ…', '#ff7777'); setTimeout(() => a.lose(), 450); }
+    };
+    a.say('となり同士を入れかえて、1→5の順に並べよう'); a.prog(0);
+    const g = {
+        update(dt) { if (busy > 0 && busy < 8) busy -= dt; },
+        down(x) { const i = Math.floor((x - 10) / (tw + gap)); if (i >= 0 && i < 5) press(i); },
+        keyPress(code) { g._kb = true; if (code === 'ArrowLeft') cur = (cur + 4) % 5; if (code === 'ArrowRight') cur = (cur + 1) % 5; place(); },
+        keyDown() { press(cur); }
+    };
+    place();
+    return g;
+};
+
+function clearZukanNew() {
+    Object.keys(caughtFish).forEach(k => { if (caughtFish[k]) caughtFish[k].isNew = false; });
+    localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
+    renderZukanGrid();
+    renderZukanSubFilterUI();
+    updateMenuUI();
+    playSE('tap');
+}
+
+/* ===================================================
+   アクセサリー（追加分）  画像は images/acc/<id>.png
+   slot … rodAcc=釣り糸等 / bait=エサ / netAcc=網の補助 / netReel=網の飾り
+   =================================================== */
+const ACC_SLOT_LEGACY = { line_tough: 'rodAcc', bait_reel: 'rodAcc', maki_esa: 'bait', net_tough: 'netAcc', net_fixed: 'netReel' };
+const accSlot = (i) => i.slot || ACC_SLOT_LEGACY[i.id];
+const ACC_NEW = {
+    float: { name: 'うき', price: 8000, slot: 'rodAcc', emoji: '🎈', desc: '竿用。ニセのアタリが出にくくなる（発生率-70%）。' },
+    scope: { name: '遠眼鏡', price: 14000, slot: 'rodAcc', emoji: '🔭', desc: '竿用。PERFECT・GREATの判定が25%ゆるくなる。' },
+    compass: { name: '羅針盤', price: 20000, slot: 'rodAcc', emoji: '🧭', desc: '竿用。特別な戦い（ミニゲーム）で、ミスできる回数+1。' },
+    glow_bait: { name: '光るエサ', price: 9000, slot: 'bait', emoji: '✨', desc: 'エサ枠。大物が出やすくなる（×1.3）。' },
+    gold_lure: { name: '金のルアー', price: 16000, slot: 'bait', emoji: '🪙', desc: 'エサ枠。売値+8%。' },
+    exp_bait: { name: '賢者のミミズ', price: 12000, slot: 'bait', emoji: '🪱', desc: 'エサ枠。獲得EXP+15%。' },
+    net_pole: { name: 'のびる柄', price: 14000, slot: 'netAcc', emoji: '📏', desc: '網用。空振りできる回数+1。' },
+    lantern: { name: '水中ランタン', price: 12000, slot: 'netAcc', emoji: '🏮', desc: '網用。魚の動きが12%ゆっくりになる。' },
+    net_scope: { name: '網用スコープ', price: 14000, slot: 'netAcc', emoji: '🎯', desc: '網用。PERFECT・GREATの判定が25%ゆるくなる。' },
+    net_buoy: { name: 'ブイ', price: 11000, slot: 'netReel', emoji: '🛟', desc: '網用。輪が8%大きくなる。' },
+    net_gold: { name: '金の網かざり', price: 16000, slot: 'netReel', emoji: '🏅', desc: '網用。売値+8%。' }
+};
+Object.keys(ACC_NEW).forEach(k => { ACC_DATA[k] = Object.assign({ id: k, icon: `images/acc/${k}.png` }, ACC_NEW[k]); });
+// 画像が無い間は絵文字で表示（装備画面・ショップ）
+document.addEventListener('error', (e) => {
+    const im = e.target;
+    if (!im || im.tagName !== 'IMG' || im.dataset.fb) return;
+    const m = (im.getAttribute('src') || '').match(/images\/acc\/([^/.]+)\.png/);
+    if (!m || !ACC_NEW[m[1]]) return;
+    im.dataset.fb = '1';
+    im.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="72" font-size="64" text-anchor="middle">${ACC_NEW[m[1]].emoji}</text></svg>`);
+}, true);
+
+/* ===================================================
+   デイリーミッションの引き直し（100,000G・何度でも）
+   =================================================== */
+const REROLL_COST = 100000;
+function rerollMissions() {
+    if (playerData.gold < REROLL_COST) { alert('ゴールドが足りません（100,000G）'); return; }
+    if (!confirm('100,000Gを払って、ミッションを引き直しますか？\n（いまの進み具合はリセットされます）')) return;
+    playerData.gold -= REROLL_COST;
+    const before = (playerData.daily && playerData.daily.list || []).join();
+    let ids;
+    for (let n = 0; n < 8; n++) { ids = MISSION_POOL.map(m => m.id).sort(() => Math.random() - 0.5).slice(0, 3); if (ids.slice().sort().join() !== before.split(',').sort().join()) break; }
+    playerData.daily = { date: todayStr(), list: ids, prog: {}, claimed: [] };
+    savePlayerData();
+    renderMissions();
+    updateMenuUI();
+    playSE('success');
+}
+
+/* 画像が読み込めない時の代わりの表示（ショップ・装備画面の共通） */
+function imgFallback(im) {
+    if (im.dataset.fb) return;
+    im.dataset.fb = '1';
+    im.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="72" font-size="64" text-anchor="middle">🎒</text></svg>');
 }
