@@ -468,7 +468,7 @@ let playerData = {
     easyMode: false,
     vibrationEnabled: true,
     clearCount: 0,
-    isReincarnated: false
+    isReincarnated: false,
 };
 
 let caughtFish = JSON.parse(localStorage.getItem('retro_fishing_zukan_v4')) || {};
@@ -596,19 +596,15 @@ function updateMenuUI() {
         const count = playerData.clearCount || 0;
 
         if (count === 0) {
-            // 未クリア：非表示
             clearBadge.style.display = "none";
         } else if (count === 1) {
-            // 1回クリア：★
             clearBadge.innerText = "★";
             clearBadge.style.display = "flex";
         } else {
-            // 2回目以降：★x2, ★x3 ...
             clearBadge.innerText = `★x${count}`;
             clearBadge.style.display = "flex";
         }
     }
-
     document.getElementById('header-level').innerText = curLevel;
     document.getElementById('header-exp-percent').innerText = percent;
     document.getElementById('header-level-bar-inner').style.width = `${percent}%`;
@@ -1063,6 +1059,7 @@ function processAchievementQueue() {
 
 /* 全データ初期化（コンプ100%時の転生対応版） */
 /* 全データ初期化（実績・周回星マークの選択保持対応版） */
+/* 全データ初期化（★保持時はプレイ時間・所持道具・捕獲数を引き継ぐ） */
 function resetAllData() {
     // 通常・ガチャ両方の図鑑コンプリート判定
     const isNormal100 = checkCategoryCompPercent('normal') === 100;
@@ -1081,42 +1078,52 @@ function resetAllData() {
     const c2 = window.confirm("本当によろしいですか？この操作は取り消せません。");
     if (!c2) return;
 
-    // ▼ 追加：実績・称号（および周回数・星）を削除するかどうかの確認 ▼
+    // 実績・称号（および道具やプレイ時間）を削除するかどうかの確認
     let deleteAchievements = true;
     if (isFullComp) {
-        // コンプ達成時は実績を消すか残すかを選択
         deleteAchievements = window.confirm(
             "【実績・称号データの取り扱い】\n\n" +
             "「OK (はい)」  : 実績・称号データと周回数(★)もリセットします。\n" +
-            "「キャンセル (いいえ)」: 実績・称号データを残し、周回数(★)も加算して引き継ぎます。"
+            "「キャンセル (いいえ)」: 実績・称号データ・道具・プレイ時間・捕獲数を残し、周回数(★)も加算して引き継ぎます。"
         );
     } else {
-        // 通常のリセット時は確認
-        deleteAchievements = window.confirm("実績・称号データおよびクリア記録(★)も削除しますか？\n（「いいえ」を選ぶと実績と周回数はそのまま残ります）");
+        deleteAchievements = window.confirm("実績・称号データおよびクリア記録(★)も削除しますか？\n（「いいえ」を選ぶと実績・道具・プレイ時間・周回数はそのまま残ります）");
     }
 
-    // 既存実績・周回数の引き継ぎ用処理
     let nextAchievements = [];
     let nextClearCount = 0;
+    
+    // 引き継ぎ用変数のセット
+    let nextPlayTime = 0;
+    let nextOwnedRods = ["wood"];
+    let nextOwnedNets = ["bug_net"];
+    let nextOwnedAccs = [];
+    let nextTotalCatches = 0;
+    let nextNetCatches = 0;
 
     if (!deleteAchievements) {
-        // 「いいえ（消さない）」を選んだ場合：実績と周回数を保持＆加算
+        // ★を残す（キャンセル）場合：実績、道具、プレイ時間、捕獲数を保持して引き継ぐ
         nextAchievements = playerData.achievements || [];
         nextClearCount = playerData.clearCount || 0;
+        nextPlayTime = playerData.playTimeSeconds || 0;
+        nextOwnedRods = playerData.ownedRods || ["wood"];
+        nextOwnedNets = playerData.ownedNets || ["bug_net"];
+        nextOwnedAccs = playerData.ownedAccs || [];
+        nextTotalCatches = playerData.totalCatches || 0;
+        nextNetCatches = playerData.netCatches || 0;
 
         if (isFullComp) {
-            nextClearCount += 1; // 周回数を加算（★が増える）
+            nextClearCount += 1;
             if (!nextAchievements.includes('hero_reincarnation')) {
-                nextAchievements.push('hero_reincarnation'); // 転生実績付与
+                nextAchievements.push('hero_reincarnation');
             }
         }
     } else if (isFullComp) {
-        // 「はい（消す）」を選んだが転生条件達成の場合：実績は全消去するが、転生実績のみ新しく付与
+        // ★を消す（OK）が転生条件達成時の場合
         nextAchievements = ['hero_reincarnation'];
-        nextClearCount = 0; // 周回数・星もリセット
+        nextClearCount = 0;
     }
 
-    // ローカルストレージデータの削除
     localStorage.removeItem('retro_fishing_zukan_v4');
     localStorage.removeItem('retro_fishing_player_v1');
     localStorage.removeItem('retro_fishing_ranking_v1');
@@ -1129,25 +1136,32 @@ function resetAllData() {
         { fishName: "名無し", time: 0.320 }
     ];
 
-    // 新規プレイヤーデータ生成（コンプ100%転生時は 10,000 G スタート）
     playerData = {
         level: 1, 
         exp: 0, 
-        gold: isFullComp ? 10000 : 0, // ★ 10,000 G スタート
-        equippedRod: "wood", ownedRods: ["wood"],
-        equippedNet: "bug_net", ownedNets: ["bug_net"],
-        equippedRodAcc: null, equippedBait: null,
-        equippedNetAcc: null, equippedNetReel: null,
-        ownedAccs: [],
-        unlockedGachaMaps: [], totalCatches: 0, currentCombo: 0,
-        netCatches: 0, netCombo: 0, missCount: 0,
-        achievements: nextAchievements, // 選択に応じた実績データ
-        playTimeSeconds: 0,
+        gold: isFullComp ? 10000 : 0, // コンプ時 10,000 G
+        equippedRod: "wood", 
+        ownedRods: nextOwnedRods,
+        equippedNet: "bug_net", 
+        ownedNets: nextOwnedNets,
+        equippedRodAcc: null, 
+        equippedBait: null,
+        equippedNetAcc: null, 
+        equippedNetReel: null,
+        ownedAccs: nextOwnedAccs,
+        unlockedGachaMaps: [], 
+        totalCatches: nextTotalCatches, 
+        currentCombo: 0,
+        netCatches: nextNetCatches, 
+        netCombo: 0, 
+        missCount: 0,
+        achievements: nextAchievements,
+        playTimeSeconds: nextPlayTime,
         hasSeenHowTo: false,
         hasSeenGachaNotice: false,
         easyMode: false,
         vibrationEnabled: true,
-        clearCount: nextClearCount, // 選択に応じた周回数（星）
+        clearCount: nextClearCount,
         isReincarnated: isFullComp
     };
 
@@ -2139,6 +2153,8 @@ function updateAccSlotUI(slotKey, imgId, nameId, defaultText) {
 
 let currentSelectingSlot = "";
 
+/* アクセサリを複数所持・装備可能にするポップアップ表示制御 */
+/* 装備品選択ポップアップ（スロットごとのアクセサリ制限対応版） */
 function openEquipSelectModal(slotType) {
     currentSelectingSlot = slotType;
     const modal = document.getElementById('equip-select-modal');
@@ -2148,16 +2164,22 @@ function openEquipSelectModal(slotType) {
     let items = [];
     let currentEquipped = "";
 
+    // 1. 釣り竿本体
     if (slotType === 'rod') {
         items = playerData.ownedRods.map(k => ROD_DATA[k]);
         currentEquipped = playerData.equippedRod;
-    } else if (slotType === 'net') {
+    } 
+    // 2. 捕獲ネット本体
+    else if (slotType === 'net') {
         items = playerData.ownedNets.map(k => NET_DATA[k]);
         currentEquipped = playerData.equippedNet;
-    } else {
+    } 
+    // 3. アクセサリ・消耗品スロット群
+    else {
         const accKeys = playerData.ownedAccs || [];
-        items = accKeys.map(k => ACC_DATA[k]).filter(item => item !== undefined);
+        const allOwnedAccs = accKeys.map(k => ACC_DATA[k]).filter(item => item !== undefined);
 
+        // 竿用アクセサリ枠（丈夫な釣り糸、ベイトリール ＋ まき餌）
         if (slotType === 'rodAcc') {
             items = items.filter(i => accSlot(i) === 'rodAcc');
             currentEquipped = playerData.equippedRodAcc;
@@ -2173,6 +2195,7 @@ function openEquipSelectModal(slotType) {
         }
     }
 
+    // アクセサリ枠の場合は「外す」ボタンを表示
     if (slotType !== 'rod' && slotType !== 'net') {
         const unequipDiv = document.createElement('div');
         unequipDiv.className = "equip-select-item";

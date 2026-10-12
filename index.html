@@ -51,7 +51,7 @@
 
     <!-- メインメニュー画面 -->
     <div id="menu-screen">
-        <!-- 右上アイコン群（左：ランキング / 右端：設定） -->
+        <!-- 左上星バッジ＆右上アイコン群 -->
         <div id="menu-clear-badge" class="menu-clear-badge" style="display: none;">★</div>
         <div class="header-icon-btns">
             <div class="ranking-icon-btn" onclick="openRankingModal()">
@@ -163,9 +163,9 @@
 
     <!-- ガチャ注意書き modal -->
     <div id="gacha-notice-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚠️ ガチャの使い方と注意</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">⚠️ ガチャの使い方と注意</div>
         
-        <div style="width:100%; flex:1; min-height:0; overflow-y:auto; padding:0 8px; text-align:left; font-size:15px; line-height:1.8; color:#eee;">
+        <div style="width:100%; flex:1; min-height:0; overflow-y:auto; padding:0 8px; text-align:left; font-size:14px; line-height:1.7; color:#eee;">
             ❶ <strong style="color:#ffd700;">ガチャのまわし方</strong><br>
             お持ちのお金（G）を使って引くことができます。<br>
             「1回（1000G）」または「10連（10000G）」が選べます。<br><br>
@@ -179,12 +179,12 @@
             同じ釣り場や道具がもう一度当たった場合は、お返しとして自動的に 150 G がお金に戻されます。<br><br>❺ <strong style="color:#ffd700;">おトクな仕組み</strong><br>30回連続でハズレだと次は必ず当たり。10連は当たり1枠が確定します。迷ったら、まずは気軽な「ノーマルガチャ」へ！
         </div>
 
-        <button class="btn" style="padding: 10px 35px; font-size: 16px; margin-top: 10px;" onclick="closeGachaNotice()">閉じる</button>
+        <button class="btn" style="padding: 8px 30px; font-size: 15px; margin-top: 8px;" onclick="closeGachaNotice()">閉じる</button>
     </div>
 
     <!-- ガチャ景品一覧 modal -->
     <div id="gacha-list-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">🎰 ガチャ景品ラインナップ 🎰</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">🎰 ガチャ景品ラインナップ 🎰</div>
 
         <div class="gacha-list-scroll-area">
             <div class="gacha-list-section">
@@ -233,7 +233,7 @@
 
     <!-- 実績・称号 modal -->
     <div id="achievement-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 8px; flex-shrink: 0;">実績・称号</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 8px; flex-shrink: 0;">実績・称号</div>
         
         <div class="achievement-progress-container">
             <div class="achievement-progress-text">
@@ -246,12 +246,12 @@
         </div>
 
         <div class="achievement-list" id="achievement-list"></div>
-        <button class="btn" style="margin-top: 10px; padding: 6px 20px; font-size: 15px;" onclick="closeAchievements()">閉じる</button>
+        <button class="btn" style="margin-top: 8px; padding: 6px 20px; font-size: 14px;" onclick="closeAchievements()">閉じる</button>
     </div>
 
     <!-- 設定 modal -->
     <div id="config-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">設定</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">設定</div>
         
         <div style="width:100%; flex:1; overflow-y:auto; padding-right:4px;">
             <div class="config-row">
@@ -275,7 +275,7 @@
                 <button class="btn" id="config-vibe-btn" style="background:#006644;" onclick="toggleVibration()">バイブ: ON</button>
             </div>
             
-            <div class="config-row" style="border-top: 1px dashed #444; padding-top: 10px; margin-top: 10px;">
+            <div class="config-row" style="border-top: 1px dashed #444; padding-top: 8px; margin-top: 8px;">
                 <span style="color:#ffcc00;">隠しコマンド</span>
                 <button class="btn" style="background:#6600cc; font-size:12px;" onclick="openCheatPrompt()">コード入力</button>
             </div>
@@ -359,7 +359,7 @@
             </div>
         </div>
 
-        <button class="btn" style="margin-top: 10px; padding: 6px 25px; font-size: 15px;" onclick="closeConfigModal()">閉じる</button>
+        <button class="btn" style="margin-top: 8px; padding: 6px 25px; font-size: 14px;" onclick="closeConfigModal()">閉じる</button>
     </div>
 
     <!-- ショップ画面 -->
@@ -459,17 +459,17 @@
 
     <!-- レベルアップ modal -->
     <div id="levelup-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 32px; color: #ffd700; text-shadow: 3px 3px 0 #8b0000; margin-bottom: 8px;">LEVEL UP!!</div>
-        <div id="levelup-text" style="font-size: 20px; color: #fff; font-weight: bold; margin-bottom: 10px;">釣りレベルが 2 に上がった！</div>
-        <div id="levelup-unlock-text" style="font-size: 15px; color: #00ffcc; margin-bottom: 20px;">🌊 新エリア「川」が解放されました！</div>
-        <button class="btn" style="font-size: 18px; padding: 8px 30px;" onclick="closeLevelUpModal()">最高だ！</button>
+        <div style="font-family: 'Reggae One', cursive; font-size: 28px; color: #ffd700; text-shadow: 3px 3px 0 #8b0000; margin-bottom: 8px;">LEVEL UP!!</div>
+        <div id="levelup-text" style="font-size: 18px; color: #fff; font-weight: bold; margin-bottom: 10px;">釣りレベルが Lv.2 に上がった！</div>
+        <div id="levelup-unlock-text" style="font-size: 14px; color: #00ffcc; margin-bottom: 15px;">🌊 新エリア「川」が解放されました！</div>
+        <button class="btn" style="font-size: 16px; padding: 8px 25px;" onclick="closeLevelUpModal()">最高だ！</button>
     </div>
 
     <!-- マップ選択 modal -->
     <div id="map-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">釣り場を選択</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">釣り場を選択</div>
         <div class="map-grid" id="map-grid"></div>
-        <button class="btn" style="margin-top: 12px; padding: 6px 20px; flex-shrink: 0;" onclick="closeMapModal()">閉じる</button>
+        <button class="btn" style="margin-top: 10px; padding: 6px 20px; flex-shrink: 0;" onclick="closeMapModal()">閉じる</button>
     </div>
 
     <!-- リザルト modal -->
@@ -494,7 +494,7 @@
     <!-- 図鑑 modal -->
     <div id="zukan-modal" class="modal">
         <div class="zukan-header">
-            <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">おさかな絵巻</span>
+            <span style="font-family: 'Reggae One', cursive; font-size: 18px; color: #ffd700;">おさかな絵巻</span>
             <div>
                                 <button class="btn zukan-close" style="position:absolute;top:10px;right:14px;z-index:40;" onclick="closeZukan()">閉じる</button>
             </div>
@@ -523,11 +523,11 @@
     <div id="zukan-detail-modal" class="modal">
         <div id="zukan-detail-title">---</div>
         <img id="zukan-detail-img" src="" alt="Fish Detail" onclick="zoomImage(this.src)">
-        <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">(タップで生物を拡大表示)</div>
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 6px;">(タップで生物を拡大表示)</div>
         <div id="zukan-detail-desc">---</div>
-        <div id="zukan-detail-price" style="font-size: 14px; color: #ffd700; margin-bottom: 4px;">買取価格: 0 G</div>
+        <div id="zukan-detail-price" style="font-size: 13px; color: #ffd700; margin-bottom: 4px;">買取価格: 0 G</div>
         <div id="zukan-detail-time">最速記録: ---秒</div>
-        <button class="btn" style="padding: 8px 20px; font-size: 15px; margin-top: 10px;" onclick="closeZukanDetail()">閉じる</button>
+        <button class="btn" style="padding: 6px 20px; font-size: 14px; margin-top: 8px;" onclick="closeZukanDetail()">閉じる</button>
     </div>
 
     <!-- デイリーミッション modal -->
@@ -577,7 +577,7 @@
 <!-- ランキング modal -->
 <div id="ranking-modal" class="modal">
     <div class="modal-content">
-        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚡ 最速反応速度ランキング ⚡</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">⚡ 最速反応速度ランキング ⚡</div>
         
         <div style="width:100%; flex:1; overflow-y:auto; padding: 4px;">
             <div id="ranking-list" class="ranking-list">
@@ -585,7 +585,7 @@
             </div>
         </div>
 
-        <button class="btn" style="margin-top: 10px; padding: 6px 25px; font-size: 15px;" onclick="closeRankingModal()">閉じる</button>
+        <button class="btn" style="margin-top: 8px; padding: 6px 25px; font-size: 14px;" onclick="closeRankingModal()">閉じる</button>
     </div>
 </div>
 
@@ -593,7 +593,7 @@
 <div id="equip-screen" class="modal">
     <div class="modal-content equip-modal-content">
         <div class="equip-header">
-            <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">装備変更</span>
+            <span style="font-family: 'Reggae One', cursive; font-size: 18px; color: #ffd700;">装備変更</span>
             <button class="btn" onclick="closeEquipScreen()">閉じる</button>
         </div>
 
