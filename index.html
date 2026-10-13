@@ -44,14 +44,15 @@
 <div id="title-screen">
     <!-- ▼ onclick を追加 ▼ -->
     <div id="main-logo" onclick="onLogoTap()">爆釣一閃！<br>おさかな一本勝負</div>
-    <div class="version-text" id="version-label">Ver 3.0.0</div>
+    <div class="version-text" id="version-label">Ver 3.1.0</div>
     <div class="tagline">すきま時間に、一閃。<br>反射神経 × コレクションの釣りゲーム</div>
     <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
+    <a class="title-survey-btn" href="https://forms.cloud.microsoft/r/SZ3viK17xa" target="_blank" rel="noopener noreferrer">📝 アンケートに答える（1分）</a>
 </div>
 
     <!-- メインメニュー画面 -->
     <div id="menu-screen">
-        <!-- 左上星バッジ＆右上アイコン群 -->
+        <!-- 右上アイコン群（左：ランキング / 右端：設定） -->
         <div id="menu-clear-badge" class="menu-clear-badge" style="display: none;">★</div>
         <div class="header-icon-btns">
             <div class="ranking-icon-btn" onclick="openRankingModal()">
@@ -62,6 +63,7 @@
             </div>
         </div>
         
+        <div class="menu-date" id="menu-date"></div>
         <div class="menu-title" id="menu-title">メインメニュー</div>
 
         <div class="menu-status-box">
@@ -101,35 +103,33 @@
 
     <!-- ガチャ画面 -->
     <div id="gacha-screen">
-        <button id="btn-gacha-notice" class="gacha-notice-btn ev-only" onclick="openGachaNotice()">
+        <button id="btn-gacha-notice" class="gacha-notice-btn" onclick="openGachaNotice()">
             <img src="images/tyuui.png" alt="注意" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><text x=\'20\' y=\'75\' font-size=\'70\' fill=\'yellow\'>⚠️</text></svg>'">
         </button>
 
         <div class="gacha-title">ガチャ</div>
         <div class="gacha-gold-text">所持金: <span id="gacha-gold">0</span> G</div>
         <div class="gacha-tabs">
-            <button class="gacha-tab active" id="gtab-ev" onclick="setGachaTab('ev')">🌋 イベントガチャ</button>
+            <button class="gacha-tab active" id="gtab-ev" onclick="setGachaTab('ev')">🌋 レアガチャ</button>
             <button class="gacha-tab" id="gtab-ng" onclick="setGachaTab('ng')">🎲 ノーマルガチャ</button>
         </div>
         
-        <div class="gacha-arrow-selector ev-only">
-            <button class="gacha-arrow-btn" onclick="prevGachaSeries()">＜</button>
-            <div id="gacha-series-title" class="gacha-series-title-text">🌋 火山ガチャ</div>
-            <button class="gacha-arrow-btn" onclick="nextGachaSeries()">＞</button>
-        </div>
-
-        <div class="gacha-box-ui ev-only">
-            <img id="gacha-banner-img" class="gacha-banner-img" src="images/banner/banner_volcano.png" alt="ガチャバナー" onclick="zoomImage(this.src)">
-            <div style="font-size: 10px; color: #aaa; text-align: center; margin-top: 6px;">※バナータップで拡大 / ハズレ（釣りゴミ等）確率: 82% ／ 30回連続ハズレで次は確定当たり</div>
-        </div>
-
-        <div class="ev-only" style="display:flex; gap:10px; width:100%; justify-content:center; margin-bottom:8px;">
-            <button class="btn" style="padding:10px 15px; font-size:14px; background:#440066;" onclick="spinGacha(1)">1回回す<br>(1000 G)</button>
-            <button class="btn" style="padding:10px 15px; font-size:14px; background:#8800aa;" onclick="spinGacha(10)">10連ガチャ<br>(10000 G)</button>
-        </div>
-
-        <div class="ev-only" style="margin-bottom: 8px;">
-            <button class="btn" style="background:#112233;" onclick="openGachaListModal()">景品一覧を見る</button>
+        <div id="ev-panel" class="ev-only">
+            <div class="ev-head">
+                <button class="gacha-arrow-btn" onclick="prevGachaSeries()">＜</button>
+                <div id="gacha-series-title" class="ng-title">🌋 火山ガチャ</div>
+                <button class="gacha-arrow-btn" onclick="nextGachaSeries()">＞</button>
+            </div>
+            <div class="ev-banner-box">
+                <img id="gacha-banner-img" class="gacha-banner-img" src="images/banner/banner_volcano.png" alt="ガチャバナー" onclick="zoomImage(this.src)">
+                <div class="ev-note">※バナータップで拡大 ／ ハズレ（釣りゴミ等）確率: 82% ／ 30回連続ハズレで次は確定当たり</div>
+            </div>
+            <div class="ng-spacer"></div>
+            <div class="ng-dock">
+                <button class="ng-btn" onclick="spinGacha(1)">1回<small>1000G</small></button>
+                <button class="ng-btn big" onclick="spinGacha(10)">10連<small>10000G</small></button>
+            </div>
+            <button class="ng-link" onclick="openGachaListModal()">景品をみる</button>
         </div>
 
         <div id="ng-panel" class="ng-only">
@@ -163,9 +163,9 @@
 
     <!-- ガチャ注意書き modal -->
     <div id="gacha-notice-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">⚠️ ガチャの使い方と注意</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚠️ ガチャの使い方と注意</div>
         
-        <div style="width:100%; flex:1; min-height:0; overflow-y:auto; padding:0 8px; text-align:left; font-size:14px; line-height:1.7; color:#eee;">
+        <div style="width:100%; flex:1; min-height:0; overflow-y:auto; padding:0 8px; text-align:left; font-size:15px; line-height:1.8; color:#eee;">
             ❶ <strong style="color:#ffd700;">ガチャのまわし方</strong><br>
             お持ちのお金（G）を使って引くことができます。<br>
             「1回（1000G）」または「10連（10000G）」が選べます。<br><br>
@@ -179,12 +179,12 @@
             同じ釣り場や道具がもう一度当たった場合は、お返しとして自動的に 150 G がお金に戻されます。<br><br>❺ <strong style="color:#ffd700;">おトクな仕組み</strong><br>30回連続でハズレだと次は必ず当たり。10連は当たり1枠が確定します。迷ったら、まずは気軽な「ノーマルガチャ」へ！
         </div>
 
-        <button class="btn" style="padding: 8px 30px; font-size: 15px; margin-top: 8px;" onclick="closeGachaNotice()">閉じる</button>
+        <button class="btn" style="padding: 10px 35px; font-size: 16px; margin-top: 10px;" onclick="closeGachaNotice()">閉じる</button>
     </div>
 
     <!-- ガチャ景品一覧 modal -->
     <div id="gacha-list-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">🎰 ガチャ景品ラインナップ 🎰</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">🎰 ガチャ景品ラインナップ 🎰</div>
 
         <div class="gacha-list-scroll-area">
             <div class="gacha-list-section">
@@ -233,7 +233,7 @@
 
     <!-- 実績・称号 modal -->
     <div id="achievement-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 8px; flex-shrink: 0;">実績・称号</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 8px; flex-shrink: 0;">実績・称号</div>
         
         <div class="achievement-progress-container">
             <div class="achievement-progress-text">
@@ -246,12 +246,12 @@
         </div>
 
         <div class="achievement-list" id="achievement-list"></div>
-        <button class="btn" style="margin-top: 8px; padding: 6px 20px; font-size: 14px;" onclick="closeAchievements()">閉じる</button>
+        <button class="btn" style="margin-top: 10px; padding: 6px 20px; font-size: 15px;" onclick="closeAchievements()">閉じる</button>
     </div>
 
     <!-- 設定 modal -->
     <div id="config-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">設定</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">設定</div>
         
         <div style="width:100%; flex:1; overflow-y:auto; padding-right:4px;">
             <div class="config-row">
@@ -275,18 +275,49 @@
                 <button class="btn" id="config-vibe-btn" style="background:#006644;" onclick="toggleVibration()">バイブ: ON</button>
             </div>
             
-            <div class="config-row" style="border-top: 1px dashed #444; padding-top: 8px; margin-top: 8px;">
+            <div class="config-row" style="border-top: 1px dashed #444; padding-top: 10px; margin-top: 10px;">
                 <span style="color:#ffcc00;">隠しコマンド</span>
-                <button class="btn" style="background:#6600cc; font-size:12px;" onclick="openCheatPrompt()">コード入力</button>
+                <span><button class="btn" id="config-notes-btn" style="background:#2a4a6a; font-size:12px; margin-right:4px;" onclick="openBottleNotes()">📜 拾った手紙</button><button class="btn" style="background:#6600cc; font-size:12px;" onclick="openCheatPrompt()">コード入力</button></span>
             </div>
 
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 3.0.0)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 3.1.0)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V3.1.0======<br>
+                    <b>🗑 ゴミと海の宝</b><br>
+                    ・ニセのアタリで「ゴミ」が釣れるように。ごくまれに…？<br>
+                    ・ゴミが釣れやすくなるアクセサリーを追加<br>
+                    <b>🎒 アクセサリー</b><br>
+                    ・最強アクセサリー（4枠）を追加。まき餌の値段を調整<br>
+                    <b>🏆 実績・生き物</b><br>
+                    ・実績を追加（ゴミ掃除／アクセサリー全購入／工房MAX強化）<br>
+                    ・さざ波の海に新しい生き物<br>
+                    <b>🎲 ガチャ</b><br>
+                    ・「イベントガチャ」を「レアガチャ」に改名。画面をノーマルと同じ配置に<br>
+                    <b>🎍 季節イベントエリア</b><br>
+                    ・2か月ごとのエリアと生き物（年144種）を追加。まずは…探してみよう<br>
+                    ・生き物の説明・豆知識を、ためになる内容に<br>
+                    ・エリアごとに季節のミニゲームを追加<br>
+                    <b>🔧 その他</b><br>
+                    ・遊び方に「ミニゲーム練習」を追加（スコアが高いほど難しく。10ラウンド・20ラウンドでごほうびG）<br>
+                    ・練習は毎回ルール説明つき。ミニゲームごとに制限時間・段階的な難しさ（枚数・ボタン・石板・星の数が増える等）を追加<br>
+                    ・まだ遊んでいないミニゲームは「？？？」表示<br>
+                    ・季節のミニゲームは、その時期なら（エリア未解放でも）練習で遊べます<br>
+                    ・練習中のBGMはメニューのまま（別タブに移動してもボス曲が鳴らない）<br>
+                    ・季節イベントエリアのBGMを専用曲に変更<br>
+                    ・タイトル画面に、アンケート（1分）へのリンクを追加<br>
+                    ・図鑑に「並べ替え」ボタンを追加（希少度順／逆順／五十音順／逆順）<br>
+                    ・メインメニューに今日の日付を表示（クリアスターと重ならないよう調整）<br>
+                    ・設定（音・難易度・バイブなど）が保存され、次回起動時も引き継がれるように<br>
+                    ・「すべての実績を達成した」実績を削除。残り実績数のカウントのズレを修正<br>
+                    ・ハズレの「海の宝箱」を「宝箱」に、「海はゴミ箱じゃないよ」を水辺向けの言葉に変更<br>
+                    ・魚影の向きを正しい向きに統一。ベニザケのファイル名を修正<br>
+                    ・結果画面の🏠も、少し待ってから押せるように<br>
+                    <br>
                     ==V3.0.0======<br>
                     【大型アップデート】<br>
                     <b>🎣 あそびが変わった</b><br>
@@ -359,7 +390,7 @@
             </div>
         </div>
 
-        <button class="btn" style="margin-top: 8px; padding: 6px 25px; font-size: 14px;" onclick="closeConfigModal()">閉じる</button>
+        <button class="btn" style="margin-top: 10px; padding: 6px 25px; font-size: 15px;" onclick="closeConfigModal()">閉じる</button>
     </div>
 
     <!-- ショップ画面 -->
@@ -454,22 +485,23 @@
             <div class="howto-step small">PC：↑↓←→で選ぶ ／ Zで決定 ／ Xで戻る</div>
         </div>
         <button class="btn howto-practice" onclick="replayTutorial()">🎣 練習してみる（ごほうびなし）</button>
+        <button class="btn howto-practice" id="howto-sp-btn" style="display:none;" onclick="openPracticeList()">🎮 ミニゲーム練習（スコアに挑戦）</button>
         <button class="btn" style="padding: 8px 25px; font-size: 15px;" onclick="closeHowToPlay()">閉じる</button>
     </div>
 
     <!-- レベルアップ modal -->
     <div id="levelup-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 28px; color: #ffd700; text-shadow: 3px 3px 0 #8b0000; margin-bottom: 8px;">LEVEL UP!!</div>
-        <div id="levelup-text" style="font-size: 18px; color: #fff; font-weight: bold; margin-bottom: 10px;">釣りレベルが Lv.2 に上がった！</div>
-        <div id="levelup-unlock-text" style="font-size: 14px; color: #00ffcc; margin-bottom: 15px;">🌊 新エリア「川」が解放されました！</div>
-        <button class="btn" style="font-size: 16px; padding: 8px 25px;" onclick="closeLevelUpModal()">最高だ！</button>
+        <div style="font-family: 'Reggae One', cursive; font-size: 32px; color: #ffd700; text-shadow: 3px 3px 0 #8b0000; margin-bottom: 8px;">LEVEL UP!!</div>
+        <div id="levelup-text" style="font-size: 20px; color: #fff; font-weight: bold; margin-bottom: 10px;">釣りレベルが 2 に上がった！</div>
+        <div id="levelup-unlock-text" style="font-size: 15px; color: #00ffcc; margin-bottom: 20px;">🌊 新エリア「川」が解放されました！</div>
+        <button class="btn" style="font-size: 18px; padding: 8px 30px;" onclick="closeLevelUpModal()">最高だ！</button>
     </div>
 
     <!-- マップ選択 modal -->
     <div id="map-modal" class="modal">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">釣り場を選択</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">釣り場を選択</div>
         <div class="map-grid" id="map-grid"></div>
-        <button class="btn" style="margin-top: 10px; padding: 6px 20px; flex-shrink: 0;" onclick="closeMapModal()">閉じる</button>
+        <button class="btn" style="margin-top: 12px; padding: 6px 20px; flex-shrink: 0;" onclick="closeMapModal()">閉じる</button>
     </div>
 
     <!-- リザルト modal -->
@@ -488,13 +520,13 @@
         <div id="result-bonus"></div>
         <div id="result-time" style="font-size: 14px; color: #00ffcc; margin-bottom: 15px;">反応速度: 0.000秒</div>
         <button class="btn" id="next-btn" style="font-size: 16px; padding: 8px 20px;" onclick="closeResult()">次へ進む</button>
-        <button class="btn" style="font-size: 14px; padding: 8px 12px; margin-left: 6px;" onclick="menuFromResult()">🏠</button>
+        <button class="btn" id="result-home-btn" style="font-size: 14px; padding: 8px 12px; margin-left: 6px;" onclick="menuFromResult()">🏠</button>
     </div>
 
     <!-- 図鑑 modal -->
     <div id="zukan-modal" class="modal">
         <div class="zukan-header">
-            <span style="font-family: 'Reggae One', cursive; font-size: 18px; color: #ffd700;">おさかな絵巻</span>
+            <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">おさかな絵巻</span>
             <div>
                                 <button class="btn zukan-close" style="position:absolute;top:10px;right:14px;z-index:40;" onclick="closeZukan()">閉じる</button>
             </div>
@@ -503,6 +535,7 @@
         <div class="zukan-main-tabs">
             <button class="zukan-main-tab active" id="zukan-tab-normal" onclick="switchZukanCategory('normal')">通常エリア</button>
             <button class="zukan-main-tab" id="zukan-tab-gacha" onclick="switchZukanCategory('gacha')">ガチャエリア</button>
+            <button class="zukan-main-tab" id="zukan-tab-event" onclick="switchZukanCategory('event')">イベントエリア</button>
         </div>
 
         <div class="zukan-progress-container">
@@ -523,11 +556,11 @@
     <div id="zukan-detail-modal" class="modal">
         <div id="zukan-detail-title">---</div>
         <img id="zukan-detail-img" src="" alt="Fish Detail" onclick="zoomImage(this.src)">
-        <div style="font-size: 12px; color: #aaa; margin-bottom: 6px;">(タップで生物を拡大表示)</div>
+        <div style="font-size: 12px; color: #aaa; margin-bottom: 8px;">(タップで生物を拡大表示)</div>
         <div id="zukan-detail-desc">---</div>
-        <div id="zukan-detail-price" style="font-size: 13px; color: #ffd700; margin-bottom: 4px;">買取価格: 0 G</div>
+        <div id="zukan-detail-price" style="font-size: 14px; color: #ffd700; margin-bottom: 4px;">買取価格: 0 G</div>
         <div id="zukan-detail-time">最速記録: ---秒</div>
-        <button class="btn" style="padding: 6px 20px; font-size: 14px; margin-top: 8px;" onclick="closeZukanDetail()">閉じる</button>
+        <button class="btn" style="padding: 8px 20px; font-size: 15px; margin-top: 10px;" onclick="closeZukanDetail()">閉じる</button>
     </div>
 
     <!-- デイリーミッション modal -->
@@ -577,7 +610,7 @@
 <!-- ランキング modal -->
 <div id="ranking-modal" class="modal">
     <div class="modal-content">
-        <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 10px; flex-shrink: 0;">⚡ 最速反応速度ランキング ⚡</div>
+        <div style="font-family: 'Reggae One', cursive; font-size: 22px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">⚡ 最速反応速度ランキング ⚡</div>
         
         <div style="width:100%; flex:1; overflow-y:auto; padding: 4px;">
             <div id="ranking-list" class="ranking-list">
@@ -585,7 +618,7 @@
             </div>
         </div>
 
-        <button class="btn" style="margin-top: 8px; padding: 6px 25px; font-size: 14px;" onclick="closeRankingModal()">閉じる</button>
+        <button class="btn" style="margin-top: 10px; padding: 6px 25px; font-size: 15px;" onclick="closeRankingModal()">閉じる</button>
     </div>
 </div>
 
@@ -593,7 +626,7 @@
 <div id="equip-screen" class="modal">
     <div class="modal-content equip-modal-content">
         <div class="equip-header">
-            <span style="font-family: 'Reggae One', cursive; font-size: 18px; color: #ffd700;">装備変更</span>
+            <span style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700;">装備変更</span>
             <button class="btn" onclick="closeEquipScreen()">閉じる</button>
         </div>
 
@@ -659,6 +692,7 @@
 <script src="fishfacing.js"></script>
 <script src="script.js"></script>
 <script src="addons.js"></script>
+<script src="events.js"></script>
 <script>
   // ファイルの取り違え対策：script.js が正しく読み込めていない時に知らせる
   window.addEventListener('DOMContentLoaded', function () {

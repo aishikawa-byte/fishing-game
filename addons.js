@@ -76,7 +76,7 @@ addFish([
     { id: 348, name: "ブリ", location: "sea3", size: "big", price: 750, weight: 14, image: "images/fish/buri.png", desc: "成長で名前が変わる出世魚の代表。" },
     { id: 349, name: "メバチマグロ", location: "sea3", size: "big", price: 1200, weight: 10, image: "images/fish/mebatimaguro.png", desc: "大きな目が特徴のマグロ。" },
     { id: 350, name: "カリフォルニアアシカ", location: "sea3", toolType: "net", size: "big", price: 1100, weight: 8, image: "images/fish/kariforuniaasika.png", desc: "【網限定】芸達者で知られる人気者の海獣。" },
-    { id: 351, name: "ベニザケ", location: "river", size: "midi", price: 320, weight: 14, image: "images/fish/binizake.png", desc: "真っ赤な婚姻色になるサケの仲間。" },
+    { id: 351, name: "ベニザケ", location: "river", size: "midi", price: 320, weight: 14, image: "images/fish/benizake.png", desc: "真っ赤な婚姻色になるサケの仲間。" },
     { id: 352, name: "ムツゴロウ", location: "swamp", size: "small", price: 220, weight: 22, image: "images/fish/mutugorou.png", desc: "干潟で跳ねる、愛嬌たっぷりの魚。" },
     { id: 353, name: "シシャモ", location: "lake", size: "small", price: 130, weight: 28, image: "images/fish/sisyamo.png", desc: "卵をぎっしり抱えた北海道の名物。" },
     { id: 354, name: "ゴマフアザラシ", location: "snow", toolType: "net", size: "midi", price: 420, weight: 16, image: "images/fish/gomahuazarasi.png", desc: "【網限定】ごま模様がかわいいアザラシ。" },
@@ -214,11 +214,21 @@ addTrivia({
     387: "漢字では「鰆」。春の味覚として知られているよ。"
 });
 
-// ---- 魚影の向き（新しい画像はすべて頭が左向き） ----
-setFacing({ 300: 'L', 301: 'L', 302: 'L', 303: 'L', 304: 'L', 305: 'L', 306: 'L', 307: 'L', 308: 'L', 309: 'L', 310: 'L', 311: 'L', 312: 'L', 313: 'L', 314: 'L', 315: 'L', 316: 'L', 317: 'L', 318: 'L', 319: 'L', 320: 'L', 321: 'L', 322: 'L', 323: 'L', 324: 'L', 325: 'L', 326: 'L', 327: 'L', 328: 'L', 329: 'L', 330: 'L', 331: 'L', 332: 'L', 333: 'L', 334: 'L', 335: 'L', 336: 'L', 337: 'L', 338: 'L', 339: 'L', 340: 'L', 341: 'L', 342: 'L', 343: 'L', 344: 'L', 345: 'L', 346: 'L', 347: 'L', 348: 'L', 349: 'L', 350: 'L', 351: 'L', 352: 'L', 353: 'L', 354: 'L', 355: 'L', 356: 'L', 357: 'L', 358: 'L', 359: 'L', 360: 'L', 361: 'L', 362: 'L', 363: 'L', 364: 'L', 365: 'L', 366: 'L', 367: 'L', 368: 'L', 369: 'L', 370: 'L', 371: 'L', 372: 'L', 373: 'L', 374: 'L', 375: 'L', 376: 'L', 377: 'L', 378: 'L', 379: 'L', 388: 'L', 380: 'L', 381: 'L', 382: 'L', 383: 'L', 384: 'L', 385: 'L', 386: 'L', 387: 'L' });
+// ---- 魚影の向き ----
+// 向きは fishfacing.js に一本化しました（300〜388 もそちらで設定）。個別に足すときだけ setFacing({ id: 'L' }) を使ってください。
 
 // ---- サカバンバスピス（深海）の絵を新しい画像に差し替え（Ver 2.7.1） ----
 FISH_DATA.find(f => f.id === 108).image = "images/fish/sakabanbasupisu.png";
+
+/* ===================================================
+   Ver 3.0.1  さざ波の海に「オジサン」（画像 images/fish/ojisan.png を置くと登場します）
+   =================================================== */
+addFishWhenImage([
+    { id: 389, name: "オジサン", location: "sea", size: "small", price: 140, weight: 14, image: "images/fish/ojisan.png", desc: "あごの下に2本のヒゲがある魚。名前も見た目も、なんだかオジサン。" }
+]);
+addTrivia({ 389: "正式名ではなく、ヒメジ科の魚の呼び名。あごのヒゲで砂の中のエサを探すよ。" });
+setFacing({ 389: 'L' });
+setCm({ 389: 25 });
 
 /* ===================================================
    新しく足すとき（コピーして使ってください）
@@ -235,5 +245,5 @@ FISH_DATA.find(f => f.id === 108).image = "images/fish/sakabanbasupisu.png";
    setCm({ 400: 12, 401: 40 });            // 実物サイズ(cm)。魚影の大きさに使われます（無ければ size から自動）
    setSpecial({ 401: 'dodge' });           // 特別な捕まえ方を指定（timing/follow/dodge/rhythm/charge/guard/match/simon/shell/sort/lights/odd/pop）
    ※ 各エリアの竿・網で「出現の重み(weight)が一番小さい生き物」は、自動で特別な捕まえ方（ミニゲーム）になります。
-   ※ id は他と重ならない番号にしてください。今回の追加は 300〜388 まで使用済みです。
+   ※ id は他と重ならない番号にしてください。今回の追加は 300〜389 まで使用済みです（400〜459 はイベントエリア用）。
    =================================================== */

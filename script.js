@@ -1,3 +1,4 @@
+
 /* ===================================================
 マップ（釣り場）設定
 =================================================== */
@@ -87,7 +88,7 @@ const NET_DATA = {
    新規アクセサリ＆消耗品データ
    =================================================== */
 const ACC_DATA = {
-    maki_esa: { id: "maki_esa", name: "まき餌", icon: "images/acc/maki_esa.png", price: 4500, desc: "消耗品。装備中、魚がかかるまでの待ち時間が短縮！" },
+    maki_esa: { id: "maki_esa", name: "まき餌", icon: "images/acc/maki_esa.png", price: 12000, desc: "消耗品。装備中、魚がかかるまでの待ち時間が短縮！" },
     line_tough: { id: "line_tough", name: "丈夫な釣り糸", icon: "images/acc/line_tough.png", price: 15000, desc: "竿用。ミス時に20%の確率で無効化してセーフ！" },
     net_tough: { id: "net_tough", name: "補強ネット", icon: "images/acc/net_tough.png", price: 15000, desc: "網用。ミス時に20%の確率で無効化してセーフ！" },
     bait_reel: { id: "bait_reel", name: "ベイトリール", icon: "images/acc/bait_reel.png", price: 12000, desc: "竿用。大物との戦いでの連打パワーがアップ！" },
@@ -468,7 +469,7 @@ let playerData = {
     easyMode: false,
     vibrationEnabled: true,
     clearCount: 0,
-    isReincarnated: false,
+    isReincarnated: false
 };
 
 let caughtFish = JSON.parse(localStorage.getItem('retro_fishing_zukan_v4')) || {};
@@ -546,7 +547,9 @@ function setToolMode(mode) {
     playWaterPlop();
 }
 
+function menuDateText() { const d = new Date(); return (d.getMonth() + 1) + '月' + d.getDate() + '日'; }
 function updateMenuUI() {
+    const _md = document.getElementById('menu-date'); if (_md) _md.innerText = menuDateText();
     const curExp = playerData.exp % 100;
     const curLevel = playerData.level;
     const percent = curExp;
@@ -596,15 +599,19 @@ function updateMenuUI() {
         const count = playerData.clearCount || 0;
 
         if (count === 0) {
+            // 未クリア：非表示
             clearBadge.style.display = "none";
         } else if (count === 1) {
+            // 1回クリア：★
             clearBadge.innerText = "★";
             clearBadge.style.display = "flex";
         } else {
+            // 2回目以降：★x2, ★x3 ...
             clearBadge.innerText = `★x${count}`;
             clearBadge.style.display = "flex";
         }
     }
+
     document.getElementById('header-level').innerText = curLevel;
     document.getElementById('header-exp-percent').innerText = percent;
     document.getElementById('header-level-bar-inner').style.width = `${percent}%`;
@@ -953,7 +960,7 @@ let isToastShowing = false;
 function checkAchievements() {
     if (!playerData.achievements) playerData.achievements = [];
 
-    const totalUnlockedFish = Object.keys(caughtFish).filter(id => caughtFish[id] && caughtFish[id].unlocked).length;
+    const totalUnlockedFish = Object.keys(caughtFish).filter(id => caughtFish[id] && caughtFish[id].unlocked && !(FISH_DATA.find(f => f.id == id) && zukanCatOf(FISH_DATA.find(f => f.id == id)) === 'event')).length;
 
     const rodCatches = playerData.totalCatches || 0;
     const netCatches = playerData.netCatches || 0;
@@ -1001,7 +1008,7 @@ function checkAchievements() {
         { id: "net_master", cond: netCatches >= 100 },
         { id: "net_combo_master", cond: netCombo >= 30 },
 
-        { id: "zukan_master", cond: totalUnlockedFish >= FISH_DATA.length },
+        { id: "zukan_master", cond: totalUnlockedFish >= FISH_DATA.filter(f => zukanCatOf(f) !== 'event').length },
 
         { id: "miss_master", cond: (playerData.missCount || 0) >= 50 },
         { id: "thousand_catches", cond: grandTotalCatches >= 1000 },
@@ -1059,7 +1066,6 @@ function processAchievementQueue() {
 
 /* 全データ初期化（コンプ100%時の転生対応版） */
 /* 全データ初期化（実績・周回星マークの選択保持対応版） */
-/* 全データ初期化（★保持時はプレイ時間・所持道具・捕獲数を引き継ぐ） */
 function resetAllData() {
     // 通常・ガチャ両方の図鑑コンプリート判定
     const isNormal100 = checkCategoryCompPercent('normal') === 100;
@@ -1078,52 +1084,42 @@ function resetAllData() {
     const c2 = window.confirm("本当によろしいですか？この操作は取り消せません。");
     if (!c2) return;
 
-    // 実績・称号（および道具やプレイ時間）を削除するかどうかの確認
+    // ▼ 追加：実績・称号（および周回数・星）を削除するかどうかの確認 ▼
     let deleteAchievements = true;
     if (isFullComp) {
+        // コンプ達成時は実績を消すか残すかを選択
         deleteAchievements = window.confirm(
             "【実績・称号データの取り扱い】\n\n" +
             "「OK (はい)」  : 実績・称号データと周回数(★)もリセットします。\n" +
-            "「キャンセル (いいえ)」: 実績・称号データ・道具・プレイ時間・捕獲数を残し、周回数(★)も加算して引き継ぎます。"
+            "「キャンセル (いいえ)」: 実績・称号データを残し、周回数(★)も加算して引き継ぎます。"
         );
     } else {
-        deleteAchievements = window.confirm("実績・称号データおよびクリア記録(★)も削除しますか？\n（「いいえ」を選ぶと実績・道具・プレイ時間・周回数はそのまま残ります）");
+        // 通常のリセット時は確認
+        deleteAchievements = window.confirm("実績・称号データおよびクリア記録(★)も削除しますか？\n（「いいえ」を選ぶと実績と周回数はそのまま残ります）");
     }
 
+    // 既存実績・周回数の引き継ぎ用処理
     let nextAchievements = [];
     let nextClearCount = 0;
-    
-    // 引き継ぎ用変数のセット
-    let nextPlayTime = 0;
-    let nextOwnedRods = ["wood"];
-    let nextOwnedNets = ["bug_net"];
-    let nextOwnedAccs = [];
-    let nextTotalCatches = 0;
-    let nextNetCatches = 0;
 
     if (!deleteAchievements) {
-        // ★を残す（キャンセル）場合：実績、道具、プレイ時間、捕獲数を保持して引き継ぐ
+        // 「いいえ（消さない）」を選んだ場合：実績と周回数を保持＆加算
         nextAchievements = playerData.achievements || [];
         nextClearCount = playerData.clearCount || 0;
-        nextPlayTime = playerData.playTimeSeconds || 0;
-        nextOwnedRods = playerData.ownedRods || ["wood"];
-        nextOwnedNets = playerData.ownedNets || ["bug_net"];
-        nextOwnedAccs = playerData.ownedAccs || [];
-        nextTotalCatches = playerData.totalCatches || 0;
-        nextNetCatches = playerData.netCatches || 0;
 
         if (isFullComp) {
-            nextClearCount += 1;
+            nextClearCount += 1; // 周回数を加算（★が増える）
             if (!nextAchievements.includes('hero_reincarnation')) {
-                nextAchievements.push('hero_reincarnation');
+                nextAchievements.push('hero_reincarnation'); // 転生実績付与
             }
         }
     } else if (isFullComp) {
-        // ★を消す（OK）が転生条件達成時の場合
+        // 「はい（消す）」を選んだが転生条件達成の場合：実績は全消去するが、転生実績のみ新しく付与
         nextAchievements = ['hero_reincarnation'];
-        nextClearCount = 0;
+        nextClearCount = 0; // 周回数・星もリセット
     }
 
+    // ローカルストレージデータの削除
     localStorage.removeItem('retro_fishing_zukan_v4');
     localStorage.removeItem('retro_fishing_player_v1');
     localStorage.removeItem('retro_fishing_ranking_v1');
@@ -1136,32 +1132,25 @@ function resetAllData() {
         { fishName: "名無し", time: 0.320 }
     ];
 
+    // 新規プレイヤーデータ生成（コンプ100%転生時は 10,000 G スタート）
     playerData = {
         level: 1, 
         exp: 0, 
-        gold: isFullComp ? 10000 : 0, // コンプ時 10,000 G
-        equippedRod: "wood", 
-        ownedRods: nextOwnedRods,
-        equippedNet: "bug_net", 
-        ownedNets: nextOwnedNets,
-        equippedRodAcc: null, 
-        equippedBait: null,
-        equippedNetAcc: null, 
-        equippedNetReel: null,
-        ownedAccs: nextOwnedAccs,
-        unlockedGachaMaps: [], 
-        totalCatches: nextTotalCatches, 
-        currentCombo: 0,
-        netCatches: nextNetCatches, 
-        netCombo: 0, 
-        missCount: 0,
-        achievements: nextAchievements,
-        playTimeSeconds: nextPlayTime,
+        gold: isFullComp ? 10000 : 0, // ★ 10,000 G スタート
+        equippedRod: "wood", ownedRods: ["wood"],
+        equippedNet: "bug_net", ownedNets: ["bug_net"],
+        equippedRodAcc: null, equippedBait: null,
+        equippedNetAcc: null, equippedNetReel: null,
+        ownedAccs: [],
+        unlockedGachaMaps: [], totalCatches: 0, currentCombo: 0,
+        netCatches: 0, netCombo: 0, missCount: 0,
+        achievements: nextAchievements, // 選択に応じた実績データ
+        playTimeSeconds: 0,
         hasSeenHowTo: false,
         hasSeenGachaNotice: false,
         easyMode: false,
         vibrationEnabled: true,
-        clearCount: nextClearCount,
+        clearCount: nextClearCount, // 選択に応じた周回数（星）
         isReincarnated: isFullComp
     };
 
@@ -1180,11 +1169,7 @@ function resetAllData() {
 
 /* 指定カテゴリ（normal / gacha）の図鑑コンプリート率（%）を取得するヘルパー関数 */
 function checkCategoryCompPercent(catKey) {
-    const targetFishList = FISH_DATA.filter(fish => {
-        const map = MAP_DATA[fish.location];
-        const isGacha = map && map.gacha;
-        return catKey === 'gacha' ? isGacha : !isGacha;
-    });
+    const targetFishList = FISH_DATA.filter(fish => zukanCatOf(fish) === (catKey === 'gacha' ? 'gacha' : 'normal'));   // イベントエリアはコンプ対象外
 
     if (targetFishList.length === 0) return 0;
     const unlockedCount = targetFishList.filter(fish => caughtFish[fish.id] && caughtFish[fish.id].unlocked).length;
@@ -1292,6 +1277,7 @@ function buyItem(type, key) {
 function openHowToPlay() {
     closeAllModals();
     document.getElementById('howto-modal').style.display = "flex";
+    if (typeof practiceKinds === 'function') { const pb = byId('howto-sp-btn'); if (pb) pb.style.display = practiceKinds().length ? '' : 'none'; }   // 遊んだミニゲームがあるときだけ表示
     if (!playerData.hasSeenHowTo) {
         playerData.hasSeenHowTo = true;
         savePlayerData();
@@ -1324,6 +1310,7 @@ function renderMapGrid() {
 
     Object.keys(MAP_DATA).forEach(locKey => {
         const map = MAP_DATA[locKey];
+        if (map.event) return;      // イベントエリアは下でまとめて表示
         let isUnlocked = playerData.level >= map.reqLevel;
         
         if (map.gacha) {
@@ -1344,11 +1331,13 @@ function renderMapGrid() {
         }
         grid.appendChild(btn);
     });
+    renderEventMapButtons(grid);
 }
 
 function selectLocation(locKey) {
     const map = MAP_DATA[locKey];
     if (!map) return;
+    if (map.event && !eventAreaOpen(locKey)) return;     // イベントエリアは「解放済み」かつ「開催期間中」だけ
 
     if (map.gacha) {
         if (!playerData.unlockedGachaMaps.includes(locKey)) return;
@@ -1408,11 +1397,7 @@ function resetGameStateToReady() {
 }
 
 function renderZukanGrid() {
-    const currentCategoryFishList = FISH_DATA.filter(fish => {
-        const map = MAP_DATA[fish.location];
-        const isGacha = map && map.gacha;
-        return currentZukanMainTab === 'gacha' ? isGacha : !isGacha;
-    });
+    const currentCategoryFishList = FISH_DATA.filter(fish => zukanCatOf(fish) === currentZukanMainTab);
 
     const totalFish = currentCategoryFishList.length;
     const unlockedCount = currentCategoryFishList.filter(fish => caughtFish[fish.id] && caughtFish[fish.id].unlocked).length;
@@ -1429,8 +1414,17 @@ function renderZukanGrid() {
         return fish.location === currentFilter;
     });
 
-    listToDisplay.sort(zukanCompare);
+    const isEvTab = currentZukanMainTab === 'event';
+    const showHeads = zukanSortList(listToDisplay, isEvTab);
+    let _lastMonthHead = null;
     listToDisplay.forEach(fish => {
+        if (isEvTab && showHeads && fish.month !== _lastMonthHead) {        // 月ごとの見出し
+            _lastMonthHead = fish.month;
+            const hd = document.createElement('div');
+            hd.className = 'zukan-month-head';
+            hd.innerText = eventMonthLabel(fish.month);
+            gridContainer.appendChild(hd);
+        }
         const fishRecord = caughtFish[fish.id];
         const isUnlocked = fishRecord && fishRecord.unlocked;
         const card = document.createElement('div');
@@ -1727,6 +1721,7 @@ function loadPlayerData() {
             playerData = Object.assign({}, playerData, parsed);
         } catch(e) {}
     }
+    soundEnabled = playerData.soundEnabled !== false;   // 音のON/OFFも保存（Ver 3.1.0）
 }
 
 /* ===================================================
@@ -2051,6 +2046,19 @@ function openCheatPrompt() {
         message = "✨ 100,000G・全道具・全エリアをすべて獲得しました！";
         isSuccess = true;
     } 
+    else if (code === "eventall092365") {
+        playerData.eventAllOpen = true;
+        message = "🎍 季節イベントのエリアとミニゲームが、期間に関係なくすべて遊べるようになりました！（解除：EventClose087234）";
+        isSuccess = true;
+    }
+    else if (code === "eventclose087234") {
+        playerData.eventAllOpen = false;
+        message = "🎍 季節イベントを、通常の開催期間だけ遊べる状態にもどしました。";
+        isSuccess = true;
+    }
+    else if (redeemSecretCode(input.trim())) {     // 小瓶の手紙に書かれた合言葉（Ver 3.0.1）
+        return;
+    }
     else {
         alert("合言葉が違います。");
         return;
@@ -2153,8 +2161,6 @@ function updateAccSlotUI(slotKey, imgId, nameId, defaultText) {
 
 let currentSelectingSlot = "";
 
-/* アクセサリを複数所持・装備可能にするポップアップ表示制御 */
-/* 装備品選択ポップアップ（スロットごとのアクセサリ制限対応版） */
 function openEquipSelectModal(slotType) {
     currentSelectingSlot = slotType;
     const modal = document.getElementById('equip-select-modal');
@@ -2164,22 +2170,16 @@ function openEquipSelectModal(slotType) {
     let items = [];
     let currentEquipped = "";
 
-    // 1. 釣り竿本体
     if (slotType === 'rod') {
         items = playerData.ownedRods.map(k => ROD_DATA[k]);
         currentEquipped = playerData.equippedRod;
-    } 
-    // 2. 捕獲ネット本体
-    else if (slotType === 'net') {
+    } else if (slotType === 'net') {
         items = playerData.ownedNets.map(k => NET_DATA[k]);
         currentEquipped = playerData.equippedNet;
-    } 
-    // 3. アクセサリ・消耗品スロット群
-    else {
+    } else {
         const accKeys = playerData.ownedAccs || [];
-        const allOwnedAccs = accKeys.map(k => ACC_DATA[k]).filter(item => item !== undefined);
+        items = accKeys.map(k => ACC_DATA[k]).filter(item => item !== undefined);
 
-        // 竿用アクセサリ枠（丈夫な釣り糸、ベイトリール ＋ まき餌）
         if (slotType === 'rodAcc') {
             items = items.filter(i => accSlot(i) === 'rodAcc');
             currentEquipped = playerData.equippedRodAcc;
@@ -2195,7 +2195,6 @@ function openEquipSelectModal(slotType) {
         }
     }
 
-    // アクセサリ枠の場合は「外す」ボタンを表示
     if (slotType !== 'rod' && slotType !== 'net') {
         const unequipDiv = document.createElement('div');
         unequipDiv.className = "equip-select-item";
@@ -2319,8 +2318,8 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.0.0";
-const CSS_VERSION = "30-g";
+const APP_VERSION = "3.1.0";
+const CSS_VERSION = "30-p";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2528,9 +2527,10 @@ function playBgm(path) {
 function updateStageBgm() {
     if (!soundEnabled) return;
     let p;
-    if (gameState === 'TITLE' || gameState === 'MENU' || gameState === 'GACHA' || isZukanOpen) {
+    const gs = (typeof spState !== 'undefined' && spState && spState.practice) ? (spState.prevState || 'MENU') : gameState;   // ミニゲーム練習は、元の画面のBGMのまま
+    if (gs === 'TITLE' || gs === 'MENU' || gs === 'GACHA' || isZukanOpen) {
         p = 'sounds/title.mp3';
-    } else if (gameState === 'BATTLE' || gameState === 'SPECIAL') {
+    } else if (gs === 'BATTLE' || gs === 'SPECIAL') {
         p = 'sounds/boss.mp3';
     } else {
         const m = MAP_DATA[currentLocation];
@@ -2541,6 +2541,8 @@ function updateStageBgm() {
 
 function toggleSound() {
     soundEnabled = !soundEnabled;
+    playerData.soundEnabled = soundEnabled;
+    savePlayerData();
     initAudio();
     if (soundEnabled) { updateStageBgm(); playWaterPlop(); }
     else { bgmWant = null; pauseAllBgm(); }
@@ -2702,8 +2704,7 @@ function showFakeBite(token) {
     timerId = setTimeout(() => {
         if (waitToken !== token || gameState !== 'WAITING') return;
         hideOmen();
-        setStatus("違った…", "#fff");
-        timerId = setTimeout(() => { if (gameState === 'WAITING') startWaiting(); }, 800);
+        haulTrash();      // 「違った…」の代わりに、ゴミが釣れる（Ver 3.0.1）
     }, 1100);
 }
 
@@ -2770,7 +2771,7 @@ function netFail() {
     const s = netState;
     if (!s) return;
     const fish = s.fish;
-    if (playerData.equippedNetAcc === 'net_tough' && Math.random() < 0.2) {   // 補強ネットの救済
+    if (fxHas('net_tough') && Math.random() < 0.2) {   // 補強ネットの救済
         stopNet();
         currentTargetFish = fish;
         netRatio = reactionTime = 0.9;
@@ -2969,12 +2970,14 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirs
         failReason = 'late';
     }
     byId('result-modal').style.display = "block";
+    const homeBtn = byId('result-home-btn');
     nextBtn.disabled = true;
+    if (homeBtn) homeBtn.disabled = true;      // 🏠も、次へと同じ時間だけ押せない（連打での誤操作防止）
     let count = 1.5;
     nextBtn.innerText = `…`;
     const iv = setInterval(() => {
         count -= 0.5;
-        if (count <= 0) { clearInterval(iv); nextBtn.disabled = false; nextBtn.innerText = "次へ"; }
+        if (count <= 0) { clearInterval(iv); nextBtn.disabled = false; nextBtn.innerText = "次へ"; if (homeBtn) homeBtn.disabled = false; }
     }, 500);
 }
 
@@ -3071,6 +3074,8 @@ window.goToMenuFromHeader = function () {
 };
 
 function menuFromResult() {
+    const hb = byId('result-home-btn');
+    if (hb && hb.disabled) return;
     pendingLevelUp = null;
     goToMenuFromHeader();
 }
@@ -3156,7 +3161,7 @@ function claimMission(id) {
 }
 
 /* ===================================================
-   ガチャ画面の切り替え（イベントガチャ ⇄ ノーマルガチャ）
+   ガチャ画面の切り替え（レアガチャ ⇄ ノーマルガチャ）
    ・ノーマルガチャはEXPを獲得しません
    =================================================== */
 
@@ -3262,12 +3267,13 @@ function bindSecrets() {
    図鑑：エリア選択ウィンドウ／最後に開いたページを記憶／豆知識
    =================================================== */
 function zukanAreaKeys() {
-    return Object.keys(MAP_DATA).filter(k => !!MAP_DATA[k].gacha === (currentZukanMainTab === 'gacha'));
+    return Object.keys(MAP_DATA).filter(k => zukanCatOfArea(k) === currentZukanMainTab);
 }
 
 function areaUnlocked(k) {
     const m = MAP_DATA[k];
     if (!m) return false;
+    if (m.event) return eventUnlocked(k);
     return m.gacha ? !!(playerData.unlockedGachaMaps && playerData.unlockedGachaMaps.includes(k)) : playerData.level >= m.reqLevel;
 }
 
@@ -3284,6 +3290,7 @@ function switchZukanCategory(cat, keepFilter) {
     if (!keepFilter) currentFilter = 'all';
     byId('zukan-tab-normal').className = `zukan-main-tab ${cat === 'normal' ? 'active' : ''}`;
     byId('zukan-tab-gacha').className = `zukan-main-tab ${cat === 'gacha' ? 'active' : ''}`;
+    byId('zukan-tab-event').className = `zukan-main-tab ${cat === 'event' ? 'active' : ''}`;
     renderZukanSubFilterUI();
     renderZukanGrid();
     if (!keepFilter) saveZukanState();
@@ -3306,6 +3313,49 @@ function renderZukanSubFilterUI() {
     c.disabled = !n;
     c.onclick = clearZukanNew;
     box.appendChild(c);
+    const so = document.createElement('button');
+    so.className = 'zukan-sort-btn';
+    so.innerHTML = `↕ 並べ替え：<b>${ZUKAN_SORTS[zukanSortKey()].label}</b>`;
+    so.onclick = cycleZukanSort;
+    box.style.flexWrap = 'wrap';
+    box.appendChild(so);
+}
+
+/* ---------- 図鑑の並べ替え（Ver 3.1.0） ---------- */
+const ZUKAN_SORTS = {
+    rare: { label: '希少度・サイズ順' },
+    rareRev: { label: '希少度・サイズ逆順' },
+    kana: { label: '五十音順' },
+    kanaRev: { label: '五十音逆順' }
+};
+const zukanSortKey = () => (ZUKAN_SORTS[playerData.zukanSort] ? playerData.zukanSort : 'rare');
+function cycleZukanSort() {
+    const ks = Object.keys(ZUKAN_SORTS), i = ks.indexOf(zukanSortKey());
+    playerData.zukanSort = ks[(i + 1) % ks.length];
+    savePlayerData();
+    renderZukanSubFilterUI();
+    renderZukanGrid();
+    byId('zukan-grid').scrollTop = 0;
+    playSE && playSE('tap');
+}
+// 漢字をふくむ名前の読み（五十音順用）。新しい生き物に漢字を使うときは addYomi で足してください。
+const FISH_YOMI = {
+    '赤ベタ': 'あかべた', '青ベタ': 'あおべた', '青ハナゴイ': 'あおはなごい', '桃ハナゴイ': 'ももはなごい', 'ハチの幼虫': 'はちのようちゅう', '羊の頭蓋骨': 'ひつじのずがいこつ',
+    '竜宮の金フラスコ': 'りゅうぐうのきんふらすこ', '海底の財宝箱': 'かいていのざいほうばこ', '伝説の黄金剣': 'でんせつのおうごんけん', '龍神の黄金冠': 'りゅうじんのおうごんかん',
+    'ポセイドンの三叉槍': 'ぽせいどんのさんさそう', '貝殻': 'かいがら', '琥珀': 'こはく', '龍の翡翠玉': 'りゅうのひすいだま', '海賊の金貨袋': 'かいぞくのきんかぶくろ',
+    '青真珠のネックレス': 'あおしんじゅのねっくれす', '古代の金の壺': 'こだいのきんのつぼ', '三葉虫': 'さんようちゅう', 'カブトガニの化石': 'かぶとがにのかせき', 'アンモナイトの化石': 'あんもないとのかせき',
+    'ネッシーの化石': 'ねっしーのかせき', '金塊タートル': 'きんかいたーとる', '花咲ガニ': 'はなさきがに', '初夢マダイ': 'はつゆめまだい', 'しし舞ガニ': 'ししまいがに', '出世ブリ': 'しゅっせぶり',
+    '宝船マンボウ': 'たからぶねまんぼう', 'まつり金魚': 'まつりきんぎょ'
+};
+function addYomi(map) { Object.assign(FISH_YOMI, map); }
+const yomiOf = (f) => (FISH_YOMI[f.name] || f.name).replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/[ー・\s]/g, '');
+function zukanSortList(list, isEvTab) {
+    const key = zukanSortKey(), rev = key === 'rareRev' || key === 'kanaRev';
+    if (key === 'kana' || key === 'kanaRev') {
+        list.sort((a, b) => yomiOf(a).localeCompare(yomiOf(b), 'ja') || a.id - b.id);
+    } else list.sort(isEvTab ? eventZukanCompare : zukanCompare);
+    if (rev) list.reverse();
+    return key === 'rare' || key === 'rareRev';      // 月見出しを出すか
 }
 
 function openZukanAreaModal() {
@@ -3340,7 +3390,7 @@ function openZukan() {
     closeAllModals();
     updateStageBgm();
     const st = playerData.zukanState || {};
-    switchZukanCategory(st.tab === 'gacha' ? 'gacha' : 'normal', false);
+    switchZukanCategory(['gacha', 'event'].includes(st.tab) ? st.tab : 'normal', false);
     if (st.filter && st.filter !== 'all' && zukanAreaKeys().includes(st.filter)) {
         currentFilter = st.filter;
         renderZukanSubFilterUI();
@@ -3581,9 +3631,8 @@ function updateDifficultyUI() {
 /* ---------- 道具の効果（ここで一括管理。強化レベル・難易度も反映） ---------- */
 function upgLv(id) { return (playerData.upgrades && playerData.upgrades[id]) || 0; }
 function fx() {
-    const p = playerData, o = { limitMul: 1, limitAdd: 0, tapAdd: 0, decayMul: 1, bigMul: 1, rareMul: 1, goldMul: 1, waitMul: 1, ring: 1, netSlow: 1, netNeed1: false, spLeniency: 1, fakeMul: 1, rankMul: 1, spHp: 0, expMul: 1, swingsAdd: 0 };
-    const slots = currentToolMode === 'rod' ? [p.equippedRodAcc, p.equippedBait] : [p.equippedNetAcc, p.equippedNetReel];
-    const has = (id) => slots.includes(id);
+    const p = playerData, o = { limitMul: 1, limitAdd: 0, tapAdd: 0, decayMul: 1, bigMul: 1, rareMul: 1, goldMul: 1, waitMul: 1, ring: 1, netSlow: 1, netNeed1: false, spLeniency: 1, fakeMul: 1, trashLuck: 1, rankMul: 1, spHp: 0, expMul: 1, swingsAdd: 0 };
+    const has = fxHas;
     if (currentToolMode === 'rod') {
         const rod = p.equippedRod || 'wood', gachaArea = !!(MAP_DATA[currentLocation] && MAP_DATA[currentLocation].gacha);
         if (rod === 'iron') { o.tapAdd += 4; o.decayMul *= 0.7; o.limitAdd += 0.03; }
@@ -3594,8 +3643,8 @@ function fx() {
         if (rod === 'dragon_rod') { o.limitMul *= 1.3; if (gachaArea) o.bigMul *= 2.0; }
         const lv = upgLv(rod);
         o.limitAdd += 0.02 * lv; o.goldMul *= 1 + 0.02 * lv; o.tapAdd += 0.5 * lv;
-        if (p.equippedRodAcc === 'bait_reel') o.tapAdd += 5;
-        if (p.equippedBait === 'maki_esa') o.waitMul *= 0.8;
+        if (has('bait_reel')) o.tapAdd += 5;
+        if (has('maki_esa')) o.waitMul *= 0.8;
     } else {
         const net = p.equippedNet || 'bug_net';
         o.ring *= 1 + 0.03 * upgLv(net);
@@ -3603,7 +3652,7 @@ function fx() {
         if (net === 'iron_net') o.goldMul *= 1.03;
         if (net === 'steel_net') { o.goldMul *= 1.08; o.spLeniency *= 1.15; }
         if (net === 'divine_net') { o.netSlow *= 0.8; o.netNeed1 = true; o.goldMul *= 1.15; o.spLeniency *= 1.4; }
-        if (p.equippedNetReel === 'net_fixed' || p.equippedNetAcc === 'net_fixed') { o.ring *= 1.15; o.spLeniency *= 1.1; }
+        if (has('net_fixed')) { o.ring *= 1.15; o.spLeniency *= 1.1; }
     }
     // ---- アクセサリー（追加分）----
     if (has('float')) o.fakeMul *= 0.3;
@@ -3615,6 +3664,8 @@ function fx() {
     if (has('net_pole')) o.swingsAdd += 1;
     if (has('lantern')) o.netSlow *= 0.88;
     if (has('net_buoy')) o.ring *= 1.08;
+    if (has('magnet')) o.fakeMul *= 2.5;        // ニセのアタリ＝ゴミ
+    if (has('trash_bait')) o.trashLuck *= 3;    // 小瓶・宝箱が出やすい
     return o;
 }
 // 道具の説明文を、実際の効果に合わせて更新
@@ -3630,7 +3681,7 @@ Object.assign(NET_DATA.tough_net, { desc: "輪がやや大きい。普通サイ�
 Object.assign(NET_DATA.iron_net, { desc: "輪が大きい。大きな獲物も狙える。売値+3%。" });
 Object.assign(NET_DATA.steel_net, { desc: "輪がとても大きい。売値+8%・特別な戦いが少し楽に。" });
 Object.assign(NET_DATA.divine_net, { desc: "最強の網。輪が最大・魚の動き20%ゆっくり・大物も1回で捕獲・売値+15%・特別な戦いが楽に。" });
-Object.assign(ACC_DATA.maki_esa, { desc: "装備中、魚がかかるまでの待ち時間が20%短くなる。" });
+Object.assign(ACC_DATA.maki_esa, { desc: "装備中、魚がかかるまでの待ち時間が20%短くなる。", price: 12000 });
 Object.assign(ACC_DATA.line_tough, { desc: "竿用。反応が遅れた時、20%の確率で失敗を無効にする。" });
 Object.assign(ACC_DATA.net_tough, { desc: "網用。空振りした時、20%の確率で捕獲成功にする。" });
 Object.assign(ACC_DATA.bait_reel, { desc: "竿用。連打パワー+5。" });
@@ -3740,7 +3791,7 @@ function hitAction() {
         else finishCatch(true);
     };
     if (reactionTime <= limit) { proceed(); return; }
-    if (currentToolMode === 'rod' && playerData.equippedRodAcc === 'line_tough' && Math.random() < 0.20) {
+    if (currentToolMode === 'rod' && fxHas('line_tough') && Math.random() < 0.20) {
         setStatus("装備の力で回避！", "#00ffcc");
         proceed();
         return;
@@ -3913,7 +3964,7 @@ let spCache = { n: -1, map: {} };
 function rarestMap() {
     if (spCache.n === FISH_DATA.length) return spCache.map;
     const groups = {};
-    FISH_DATA.forEach(f => { const k = f.location + '|' + (f.toolType || 'rod'); (groups[k] = groups[k] || []).push(f); });
+    FISH_DATA.forEach(f => { const k = f.location + '|' + (f.toolType || 'rod') + (f.month ? '|' + f.month : ''); (groups[k] = groups[k] || []).push(f); });
     const m = {};
     Object.keys(groups).forEach(k => {
         const g = groups[k];
@@ -4380,7 +4431,7 @@ const SECRET_HINTS = {
     secret_sound: 'スピーカーのボタンを、たくさん鳴らしてみよう。'
 };
 Object.keys(SECRET_HINTS).forEach(k => { if (ACHIEVEMENT_DATA[k]) ACHIEVEMENT_DATA[k].shint = SECRET_HINTS[k]; });
-ACHIEVEMENT_DATA.all_clear = { id: 'all_clear', name: '爆釣一閃の伝説', icon: _IC.g, desc: 'すべての実績を達成した', hint: 'すべての実績をそろえた時、何かが起こる…', secret: false };
+// 「すべての実績を達成した」は実績としては廃止（達成すると殿堂入りの演出だけが起こります）
 ACHIEVEMENT_DATA.special_5 = { id: 'special_5', name: '勝負師', icon: _IC.s, desc: '特別な戦いに5回勝った', hint: '希少な生き物は、普通には捕まらない…' };
 ACHIEVEMENT_DATA.upgrade_10 = { id: 'upgrade_10', name: '工房の常連', icon: _IC.c, desc: '道具を合計10回強化した', hint: 'ゴールドの使い道は、工房にある' };
 
@@ -4391,9 +4442,12 @@ window.checkAchievements = function () {
     const p = playerData;
     if ((p.specialWins || 0) >= 5) unlockAch('special_5');
     if ((p.upgradeCount || 0) >= 10) unlockAch('upgrade_10');
-    const ids = Object.keys(ACHIEVEMENT_DATA).filter(k => k !== 'all_clear');
-    if (!p.achievements.includes('all_clear') && ids.every(k => p.achievements.includes(k))) {
-        unlockAch('all_clear');
+    if ((p.trashCount || 0) >= 100) unlockAch('trash_100');
+    if (Object.keys(ACC_DATA).every(k => (p.ownedAccs || []).includes(k))) unlockAch('comp_all_accs');
+    if (Object.keys(p.upgrades || {}).some(k => p.upgrades[k] >= UPG_MAX)) unlockAch('upgrade_max');
+    if (p.achievements.includes('all_clear')) { p.hallOfFame = true; p.achievements = p.achievements.filter(k => k !== 'all_clear'); savePlayerData(); }   // 旧データ：実績としては外し、殿堂入りだけ残す
+    const ids = Object.keys(ACHIEVEMENT_DATA);
+    if (!p.hallOfFame && ids.every(k => p.achievements.includes(k))) {
         p.gold += 100000;
         p.hallOfFame = true;
         savePlayerData();
@@ -4403,7 +4457,7 @@ window.checkAchievements = function () {
 };
 function applyHallOfFame() {
     // 実績「爆釣一閃の伝説」を持っていれば、データをリセットして実績を引き継いだ後も殿堂入りの証を表示する
-    if (!playerData.hallOfFame && (playerData.achievements || []).includes('all_clear')) { playerData.hallOfFame = true; savePlayerData(); }
+    if (!playerData.hallOfFame && (playerData.achievements || []).includes('all_clear')) { playerData.hallOfFame = true; playerData.achievements = playerData.achievements.filter(k => k !== 'all_clear'); savePlayerData(); }
     document.body.classList.toggle('hof', !!playerData.hallOfFame);
     const t = byId('menu-title');
     if (t) t.innerText = playerData.hallOfFame ? '👑 メインメニュー 👑' : 'メインメニュー';
@@ -4753,12 +4807,13 @@ const ACH_GROUPS = [
     ['🥅 網で捕まえる', ['net_first', 'net_apprentice', 'net_master', 'net_combo_master']],
     ['⚡ 腕前', ['perfect_10', 'perfect_100', 'big_10', 'zorome', 'special_5']],
     ['📊 通算', ['thousand_catches', 'miss_master']],
-    ['💰 お金・道具', ['rich_man', 'ultra_rich', 'buy_all_shop', 'comp_all_rods', 'comp_all_nets', 'upgrade_10']],
+    ['💰 お金・道具', ['rich_man', 'ultra_rich', 'buy_all_shop', 'comp_all_rods', 'comp_all_nets', 'comp_all_accs', 'upgrade_10', 'upgrade_max']],
+    ['🗑 海のお掃除', ['trash_100']],
     ['📅 ミッション・ガチャ', ['mission_10', 'ngacha_20']],
     ['🗺 エリア', ['all_maps']],
     ['📖 エリアの図鑑コンプリート', ['comp_sea', 'comp_river', 'comp_swamp', 'comp_lake', 'comp_snow', 'comp_underground', 'comp_deepsea', 'comp_volcano', 'comp_honey', 'comp_holy', 'comp_ryugu', 'comp_ruins', 'comp_poison', 'comp_milkyway', 'comp_eldorado', 'comp_shinju']],
     ['🔍 ひみつ', ['secret_logo', 'secret_menu', 'secret_level', 'secret_weather', 'secret_gold', 'secret_zukan', 'secret_sound']],
-    ['👑 最終章', ['all_clear', 'zukan_master', 'hero_reincarnation', 'returned_friend']]
+    ['👑 最終章', ['zukan_master', 'hero_reincarnation', 'returned_friend']]
 ];
 function achOrder() {
     const used = new Set(), out = [];
@@ -4772,7 +4827,7 @@ function achOrder() {
     return out;
 }
 function renderAchievementList() {
-    const keys = Object.keys(ACHIEVEMENT_DATA), got = playerData.achievements || [];
+    const keys = Object.keys(ACHIEVEMENT_DATA), got = (playerData.achievements || []).filter((k, i, a) => ACHIEVEMENT_DATA[k] && a.indexOf(k) === i);   // 存在しない/重複した実績IDは数えない
     const percent = keys.length ? Math.floor((got.length / keys.length) * 100) : 0;
     byId('achievement-progress-num').innerText = `${percent}% (${got.length}/${keys.length})`;
     byId('achievement-progress-bar-inner').style.width = `${percent}%`;
@@ -4796,7 +4851,7 @@ function renderAchievementList() {
     });
 }
 
-/* イベントガチャ：演出つき・結果は画面中央に表示 */
+/* レアガチャ：演出つき・結果は画面中央に表示 */
 let evBusy = false;
 const _spinGacha = spinGacha;
 window.spinGacha = function (count) {
@@ -4942,9 +4997,9 @@ function spCursor(g, cells, cols, press) {
 
 
 SPG.match = function (a, P) {
-    const icons = ['🍯', '🐝', '🌼', '🍓'], deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
-    const box = spGridBox(a, 4, 2, 8), cells = deck.map(d => spCell(box, d));
-    let phase = 'show', timer = 2.6 / P.sp, open = [], matched = 0, lock = 0, lives = P.hp + 2;
+    const pairs = P.pairs || 4, icons = ['🍯', '🐝', '🌼', '🍓', '🧁', '🍰'].slice(0, pairs), deck = [...icons, ...icons].sort(() => Math.random() - 0.5);
+    const mcols = pairs === 4 ? 4 : (pairs === 5 ? 5 : 4), box = spGridBox(a, mcols, 2 + (pairs === 6 ? 1 : 0), 8), cells = deck.map(d => spCell(box, d, pairs > 4 ? 'font-size:28px;' : ''));
+    let phase = 'show', timer = (2.6 + (pairs - 4) * 0.5) / P.sp, open = [], matched = 0, lock = 0, lives = P.hp + 2;
     const down = (i) => { cells[i].innerHTML = '❓'; cells[i].style.background = 'linear-gradient(#a9792e,#6a431a)'; };
     a.hearts(lives); a.say('絵を覚えて！ すぐ裏返るよ'); a.prog(0);
     const press = (i) => {
@@ -4959,22 +5014,23 @@ SPG.match = function (a, P) {
                 lock -= dt;
                 if (lock <= 0) {
                     const [p, q] = open; open = [];
-                    if (deck[p] === deck[q]) { cells[p]._m = cells[q]._m = true; cells[p].style.background = cells[q].style.background = 'linear-gradient(#7be0a0,#2a9a5a)'; matched++; a.prog(matched / 4); a.flash('ペア！', '#7fff7f'); playSE('success'); if (matched >= 4) a.win(); }
+                    if (deck[p] === deck[q]) { cells[p]._m = cells[q]._m = true; cells[p].style.background = cells[q].style.background = 'linear-gradient(#7be0a0,#2a9a5a)'; matched++; a.prog(matched / pairs); a.flash('ペア！', '#7fff7f'); playSE('success'); if (matched >= pairs) a.win(); }
                     else { down(p); down(q); lives--; a.hearts(lives); a.flash('ちがう…', '#ff7777'); playSE('foul'); if (lives <= 0) a.lose(); }
                 }
             }
         }
     };
-    return spCursor(g, cells, 4, press);
+    return spCursor(g, cells, mcols, press);
 };
 
 SPG.simon = function (a, P) {
-    const cols = [['#3a8dff', '🔵'], ['#ffd23a', '🟡'], ['#ff6bd0', '🟣'], ['#3aff8a', '🟢']], freq = [392, 494, 587, 784];
-    const box = spGridBox(a, 2, 2, 10), cells = cols.map(([c, e]) => spCell(box, e, `background:${c};opacity:.5;font-size:46px;`));
+    const nb = P.btn || 4, goalN = P.need || 4;
+    const cols = [['#3a8dff', '🔵'], ['#ffd23a', '🟡'], ['#ff6bd0', '🟣'], ['#3aff8a', '🟢'], ['#ff7a3a', '🟠'], ['#b07aff', '🟤']].slice(0, nb), freq = [392, 494, 587, 784, 880, 988];
+    const box = spGridBox(a, nb > 4 ? 3 : 2, 2, 10), cells = cols.map(([c, e]) => spCell(box, e, `background:${c};opacity:.5;font-size:46px;`));
     let round = 0, seq = [], pos = 0, phase = 'gap', timer = 0.9, showIdx = 0, lit = -1, lives = P.hp;
     const light = (i, on) => { cells[i].style.opacity = on ? 1 : 0.5; cells[i].style.transform = on ? 'scale(1.06)' : 'none'; if (on) playTone(freq[i], 0.25, 'triangle'); };
     const start = (fresh) => {
-        if (fresh) { if (!seq.length) seq = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)]; else seq.push(Math.floor(Math.random() * 4)); }   // 前の順番のまま、1つ足す
+        if (fresh) { if (!seq.length) seq = [Math.floor(Math.random() * nb), Math.floor(Math.random() * nb)]; else seq.push(Math.floor(Math.random() * nb)); }   // 前の順番のまま、1つ足す
         phase = 'show'; showIdx = 0; lit = -1; timer = 0.7; a.say(`光る順番を覚えて…（${seq.length}こ）`);
     };
     a.hearts(lives); a.prog(0); a.say('よく見ていてね');
@@ -4983,7 +5039,7 @@ SPG.simon = function (a, P) {
         light(i, true); setTimeout(() => light(i, false), 180);
         if (i === seq[pos]) {
             pos++;
-            if (pos >= seq.length) { round++; a.prog(round / 4); a.flash('せいかい！', '#7fff7f'); if (round >= 4) return a.win(); phase = 'gap'; timer = 0.9; }
+            if (pos >= seq.length) { round++; a.prog(round / goalN); a.flash('せいかい！', '#7fff7f'); if (round >= goalN) return a.win(); phase = 'gap'; timer = 0.9; }
         } else {
             lives--; a.hearts(lives); a.flash('ちがう！', '#ff7777'); playSE('foul');
             if (lives <= 0) return a.lose(); phase = 'gap'; timer = 0.9; g._replay = true;
@@ -5000,7 +5056,7 @@ SPG.simon = function (a, P) {
             }
         }
     };
-    return spCursor(g, cells, 2, press);
+    return spCursor(g, cells, nb > 4 ? 3 : 2, press);
 };
 
 SPG.shell = function (a, P) {
@@ -5011,7 +5067,7 @@ SPG.shell = function (a, P) {
     let round = 0, lives = P.hp, phase = 'idle', timer = 0.5, swaps = 0, pearlShell = 0;
     const place = () => { sh.forEach(s => { s.e.style.left = xs[s.slot] + 'px'; }); pearl.style.left = xs[sh[pearlShell].slot] + 'px'; };
     const lift = (s, up) => { s.e.style.top = (up ? baseTop - 34 : baseTop) + 'px'; };
-    const begin = () => { sh.forEach((s, i) => { s.slot = i; lift(s, false); }); pearlShell = Math.floor(Math.random() * 3); place(); pearl.style.opacity = 1; lift(sh[pearlShell], true); phase = 'show'; timer = 1.2; swaps = 3 + round * 2 + (P.sp > 1.1 ? 2 : 0); a.say('真珠の場所を覚えて！'); };
+    const begin = () => { sh.forEach((s, i) => { s.slot = i; lift(s, false); }); pearlShell = Math.floor(Math.random() * 3); place(); pearl.style.opacity = 1; lift(sh[pearlShell], true); phase = 'show'; timer = 1.2; swaps = 3 + round * 2 + (P.sp > 1.1 ? 2 : 0) + (P.extra || 0); a.say('真珠の場所を覚えて！'); };
     a.hearts(lives); a.prog(0);
     const g = {
         update(dt) {
@@ -5043,13 +5099,13 @@ SPG.shell = function (a, P) {
 
 
 SPG.odd = function (a, P) {
-    const dims = [[3, 3], [4, 4], [5, 4]], syms = [['⭐', '🌟'], ['🌙', '🌛'], ['💫', '✨']];
+    const dims = [[3, 3], [4, 4], [5, 4], [6, 5], [6, 6]], syms = [['⭐', '🌟'], ['🌙', '🌛'], ['💫', '✨'], ['⭐', '🌟'], ['🌙', '🌛'], ['💫', '✨']], off = P.off || 0;
     let r = 0, lives = P.hp, cells = [], odd = 0, time = 0, limit = 7 / P.sp, box = null;
     const g = { update(dt) { time -= dt; if (time <= 0) miss(); } };
     const build = () => {
-        a.stage.innerHTML = ''; const [c, rw] = dims[r]; box = spGridBox(a, c, rw, 6);
+        a.stage.innerHTML = ''; const [c, rw] = dims[Math.min(dims.length - 1, r + off)]; box = spGridBox(a, c, rw, 6);
         cells = []; odd = Math.floor(Math.random() * c * rw);
-        for (let i = 0; i < c * rw; i++) cells.push(spCell(box, i === odd ? syms[r][1] : syms[r][0], `font-size:${c > 4 ? 22 : 28}px;`));
+        for (let i = 0; i < c * rw; i++) cells.push(spCell(box, i === odd ? syms[(r + off) % 6][1] : syms[(r + off) % 6][0], `font-size:${c > 5 ? 17 : (c > 4 ? 22 : 28)}px;`));
         time = limit; a.say(`ちがう星はどれ？（${r + 1}/3問）`); a.hearts(lives); a.prog(r / 3);
         spCursor(g, cells, c, press);
     };
@@ -5097,7 +5153,7 @@ SPG.run = function (a, P) {
     const goal = spEl('', a.stage, { position: 'absolute', left: (x1 + 4) + 'px', top: (trackY - 24) + 'px', fontSize: '34px' }); goal.innerText = '🏁';
     const runner = spEl('', a.stage, { position: 'absolute', top: (trackY - 20) + 'px', fontSize: '38px', transition: 'left .06s linear' }); runner.innerHTML = mgImg('runner', '🏃', 40);
     const lamp = spEl('', a.stage, { position: 'absolute', left: (W / 2 - 46) + 'px', top: '14px', width: '92px', height: '40px', borderRadius: '20px', border: '3px solid #d8b66a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 'bold', color: '#fff' });
-    let pos = 0, phase = 'go', timer = (1.6 + Math.random()) / 1, holding = false, hp = P.hp, penal = false, time = 24 / Math.pow(P.sp, 0.6);
+    let pos = 0, phase = 'go', timer = (1.6 + Math.random()) / 1, holding = false, hp = P.hp, penal = false, time = 24 / Math.pow(P.sp, 0.6) * (P.timeMul || 1);
     const setPhase = (p) => {
         phase = p; penal = false;
         if (p === 'go') { timer = (1.4 + Math.random() * 1.1); lamp.style.background = '#2fbf5a'; lamp.innerText = 'GO!'; }
@@ -5153,16 +5209,16 @@ SPG.deliver = function (a, P) {
 };
 
 SPG.sort = function (a, P) {
-    const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ'], k = P.sp < 0.9 ? 4 : (P.sp > 1.1 ? 7 : 5);
-    const W = a.W, gap = 8, tw = (W - 20 - gap * 4) / 5, th = Math.min(120, tw * 1.55), top = (a.H - th) / 2 + 14;
+    const N = P.n || 5, runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚷ', 'ᚹ'].slice(0, N), k = P.sp < 0.9 ? 4 : (P.sp > 1.1 ? 7 : 5);
+    const W = a.W, gap = N > 5 ? 5 : 8, tw = (W - 20 - gap * (N - 1)) / N, th = Math.min(120, tw * 1.55), top = (a.H - th) / 2 + 14;
     const slotX = (i) => 10 + i * (tw + gap);
-    let vals = [1, 2, 3, 4, 5], sel = -1, cur = 0, busy = 0;
-    for (let n = 0; n < k; n++) { const i = Math.floor(Math.random() * 4); [vals[i], vals[i + 1]] = [vals[i + 1], vals[i]]; }
+    let vals = Array.from({ length: N }, (_, i) => i + 1), sel = -1, cur = 0, busy = 0;
+    for (let n = 0; n < k + (N - 5) * 2; n++) { const i = Math.floor(Math.random() * (N - 1)); [vals[i], vals[i + 1]] = [vals[i + 1], vals[i]]; }
     if (vals.every((v, i) => v === i + 1)) { [vals[0], vals[1]] = [vals[1], vals[0]]; }
-    let moves = k + (P.sp < 0.9 ? 6 : (P.sp > 1.1 ? 2 : 4));
-    const goal = spEl('', a.stage, { position: 'absolute', left: '10px', right: '10px', top: '14px', textAlign: 'center', fontSize: '15px', color: '#ffe9a0', textShadow: '1px 1px 0 #000' }); goal.innerText = 'ᚠ → ᚢ → ᚦ → ᚨ → ᚱ';
+    let moves = k + (N - 5) * 3 + (P.sp < 0.9 ? 6 : (P.sp > 1.1 ? 2 : 4));
+    const goal = spEl('', a.stage, { position: 'absolute', left: '10px', right: '10px', top: '14px', textAlign: 'center', fontSize: '15px', color: '#ffe9a0', textShadow: '1px 1px 0 #000' }); goal.innerText = runes.join(' → ');
     const tabs = {};   // 石板（数字ごと）。位置が変わると、左右にすべるように動く
-    for (let v = 1; v <= 5; v++) {
+    for (let v = 1; v <= N; v++) {
         const e = spEl('', a.stage, { position: 'absolute', top: top + 'px', width: tw + 'px', height: th + 'px', borderRadius: '10px', border: '3px solid #bba777', background: 'linear-gradient(#9b988f,#55524c)', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 0 10px rgba(255,255,255,.25),0 3px 0 #2a2824', transition: 'left .3s cubic-bezier(.3,1.5,.5,1), transform .2s, border-color .2s, box-shadow .2s', userSelect: 'none' });
         e.innerHTML = `<div style="font-size:30px;line-height:1.1;">${runes[v - 1]}</div><div style="font-size:18px;">${v}</div>`;
         tabs[v] = e;
@@ -5181,15 +5237,15 @@ SPG.sort = function (a, P) {
         A.style.transform = 'translateY(-16px)'; B.style.transform = 'translateY(14px)';   // 片方は浮き、片方は沈みながら入れかわる
         place(); A.style.transform = 'translateY(-16px)'; B.style.transform = 'translateY(14px)';
         setTimeout(() => { place(); }, 190);
-        const done = vals.filter((v, n) => v === n + 1).length; a.prog(done / 5);
-        if (done === 5) { busy = 9; setTimeout(() => a.win(), 450); }
+        const done = vals.filter((v, n) => v === n + 1).length; a.prog(done / N);
+        if (done === N) { busy = 9; setTimeout(() => a.win(), 450); }
         else if (moves <= 0) { busy = 9; a.flash('回数切れ…', '#ff7777'); setTimeout(() => a.lose(), 450); }
     };
-    a.say('となり同士を入れかえて、1→5の順に並べよう'); a.prog(0);
+    a.say(`となり同士を入れかえて、1→${N}の順に並べよう`); a.prog(0);
     const g = {
         update(dt) { if (busy > 0 && busy < 8) busy -= dt; },
-        down(x) { const i = Math.floor((x - 10) / (tw + gap)); if (i >= 0 && i < 5) press(i); },
-        keyPress(code) { g._kb = true; if (code === 'ArrowLeft') cur = (cur + 4) % 5; if (code === 'ArrowRight') cur = (cur + 1) % 5; place(); },
+        down(x) { const i = Math.floor((x - 10) / (tw + gap)); if (i >= 0 && i < N) press(i); },
+        keyPress(code) { g._kb = true; if (code === 'ArrowLeft') cur = (cur + N - 1) % N; if (code === 'ArrowRight') cur = (cur + 1) % N; place(); },
         keyDown() { press(cur); }
     };
     place();
@@ -5258,4 +5314,662 @@ function imgFallback(im) {
     if (im.dataset.fb) return;
     im.dataset.fb = '1';
     im.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="72" font-size="64" text-anchor="middle">🎒</text></svg>');
+}
+
+
+/* ===================================================
+   Ver 3.0.1  ゴミ・小瓶・宝箱 ／ 最強アクセサリー ／ 実績
+   ---------------------------------------------------
+   ・ニセのアタリ（ぴくっ…？）が来ると、「違った」の代わりにゴミが釣れる（全エリア）
+   ・ゴミの中から、ごくまれに「手紙入りの小瓶」「宝箱」
+   ・小瓶の手紙に書かれた言葉を 設定の「コード入力」に入れると、イベントエリアの解放やアイテム入手
+   ・合言葉の一覧・イベントエリアのデータは events.js にまとめてあります
+   =================================================== */
+
+/* ---------- 最強アクセサリー：他のアクセサリーの効果を全部持つ ---------- */
+const ACC_ULT = {
+    ult_rod: ['line_tough', 'bait_reel', 'scope', 'compass', 'magnet'],
+    ult_bait: ['maki_esa', 'glow_bait', 'gold_lure', 'exp_bait', 'trash_bait'],
+    ult_net: ['net_tough', 'net_pole', 'lantern', 'net_scope'],
+    ult_reel: ['net_fixed', 'net_buoy', 'net_gold']
+};
+// いま装備している（今のモードの）アクセサリーが、その効果を持つか
+function fxHas(id) {
+    const p = playerData;
+    const slots = currentToolMode === 'rod' ? [p.equippedRodAcc, p.equippedBait] : [p.equippedNetAcc, p.equippedNetReel];
+    return slots.some(e => e === id || (ACC_ULT[e] && ACC_ULT[e].includes(id)));
+}
+Object.assign(ACC_NEW, {
+    magnet: { name: 'ゴミよせマグネット', price: 15000, slot: 'rodAcc', emoji: '🧲', desc: '竿用。ニセのアタリ（ゴミ）が来やすくなる（約2.5倍）。小瓶や宝箱を狙おう。' },
+    trash_bait: { name: 'ゴミよせのエサ', price: 15000, slot: 'bait', emoji: '🧴', desc: 'エサ枠。ゴミの中から「小瓶」「宝箱」が出る確率が3倍。' },
+    ult_rod: { name: '究極の釣り糸', price: 150000, slot: 'rodAcc', emoji: '🌈', desc: '竿用の全能力：ミス20%無効・連打+5・PERFECT判定25%ゆるく・特別な戦いのミス+1・ゴミよせ。（うきの代わりにゴミよせ）' },
+    ult_bait: { name: '究極のエサ', price: 120000, slot: 'bait', emoji: '🍣', desc: 'エサ枠の全能力：待ち時間-20%・大物×1.3・売値+8%・EXP+15%・小瓶/宝箱3倍。' },
+    ult_net: { name: '究極の補助ネット', price: 110000, slot: 'netAcc', emoji: '🕸', desc: '網の補助の全能力：空振り20%救済・空振り回数+1・魚の動き12%ゆっくり・PERFECT判定25%ゆるく。' },
+    ult_reel: { name: '究極の網かざり', price: 90000, slot: 'netReel', emoji: '👑', desc: '網かざりの全能力：輪+15%と+8%・売値+8%・特別な戦いが少し楽に。' }
+});
+Object.keys(ACC_NEW).forEach(k => { if (!ACC_DATA[k]) ACC_DATA[k] = Object.assign({ id: k, icon: `images/acc/${k}.png` }, ACC_NEW[k]); });
+Object.assign(ACC_DATA.float, { desc: '竿用。ニセのアタリ（ゴミ）が出にくくなる（発生率-70%）。' });
+
+/* ---------- ゴミ ---------- */
+const TRASH_LIST = [
+    { k: 'kutu', name: '片方だけのくつ', emoji: '👞', say: '持ち主はどこへ…？' },
+    { k: 'kan', name: 'さびた空き缶', emoji: '🥫', say: '水辺は、みんなの場所だよ！' },
+    { k: 'tire', name: '古いタイヤ', emoji: '⭕', say: 'ずっしり重い…！' },
+    { k: 'ryuuboku', name: '流木', emoji: '🪵', say: 'どこから流れてきたのかな。' },
+    { k: 'kire', name: 'ぼろ布', emoji: '🧦', say: 'ぐっしょり濡れている。' },
+    { k: 'kaisou', name: 'からまった海藻', emoji: '🌿', say: 'ゴミ…？ でも元気そう。' }
+];
+const trashImg = (k) => `images/trash/trash_${k}.png`;
+const TRASH_RARE = { bottle: 0.015, chest: 0.015 };        // ゴミ1回あたり（アクセサリーなしの時）
+const BOTTLE_IMG = 'images/trash/trash_bin.png', CHEST_IMG = 'images/trash/trash_takarabako.png';
+const emojiSvg = (e) => 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="72" font-size="64" text-anchor="middle">${e}</text></svg>`);
+function imgEmoji(im, e) { if (im.dataset.fb) return; im.dataset.fb = '1'; im.src = emojiSvg(e); }
+
+function showTrashPop(it) {
+    let el = byId('trash-pop');
+    if (!el) { el = document.createElement('div'); el.id = 'trash-pop'; byId('game-container').appendChild(el); }
+    el.innerHTML = `<img src="${trashImg(it.k)}" width="76" height="76" alt="" onerror="imgEmoji(this,'${it.emoji}')"><div class="tp-name">🗑 ${it.name}を釣り上げた！</div><div class="tp-say">${it.say}</div><div class="tp-cnt">お掃除 ${playerData.trashCount || 0} こ目</div>`;
+    el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
+}
+function hideTrashPop() { const el = byId('trash-pop'); if (el) el.classList.remove('on'); }
+
+// ニセのアタリの結果。force = 'trash' | 'bottle' | 'chest'（テスト用）
+function haulTrash(force) {
+    hideFishShadow();
+    byId('ripple-effect').style.display = 'none';
+    byId('exclamation').style.display = 'none';
+    const p = playerData;
+    p.trashCount = (p.trashCount || 0) + 1;
+    const luck = fx().trashLuck || 1;
+    let kind = force;
+    if (!kind) {
+        const r = Math.random();
+        kind = r < TRASH_RARE.bottle * luck ? 'bottle' : (r < (TRASH_RARE.bottle + TRASH_RARE.chest) * luck ? 'chest' : 'trash');
+    }
+    savePlayerData();
+    checkAchievements();
+    if (kind === 'bottle') { playSE('levelup'); openBottle(); return; }
+    if (kind === 'chest') { playSE('levelup'); openChest(); return; }
+    const it = TRASH_LIST[Math.floor(Math.random() * TRASH_LIST.length)];
+    gameState = 'TRASH';
+    setStatus('ゴミだった…', '#ccc');
+    playSE('foul');
+    showTrashPop(it);
+    timerId = setTimeout(() => {
+        if (gameState !== 'TRASH') return;
+        hideTrashPop();
+        startWaiting();
+    }, 1900);
+}
+
+// 結果ウィンドウで「次へ」「🏠」を少しのあいだ押せなくする
+let _lockIv = null;
+function lockResultButtons(sec) {
+    const nb = byId('next-btn'), hb = byId('result-home-btn');
+    clearInterval(_lockIv);
+    nb.disabled = true; if (hb) hb.disabled = true;
+    nb.innerText = '…';
+    let left = sec;
+    _lockIv = setInterval(() => {
+        left -= 0.5;
+        if (left <= 0) { clearInterval(_lockIv); nb.disabled = false; nb.innerText = '次へ'; if (hb) hb.disabled = false; }
+    }, 500);
+}
+// 小瓶・宝箱の結果表示（結果ウィンドウを流用）
+function showFind(o) {
+    gameState = 'RESULT';
+    lastCastSuccess = true;
+    updateStageBgm();
+    const img = byId('result-img');
+    img.style.animation = 'none'; img.offsetHeight; img.style.animation = null;
+    img.classList.remove('silhouette'); img.classList.add('clickable-fish');
+    img.onerror = () => { img.onerror = null; img.src = emojiSvg(o.emoji); };
+    img.src = o.img;
+    const t = byId('result-title'); t.innerText = o.title; t.style.color = '#ffd700';
+    byId('result-rank').innerHTML = '';
+    byId('result-bonus').innerHTML = o.chips || '';
+    byId('result-name').innerText = o.name;
+    const pr = byId('result-price'); pr.style.display = 'block'; pr.innerText = o.line;
+    byId('result-time').innerText = o.sub || '';
+    byId('result-new-badge').style.display = 'none';
+    byId('result-hint').style.display = 'none';
+    byId('result-modal').style.display = 'block';
+    lockResultButtons(o.wait || 1.5);
+}
+
+/* ---------- 手紙入りの小瓶 ---------- */
+function pickBottleCode() {
+    if (typeof BOTTLE_CODES === 'undefined') return null;
+    const p = playerData, used = p.usedCodes || {}, ev = p.eventAreas || {}, now = eventMonthNow();
+    const pool = BOTTLE_CODES.filter(c => c.area ? (MAP_DATA[c.area] && !ev[c.area]) : !used[c.code]);
+    if (!pool.length) return null;
+    const w = (c) => c.area ? (MAP_DATA[c.area].months.includes(now) ? 6 : 1) : 2;     // いま開催中のエリアの手紙は出やすい
+    let r = Math.random() * pool.reduce((s, c) => s + w(c), 0);
+    for (const c of pool) { r -= w(c); if (r < 0) return c; }
+    return pool[0];
+}
+function openBottle() {
+    const p = playerData, e = pickBottleCode();
+    if (!p.bottleNotes) p.bottleNotes = [];
+    let line, sub;
+    if (e) {
+        if (!p.bottleNotes.includes(e.code)) p.bottleNotes.push(e.code);
+        if (p.bottleNotes.length > 40) p.bottleNotes.shift();
+        line = `中には「${e.code}」と書かれていた…`;
+        sub = '（どこかで使えるかもしれない…）';
+    } else {
+        p.gold += 5000;
+        line = '中には「ありがとう」と書かれていた…';
+        sub = 'お礼に 5,000G がはさまっていた！';
+        updateMenuUI();
+    }
+    savePlayerData();
+    showFind({ title: '📜 手紙入りの小瓶！', img: BOTTLE_IMG, emoji: '🍾', name: '手紙入りの小瓶', line, sub, wait: 3 });
+}
+// 設定の「拾った手紙」：いままで拾った言葉を読み返せる
+function openBottleNotes() {
+    const n = playerData.bottleNotes || [];
+    alert(n.length ? '📜 拾った手紙\n\n' + n.map(c => `・${c}`).join('\n') : 'まだ手紙を拾っていません。');
+}
+
+/* ---------- 宝箱 ---------- */
+const CHEST_TABLE = [
+    { w: 34, kind: 'gold', mul: 1 }, { w: 14, kind: 'gold', mul: 3 },
+    { w: 14, kind: 'buff', k: 'exp', min: 5 }, { w: 14, kind: 'buff', k: 'gold', min: 5 },
+    { w: 11, kind: 'buff', k: 'frenzy', min: 3 }, { w: 8, kind: 'buff', k: 'big', min: 5 }, { w: 5, kind: 'buff', k: 'super', min: 3 }
+];
+function openChest() {
+    const p = playerData;
+    let r = Math.random() * CHEST_TABLE.reduce((s, x) => s + x.w, 0), e = CHEST_TABLE[0];
+    for (const x of CHEST_TABLE) { r -= x.w; if (r < 0) { e = x; break; } }
+    let line;
+    if (e.kind === 'gold') {
+        const g = Math.round((1500 + (p.level || 1) * 30) * e.mul / 10) * 10;
+        p.gold += g;
+        line = `金貨 ${g.toLocaleString()}G が入っていた！`;
+    } else {
+        addBuff(e.k, e.min);
+        line = `${BUFFS[e.k].ico} ${BUFFS[e.k].name} が ${e.min}分間つく！`;
+    }
+    savePlayerData(); updateMenuUI(); updateHud();
+    showFind({ title: '🎁 宝箱を見つけた！', img: CHEST_IMG, emoji: '🧰', name: '宝箱', line, sub: '', wait: 2 });
+}
+
+/* ---------- 合言葉（コード入力） ---------- */
+function normCode(s) {
+    return String(s || '').normalize('NFKC').replace(/[\s"'“”「」『』]/g, '').replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).toLowerCase();
+}
+function redeemSecretCode(raw) {
+    if (typeof BOTTLE_CODES === 'undefined') return false;
+    const n = normCode(raw), e = BOTTLE_CODES.find(c => normCode(c.code) === n);
+    if (!e) return false;
+    const p = playerData;
+    if (e.area) {
+        const m = MAP_DATA[e.area];
+        if (!m) return false;
+        if (!p.eventAreas) p.eventAreas = {};
+        const per = `毎年${m.months[0]}〜${m.months[1]}月`;
+        if (p.eventAreas[e.area]) { alert(`「${m.name}」は、すでに解放済みです。（${per}）`); return true; }
+        p.eventAreas[e.area] = true;
+        savePlayerData(); updateMenuUI(); playSE('levelup');
+        alert(`${m.emoji || '🎉'} イベントエリア「${m.name}」が解放されました！\n開催期間：${per}\n${m.months.includes(eventMonthNow()) ? 'いまが開催中！「場所移動」から行けます。' : '開催期間になったら遊べます。'}`);
+        return true;
+    }
+    if (!p.usedCodes) p.usedCodes = {};
+    if (p.usedCodes[e.code]) { alert('この合言葉は、もう使われています。'); return true; }
+    p.usedCodes[e.code] = true;
+    if (e.gold) p.gold += e.gold;
+    if (e.item) addItem(e.item, e.n || 1);
+    if (e.buff) addBuff(e.buff, e.min || 10);
+    savePlayerData(); updateMenuUI(); updateHud(); playSE('levelup');
+    alert(`🎁 ${e.label || 'アイテムを手に入れた'}！`);
+    return true;
+}
+
+/* ===================================================
+   Ver 3.0.1  季節イベントエリア（2か月ごとに1エリア・年6エリア）
+   ---------------------------------------------------
+   エリアと生き物の定義は events.js。ここは仕組みだけです。
+   ・解放：小瓶の合言葉を「コード入力」→ そのエリアが「解放済み」になる（ずっと有効）
+   ・遊べる期間：そのエリアの月（例：1〜2月）だけ。期間外は「場所移動」に鍵つきで表示
+   ・図鑑：「イベントエリア」タブ（月ごとにまとめて表示）。図鑑コンプ・実績の対象外
+   =================================================== */
+function eventMonthNow() { return window.EVENT_DEBUG_MONTH || (new Date().getMonth() + 1); }
+const isEventArea = (k) => !!(MAP_DATA[k] && MAP_DATA[k].event);
+const eventUnlocked = (k) => !!(playerData.eventAllOpen || (playerData.eventAreas && playerData.eventAreas[k]));   // eventAllOpen：開発者コマンド EventAll092365
+const eventInSeason = (k) => !!(MAP_DATA[k] && MAP_DATA[k].months && (playerData.eventAllOpen || MAP_DATA[k].months.includes(eventMonthNow())));
+const eventAreaOpen = (k) => isEventArea(k) && eventUnlocked(k) && eventInSeason(k);
+const zukanCatOfArea = (k) => { const m = MAP_DATA[k]; return m && m.event ? 'event' : (m && m.gacha ? 'gacha' : 'normal'); };
+const zukanCatOf = (f) => zukanCatOfArea(f.location);
+function eventMonthLabel(m) { return (typeof EVENT_MONTH_NAMES !== 'undefined' && EVENT_MONTH_NAMES[m]) || `${m}月`; }
+function eventZukanCompare(a, b) {
+    const keys = Object.keys(MAP_DATA);
+    if ((a.month || 0) !== (b.month || 0)) return (a.month || 0) - (b.month || 0);
+    const ta = (a.toolType === 'net') ? 1 : 0, tb = (b.toolType === 'net') ? 1 : 0;
+    if (ta !== tb) return ta - tb;                      // 竿 → 網
+    const ia = keys.indexOf(a.location), ib = keys.indexOf(b.location);
+    if (ia !== ib) return ia - ib;
+    return (a.ord || 0) - (b.ord || 0) || zukanScore(a) - zukanScore(b) || a.id - b.id;   // レア度順（めずらしいほど後ろ）
+}
+function renderEventMapButtons(grid) {
+    Object.keys(MAP_DATA).filter(k => MAP_DATA[k].event && eventUnlocked(k)).forEach(k => {
+        const m = MAP_DATA[k], span = `${m.months[0]}〜${m.months[1]}月`;
+        const btn = document.createElement('button');
+        const open = eventInSeason(k);
+        btn.className = `map-btn event ${currentLocation === k ? 'active' : ''} ${open ? '' : 'locked'}`;
+        if (open) { btn.innerText = `${m.emoji || '🎉'} ${m.name}\n(イベント開催中：${span})`; btn.onclick = () => selectLocation(k); }
+        else btn.innerText = `🔒 ${m.name}\n(${span}に開催)`;
+        grid.appendChild(btn);
+    });
+}
+// 期間が終わったイベントエリアにいたら、さざ波の海へ戻す／魚がまだ居ないエリアは遊べない
+const _handleAction301 = window.handleAction;
+window.handleAction = function () {
+    if (gameState === 'READY' && isEventArea(currentLocation)) {
+        if (!eventAreaOpen(currentLocation)) { floatText('イベントは終了しました。さざ波の海へ戻ります', '#ffd700', true); selectLocation('sea'); return; }
+        if (!FISH_DATA.some(f => f.location === currentLocation && (f.toolType || 'rod') === currentToolMode)) {
+            playSE('foul'); setStatus(currentToolMode === 'rod' ? '竿で釣れる生き物は、準備中です' : '網で捕れる生き物は、準備中です', '#ff9'); return;
+        }
+    }
+    return _handleAction301.apply(this, arguments);
+};
+
+/* ---------- 実績（ゴミ・アクセサリー・工房） ---------- */
+Object.assign(ACHIEVEMENT_DATA, {
+    trash_100: { id: 'trash_100', name: '海のお掃除やさん', icon: _IC.s, desc: 'ゴミを合計100個釣り上げた', hint: 'ニセのアタリには、思わぬ"おみやげ"がついてくる…' },
+    comp_all_accs: { id: 'comp_all_accs', name: 'おしゃれ番長', icon: _IC.g, desc: 'すべてのアクセサリーを手に入れた', hint: 'ショップの「アクセサリー」を、ぜんぶそろえよう' },
+    upgrade_max: { id: 'upgrade_max', name: '極みの道具', icon: _IC.s, desc: '工房で道具を1つ「+10（最大）」まで強化した', hint: 'ひとつの道具を、とことん磨いてみよう' }
+});
+
+
+/* ===================================================
+   Ver 3.0.1  季節イベント用ミニゲーム（各イベントエリアの“いちばん希少な生き物”で遊べる）
+   ev_winter：豆まき／ev_spring：花びらキャッチ／ev_may：滝のぼり／ev_summer：星つなぎ／ev_autumn：だんご積み／ev_xmas：そりジャンプ
+   画像は images/minigames/ev_*.png（無くても絵文字で遊べます。追加素材リスト.md を参照）
+   =================================================== */
+function evBg(a, grad, imgName) {
+    return spEl('', a.stage, { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, background: `url(images/minigames/${imgName}.png) center/cover no-repeat, ${grad}`, pointerEvents: 'none' });
+}
+function evSp(a, name, emoji, size, x, y) {
+    const e = spEl('', a.stage, { position: 'absolute', width: size + 'px', height: size + 'px', fontSize: Math.round(size * 0.8) + 'px', lineHeight: size + 'px', textAlign: 'center', marginLeft: (-size / 2) + 'px', marginTop: (-size / 2) + 'px', pointerEvents: 'none', left: x + 'px', top: y + 'px' });
+    e.innerHTML = mgImg(name, emoji, size);
+    return e;
+}
+const evPut = (e, x, y) => { e.style.left = x + 'px'; e.style.top = y + 'px'; };
+
+Object.assign(SP_INFO, {
+    bean: { ico: '👹', name: '豆まき', text: (n) => `左右に歩く<b>鬼</b>に、タップした場所へ豆を投げよう！豆はすこし遅れて届くよ。<br>鬼に${n.need + 2}回当てたら捕獲。<b>福の神</b>に当てるとミス（ミス${n.lives}回で失敗）。（PC：←→で狙って Z）` },
+    petal: { ico: '🌸', name: '花びらキャッチ', text: (n) => `指を左右に動かして、<b>桜の花びら</b>をかごでキャッチ！<br>毛虫🐛に当たるとミス（ミス${n.lives}回で失敗）。時間内に集めよう。（PC：←→キー）` },
+    carp: { ico: '🎏', name: '滝のぼり', text: () => '連打（タップ）で鯉をジャンプさせ、<b>金色のゾーン</b>の中にとどまろう！<br>ゲージがいっぱいになれば「龍」に出世して捕獲。（PC：Zキー連打）' },
+    stars: { ico: '🎋', name: '星つなぎ', text: (n) => `夜空の星を、<b>1・2・3…の順</b>にタップして、天の川をつなごう！<br>3つの星座。まちがえるとミス（ミス${n.lives}回で失敗）。（PC：←→で選んで Z）` },
+    dango: { ico: '🍡', name: 'おだんご積み', text: (n) => `左右に動くおだんごを、タイミングよくタップして<b>真上に</b>積み上げよう！<br>ずれたら崩れてミス（ミス${n.lives}回で失敗）。（PC：Zキー）` },
+    gift: { ico: '🛷', name: 'そりジャンプ', text: (n) => `タップでそりがジャンプ！ <b>プレゼント🎁</b>を集めて、<b>雪だるま⛄</b>はよけよう。<br>ミス${n.lives}回で失敗。（PC：Zキー）` }
+});
+Object.assign(SP_AREA_KIND, { ev_winter: 'bean', ev_spring: 'petal', ev_may: 'carp', ev_summer: 'stars', ev_autumn: 'dango', ev_xmas: 'gift' });
+
+/* ---- 豆まき ---- */
+SPG.bean = function (a, P) {
+    const W = a.W, H = a.H, need = spInfoNums('bean').need + 1, rowY = 82;
+    evBg(a, 'linear-gradient(#3a1d5a,#1b0f33 60%,#4a2a14)', 'ev_bean_bg');
+    let lives = P.hp, score = 0, time = 34, aim = W / 2, cool = 0, fukuT = 4;
+    const aimE = evSp(a, 'ev_bean', '🫘', 30, aim, H - 24);
+    const mk = (kind) => ({ kind, x: Math.random() * (W - 80) + 40, dir: Math.random() < .5 ? -1 : 1, e: kind === 'oni' ? evSp(a, 'ev_oni', '👹', 54, 0, rowY) : evSp(a, 'ev_fuku', '👵', 54, 0, rowY + 6), life: 7 });
+    const acts = [mk('oni')], pend = [];
+    a.hearts(lives); a.prog(0);
+    const throwAt = (x) => {
+        if (cool > 0) return; cool = 0.25; playSE('tap');
+        const b = evSp(a, 'ev_bean', '🫘', 24, x, H - 24); b.style.transition = 'top .26s linear'; void b.offsetWidth; b.style.top = (rowY + 8) + 'px';
+        pend.push({ t: 0.26, x, b });
+    };
+    const g = {
+        update(dt) {
+            time -= dt; cool -= dt; fukuT -= dt;
+            const k = 300 * dt; if (spKeys.ArrowLeft) aim -= k; if (spKeys.ArrowRight) aim += k; aim = Math.max(20, Math.min(W - 20, aim)); evPut(aimE, aim, H - 24);
+            acts.forEach(o => {
+                o.x += o.dir * (W / (2.1 / P.sp)) * (o.kind === 'oni' ? 1 + score * 0.06 : 0.8) * dt;
+                if (o.x > W - 30) { o.x = W - 30; o.dir = -1; } if (o.x < 30) { o.x = 30; o.dir = 1; }
+                if (Math.random() < dt * 0.5) o.dir *= -1;
+                evPut(o.e, o.x, o.kind === 'oni' ? rowY : rowY + 6); o.e.style.transform = `scaleX(${o.dir})`;
+                if (o.kind === 'fuku') { o.life -= dt; }
+            });
+            for (let i = acts.length - 1; i >= 0; i--) if (acts[i].kind === 'fuku' && acts[i].life <= 0) { acts[i].e.remove(); acts.splice(i, 1); }
+            if (fukuT <= 0 && !acts.some(o => o.kind === 'fuku')) { acts.push(mk('fuku')); fukuT = 5; }
+            for (let i = pend.length - 1; i >= 0; i--) {
+                const p = pend[i]; p.t -= dt; if (p.t > 0) continue;
+                pend.splice(i, 1); p.b.remove();
+                const hit = acts.filter(o => Math.abs(o.x - p.x) < 34 * P.len).sort((u, v) => Math.abs(u.x - p.x) - Math.abs(v.x - p.x))[0];
+                if (!hit) continue;
+                if (hit.kind === 'oni') { score++; a.prog(score / (need + 1)); a.flash('鬼は外！', '#7fff7f'); playSE('success'); hit.x = Math.random() < .5 ? 40 : W - 40; if (score > need) return a.win(); }
+                else { lives--; a.hearts(lives); a.flash('福は内…！', '#ff7777'); playSE('foul'); triggerVibration(120); hit.life = 0; if (lives <= 0) return a.lose(); }
+            }
+            a.say(`あと ${Math.max(0, Math.ceil(time))} 秒　鬼 ${score}/${need + 1}`);
+            if (time <= 0) a.lose();
+        },
+        down(x) { throwAt(x); }, keyDown() { throwAt(aim); }
+    };
+    return g;
+};
+
+/* ---- 花びらキャッチ ---- */
+SPG.petal = function (a, P) {
+    const W = a.W, H = a.H, need = P.sp > 1.1 ? 14 : (P.sp < 0.9 ? 10 : 12);
+    evBg(a, 'linear-gradient(#ffd6e8,#f6a9c8 55%,#7b4a6a)', 'ev_petal_bg');
+    let px = W / 2, tx = null, lives = P.hp, score = 0, time = 30, spawn = 0.3, inv = 0;
+    const basket = evSp(a, 'ev_basket', '🧺', 48, px, H - 28); const items = [];
+    a.hearts(lives); a.prog(0);
+    const g = {
+        update(dt) {
+            time -= dt; spawn -= dt; inv -= dt;
+            const k = 330 * dt; if (spKeys.ArrowLeft) { px -= k; tx = null; } if (spKeys.ArrowRight) { px += k; tx = null; }
+            if (tx !== null) px += (tx - px) * Math.min(1, 14 * dt); px = Math.max(24, Math.min(W - 24, px)); evPut(basket, px, H - 28);
+            if (spawn <= 0) { spawn = 0.5 / P.sp; const bad = Math.random() < 0.26, x = Math.random() * (W - 40) + 20; items.push({ bad, x0: x, x, y: -20, ph: Math.random() * 6, v: (bad ? 150 : 120) * P.sp, e: bad ? evSp(a, 'ev_caterpillar', '🐛', 34, x, -20) : evSp(a, 'ev_petal', '🌸', 34, x, -20) }); }
+            for (let i = items.length - 1; i >= 0; i--) {
+                const it = items[i]; it.y += it.v * dt; it.ph += dt * 3; it.x = Math.max(16, Math.min(W - 16, it.x0 + Math.sin(it.ph) * 22)); evPut(it.e, it.x, it.y);
+                if (it.y > H - 52 && it.y < H - 8 && Math.abs(it.x - px) < 27 * P.len) {
+                    it.e.remove(); items.splice(i, 1);
+                    if (it.bad) { if (inv <= 0) { lives--; inv = 0.6; a.hearts(lives); a.flash('毛虫！', '#ff7777'); playSE('foul'); triggerVibration(120); if (lives <= 0) return a.lose(); } }
+                    else { score++; a.prog(score / need); playSE('tap'); if (score >= need) return a.win(); }
+                } else if (it.y > H + 20) { it.e.remove(); items.splice(i, 1); }
+            }
+            a.say(`あと ${Math.max(0, Math.ceil(time))} 秒　花びら ${score}/${need}`);
+            if (time <= 0) a.lose();
+        },
+        down(x) { tx = x; }, move(x) { if (tx !== null) tx = x; }, up() { }
+    };
+    return g;
+};
+
+/* ---- 滝のぼり ---- */
+SPG.carp = function (a, P) {
+    const W = a.W, H = a.H, top = 26, bot = H - 26, span = bot - top;
+    evBg(a, 'linear-gradient(90deg,#0a4a7a,#4fb5e8 50%,#0a4a7a)', 'ev_carp_bg');
+    const band = spEl('', a.stage, { position: 'absolute', left: 0, right: 0, background: 'rgba(255,226,122,.38)', borderTop: '3px solid #ffe27a', borderBottom: '3px solid #ffe27a', pointerEvents: 'none' });
+    const carp = evSp(a, 'ev_carp', '🎏', 50, W / 2, bot);
+    let y = 0.05, vy = 0, prog = 0, t = 0, time = 32; const goal = 5.5 * Math.pow(P.sp, 0.6), bh = 0.17 * Math.min(1.3, P.len);
+    a.hudText('🎏'); a.prog(0);
+    const hop = () => { vy = Math.min(vy + 0.5, 0.9); playSE('tap'); };
+    const g = {
+        update(dt) {
+            t += dt; time -= dt;
+            vy -= 0.85 * dt; vy *= Math.exp(-1.2 * dt); y += vy * dt; if (y < 0) { y = 0; vy = Math.max(0, vy); } if (y > 1) { y = 1; vy = Math.min(0, vy); }
+            const c = 0.5 + 0.34 * Math.sin(t * 0.9 * P.sp) * Math.cos(t * 0.37); const inB = Math.abs(y - c) < bh;
+            band.style.top = (bot - (c + bh) * span) + 'px'; band.style.height = (2 * bh * span) + 'px';
+            evPut(carp, W / 2 + Math.sin(t * 3) * 6, bot - y * span); carp.style.transform = `rotate(${-vy * 40}deg)`;
+            prog += inB ? dt : -dt * 0.45; prog = Math.max(0, prog); band.style.background = inB ? 'rgba(255,226,122,.6)' : 'rgba(255,226,122,.3)';
+            a.prog(prog / goal); a.say(`あと ${Math.max(0, Math.ceil(time))} 秒　金色のゾーンにとどまれ！`);
+            if (prog >= goal) return a.win(); if (time <= 0) a.lose();
+        },
+        down() { hop(); }, keyDown() { hop(); }
+    };
+    return g;
+};
+
+/* ---- 星つなぎ ---- */
+SPG.stars = function (a, P) {
+    const W = a.W, H = a.H, rounds = [4, 5, 6]; let r = 0, lives = P.hp, next = 1, tl = 0, cur = 0; let st = [];
+    evBg(a, 'linear-gradient(#050a2a,#1a1f5a 70%,#2a3a7a)', 'ev_stars_bg');
+    const line = spEl('', a.stage, { position: 'absolute', left: 0, top: 0, width: W + 'px', height: H + 'px', pointerEvents: 'none' }); line.innerHTML = `<svg width="${W}" height="${H}" style="position:absolute;left:0;top:0"><polyline id="ev-star-line" points="" fill="none" stroke="#ffe9a0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/></svg>`;
+    const setup = () => {
+        st.forEach(s => s.e.remove()); st = []; next = 1; cur = 0; const ex = P.starAdd || 0; tl = (9 + r * 1.5 + ex * 1.3) / Math.min(1.3, P.sp); const n = rounds[r] + ex, pts = [];
+        let guard = 0; while (pts.length < n && guard++ < 400) { const x = 30 + Math.random() * (W - 60), y = 30 + Math.random() * (H - 60); if (pts.every(p => Math.hypot(p[0] - x, p[1] - y) > (guard > 250 ? 50 : 60))) pts.push([x, y]); }
+        pts.forEach((p, i) => { const e = evSp(a, 'ev_star', '⭐', 46, p[0], p[1]); const num = spEl('', e, { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, fontSize: '15px', fontWeight: 'bold', color: '#1a1f5a', textAlign: 'center', lineHeight: '46px', textShadow: '0 0 3px #fff' }); num.innerText = i + 1; e.style.pointerEvents = 'none'; st.push({ n: i + 1, x: p[0], y: p[1], e }); });
+        document.getElementById('ev-star-line').setAttribute('points', ''); mark();
+        a.prog(r / 3); a.hearts(lives);
+    };
+    const mark = () => st.forEach((s, i) => { s.e.style.filter = i === cur && s.n >= next ? 'drop-shadow(0 0 6px #fff)' : 'none'; s.e.style.opacity = s.n < next ? 0.55 : 1; });
+    const tap = (s) => {
+        if (!s || s.n < next) return;
+        if (s.n === next) {
+            playSE('tap'); next++; const pts = st.filter(q => q.n < next).map(q => q.x + ',' + q.y).join(' '); document.getElementById('ev-star-line').setAttribute('points', pts);
+            const rest = st.filter(q => q.n >= next); if (rest.length) cur = st.indexOf(rest[0]); mark();
+            if (next > st.length) { r++; if (r >= rounds.length) { a.prog(1); return a.win(); } a.flash('星座かんせい！', '#ffe27a'); playSE('success'); setTimeout(() => { if (spGame === g) setup(); }, 450); next = 999; }
+        } else { lives--; a.hearts(lives); a.flash('ちがう星…', '#ff7777'); playSE('foul'); if (lives <= 0) a.lose(); }
+    };
+    const g = {
+        update(dt) {
+            if (next >= 999) return; tl -= dt; a.say(`1から順番に！ のこり ${Math.max(0, Math.ceil(tl))} 秒（星座 ${r + 1}/3）`);
+            if (tl <= 0) { lives--; a.hearts(lives); a.flash('時間切れ…', '#ff7777'); playSE('foul'); if (lives <= 0) return a.lose(); setup(); }
+        },
+        down(x, y) { if (next >= 999) return; let b = null, bd = 9e9; st.forEach(s => { const d = Math.hypot(s.x - x, s.y - y); if (d < bd) { bd = d; b = s; } }); if (bd < 34) tap(b); },
+        keyPress(code) { const rest = st.filter(q => q.n >= next); if (!rest.length) return; let i = rest.indexOf(st[cur]); if (i < 0) i = 0; i = (i + (code === 'ArrowLeft' || code === 'ArrowUp' ? -1 : 1) + rest.length) % rest.length; cur = st.indexOf(rest[i]); mark(); },
+        keyDown() { if (next >= 999) return; tap(st[cur]); }
+    };
+    setup(); return g;
+};
+
+/* ---- おだんご積み ---- */
+SPG.dango = function (a, P) {
+    const W = a.W, H = a.H, need = P.sp > 1.1 ? 9 : (P.sp < 0.9 ? 7 : 8), sz = 28, tol = 25 * P.len;
+    evBg(a, 'linear-gradient(#10163a,#2b2a6a 60%,#4a3a5a)', 'ev_dango_bg');
+    evSp(a, 'ev_moon', '🌕', 56, W - 46, 40); const stand = spEl('', a.stage, { position: 'absolute', left: (W / 2 - 46) + 'px', width: '92px', height: '10px', bottom: '4px', background: '#8a5a2a', borderRadius: '4px', pointerEvents: 'none' });
+    let lives = P.hp, n = 0, cx = W / 2, x = 40, dir = 1, falling = null, time = 40; const pile = [];
+    const baseY = (i) => H - 14 - sz / 2 - i * (sz - 4);
+    const mover = evSp(a, 'ev_dango', '🍡', sz + 4, x, baseY(0) - 36);
+    a.hearts(lives); a.prog(0); a.say(`真上に重ねよう！ ${need}こで完成`);
+    const drop = () => {
+        if (falling) return; const dx = Math.abs(x - cx);
+        if (dx <= tol) {
+            const e = evSp(a, 'ev_dango', '🍡', sz + 4, x, baseY(n)); pile.push(e); n++; cx = x; a.prog(n / need); playSE('tap');
+            if (n >= need) return a.win();
+        } else {
+            lives--; a.hearts(lives); a.flash('くずれた！', '#ff7777'); playSE('foul'); triggerVibration(120);
+            const e = evSp(a, 'ev_dango', '🍡', sz + 4, x, baseY(n)); falling = { e, vy: -120, vx: (x > cx ? 1 : -1) * 90, y: baseY(n), x };
+            if (lives <= 0) { return a.lose(); }
+        }
+    };
+    const g = {
+        update(dt) {
+            x += dir * (W / (1.35 / P.sp)) * (1 + n * 0.07) * dt; if (x > W - 22) { x = W - 22; dir = -1; } if (x < 22) { x = 22; dir = 1; }
+            time -= dt; a.say(`真上に重ねよう！ あと ${Math.max(0, Math.ceil(time))} 秒　${n}/${need}こ`); if (time <= 0) return a.lose();
+            evPut(mover, x, baseY(n) - 4);
+            mover.style.opacity = falling ? 0.3 : 1;
+            if (falling) { falling.vy += 900 * dt; falling.y += falling.vy * dt; falling.x += falling.vx * dt; evPut(falling.e, falling.x, falling.y); if (falling.y > H + 40) { falling.e.remove(); falling = null; } }
+        },
+        down() { drop(); }, keyDown() { drop(); }
+    };
+    return g;
+};
+
+/* ---- そりジャンプ ---- */
+SPG.gift = function (a, P) {
+    const W = a.W, H = a.H, need = P.sp > 1.1 ? 7 : (P.sp < 0.9 ? 5 : 6), gy = H - 46, sx = 70;
+    evBg(a, 'linear-gradient(#0c1a3a,#2a4a7a 62%,#eaf4ff 62%,#cfe4f5)', 'ev_gift_bg');
+    const sled = evSp(a, 'ev_sled', '🛷', 54, sx, gy); let y = 0, vy = 0, lives = P.hp, score = 0, spawn = 1.0, inv = 0, t = 0; const items = [];
+    a.hearts(lives); a.prog(0); a.say(`プレゼントを${need}こ集めよう！`);
+    const jump = () => { if (y <= 0.5) { vy = 640; playSE('tap'); } };
+    const g = {
+        update(dt) {
+            t += dt; spawn -= dt; inv -= dt; vy -= 1750 * dt; y += vy * dt; if (y < 0) { y = 0; vy = 0; }
+            evPut(sled, sx, gy - y); sled.style.opacity = inv > 0 && Math.floor(inv * 12) % 2 ? 0.35 : 1;
+            if (spawn <= 0) { spawn = (0.95 + Math.random() * 0.7) / P.sp; const gift = Math.random() < 0.5; items.push({ gift, x: W + 30, e: gift ? evSp(a, 'ev_present', '🎁', 36, W + 30, gy - 78) : evSp(a, 'ev_snowman', '⛄', 44, W + 30, gy + 2) }); }
+            for (let i = items.length - 1; i >= 0; i--) {
+                const it = items[i]; it.x -= 200 * P.sp * dt; evPut(it.e, it.x, it.gift ? gy - 78 : gy + 2);
+                const dx = Math.abs(it.x - sx);
+                if (it.gift && dx < 30 && Math.abs((gy - y) - (gy - 78)) < 36) { it.e.remove(); items.splice(i, 1); score++; a.prog(score / need); a.flash('ゲット！', '#7fff7f'); playSE('success'); if (score >= need) return a.win(); continue; }
+                if (!it.gift && dx < 26 * (2 - Math.min(1.3, P.len)) && y < 30 && inv <= 0) { it.e.remove(); items.splice(i, 1); lives--; inv = 1.1; a.hearts(lives); a.flash('ガシャン！', '#ff7777'); playSE('foul'); triggerVibration(120); if (lives <= 0) return a.lose(); continue; }
+                if (it.x < -40) { it.e.remove(); items.splice(i, 1); }
+            }
+            a.say(`プレゼント ${score}/${need}　タップでジャンプ！`);
+        },
+        down() { jump(); }, keyDown() { jump(); }
+    };
+    return g;
+};
+
+
+/* ===================================================
+   Ver 3.1.0  ミニゲーム練習（遊び方 →「ミニゲーム練習」）
+   ・一度でも遊んだ（説明を見た）ミニゲームだけが並びます
+   ・スコア式：1ラウンドごとにクリアで +100点。進むほど速く・きびしくなり、失敗（ミス切れ）で終了
+   ・ベストスコアは playerData.spBest に保存
+   =================================================== */
+const PRACTICE_EV_KIND = Object.fromEntries(Object.entries(SP_AREA_KIND).filter(([a]) => /^ev_/.test(a)).map(([a, k]) => [k, a]));   // 季節ミニゲーム → エリア
+// 遊べる条件：ふつうのミニゲームは「一度遊んだことがある」／季節ミニゲームは「その期間の間だけ」（エリア解放は不要）
+function practiceOpen(k) {
+    if (!SPG[k]) return false;
+    if (PRACTICE_EV_KIND[k]) return eventInSeason(PRACTICE_EV_KIND[k]);
+    return !!(playerData.spSeen || {})[k];
+}
+const practiceAllKinds = () => Object.keys(SP_INFO).filter(k => SPG[k]).sort((a, b) => (!!PRACTICE_EV_KIND[a] - !!PRACTICE_EV_KIND[b]));
+const practiceKinds = () => practiceAllKinds().filter(practiceOpen);
+const PRACTICE_REWARDS = [[10, 3000], [20, 10000]];       // [ラウンド数, ごほうびG]（練習に挑戦するたびにもらえる）
+// 練習の味付け：速さ・判定のきびしさの倍率、制限時間（秒・ラウンドが進むと短く）、追加の仕掛け
+const PRACTICE_TUNE = {
+    timing: { sp: 1.3, len: 0.8, time: 18 }, dodge: { sp: 1.35, len: 0.85 }, shell: { sp: 1.3 },
+    run: { timeMul: 0.85 }, deliver: { time: 26 }, match: { time: 40 }, sort: { time: 45 }
+};
+const PRACTICE_NOTE = {
+    timing: '練習では<b>制限時間</b>あり。判定もきびしめ。', dodge: '練習では、弾がかなり速くなっていきます。', run: '練習では制限時間がきびしめです。',
+    deliver: '練習では<b>制限時間</b>あり。', match: '練習では<b>制限時間</b>あり。進むとカードが増えます。', simon: '練習では、進むとボタンや覚える数が増えます。',
+    shell: '練習では、シャッフルがどんどん速く・多くなります。', sort: '練習では<b>制限時間</b>あり。進むと石板が増えます。', odd: '練習では、進むとカードが増えます。', stars: '練習では、数ラウンドごとに星の数が増えます。'
+};
+const practiceBest = (k) => ((playerData.spBest || {})[k]) || 0;
+function openPracticeList() {
+    closeAllModals();
+    let m = byId('sp-practice-modal');
+    if (!m) { m = spEl('modal', byId('game-container')); m.id = 'sp-practice-modal'; byId('game-container').appendChild(m); }
+    const ks = practiceAllKinds();
+    m.innerHTML = `<div style="font-size:20px;color:#ffd700;font-weight:bold;margin-bottom:6px;">🎮 ミニゲーム練習</div>
+        <div style="font-size:12px;color:#cfe8ff;margin-bottom:8px;text-align:center;line-height:1.6;">遊んだことのあるミニゲームが遊べます。<br>クリアするたびに難しくなる、スコアチャレンジ！<br><span style="color:#7fff7f;">🎁 10ラウンドで3,000G ／ 20ラウンドで10,000G</span><br><span style="color:#ffe27a;">🎍 季節のミニゲームは、その時期だけ遊べます</span></div>
+        <div id="sp-practice-list" style="display:flex;flex-direction:column;gap:8px;width:88%;max-width:340px;max-height:52%;overflow-y:auto;"></div>
+        <button class="btn" style="margin-top:12px;padding:8px 25px;font-size:15px;" onclick="closePracticeList(true)">もどる</button>`;
+    const list = m.querySelector('#sp-practice-list');
+    ks.forEach(k => {
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;font-size:15px;text-align:left;';
+        if (practiceOpen(k)) {
+            b.innerHTML = `<span>${SP_INFO[k].ico} ${SP_INFO[k].name}${PRACTICE_EV_KIND[k] ? ' 🎍' : ''}</span><small style="color:#ffe27a;white-space:nowrap;">ベスト ${practiceBest(k)}点</small>`;
+            b.onclick = () => startPractice(k);
+        } else {
+            b.innerHTML = `<span>❔ ？？？</span><small style="color:#aaa;">???</small>`;
+            b.disabled = true; b.style.opacity = '.55'; b.style.filter = 'grayscale(.6)';
+        }
+        list.appendChild(b);
+    });
+    m.style.display = 'flex';
+}
+function closePracticeList(toHowTo) {
+    const m = byId('sp-practice-modal'); if (m) m.style.display = 'none';
+    if (toHowTo) openHowToPlay();
+}
+function startPractice(kind) {
+    if (!SPG[kind]) return;
+    closePracticeList(false);
+    closeHowToPlay();
+    initAudio();
+    spState = { fish: { id: 0, name: '練習' }, seq: [kind], idx: 0, practice: true, kind, score: 0, over: false, prevState: gameState };
+    gameState = 'SPECIAL';
+    ensureSpLayer();
+    spClearFlash();
+    const L = byId('sp-layer');
+    L.style.display = 'flex';
+    let q = byId('sp-practice-quit');
+    if (!q) { q = document.createElement('button'); q.id = 'sp-practice-quit'; q.className = 'btn'; q.innerText = '✕ やめる'; q.style.cssText = 'position:absolute;right:8px;top:8px;z-index:8;padding:5px 10px;font-size:13px;'; q.onclick = () => practiceExit(); L.appendChild(q); }
+    q.style.display = '';
+    practiceRound();
+}
+function practiceParams() {
+    const r = spState.score, t = PRACTICE_TUNE[spState.kind] || {}, k = spState.kind;
+    const P = { sp: Math.min(2.6, (0.85 + 0.09 * r) * (t.sp || 1)), len: Math.max(0.5, (1.05 - 0.04 * r) * (t.len || 1)), hp: 3, practice: true, round: r, timeMul: t.timeMul || 1 };
+    if (k === 'match') P.pairs = r >= 8 ? 6 : (r >= 4 ? 5 : 4);
+    if (k === 'simon') { P.btn = r >= 6 ? 6 : 4; P.need = Math.min(8, 4 + Math.floor(r / 3)); }
+    if (k === 'shell') P.extra = Math.floor(r * 0.8);
+    if (k === 'sort') P.n = r >= 9 ? 7 : (r >= 4 ? 6 : 5);
+    if (k === 'stars') P.starAdd = Math.min(5, Math.floor(r / 3));
+    if (k === 'odd') P.off = Math.min(2, Math.floor(r / 4));
+    if (t.time) P.limit = Math.max(t.time * 0.5, t.time * (1 - 0.03 * r)) + (k === 'match' ? (P.pairs - 4) * 8 : 0) + (k === 'sort' ? (P.n - 5) * 8 : 0);
+    return P;
+}
+function practiceRound() {
+    const st = spState; if (!st || !st.practice) return;
+    const info = SP_INFO[st.kind];
+    byId('sp-title').innerHTML = `⚓ ${info.ico} ${info.name}（練習） ⚓`;
+    byId('sp-stage').innerHTML = '';
+    spGame = null; st.waitCard = false; st.over = false;
+    spApi.say(''); spApi.prog(0); spApi.hearts(0);
+    const card = byId('sp-card');
+    if (st.score === 0) {       // 最初のラウンドは毎回ルール説明（タップではじめる）
+        card.innerHTML = spCardHtml(info.ico, info.name, info.text({ lives: 3, need: 3, chargeNeed: 3, deliverNeed: 5 }).replace(/捕獲/g, 'クリア') + `<br><small>※クリアするたびに、少しずつ難しくなります${PRACTICE_NOTE[st.kind] ? '<br>' + PRACTICE_NOTE[st.kind] : ''}</small>`, true);
+        card.style.display = 'flex'; st.waitCard = true; st.token = (st.token || 0) + 1;
+        return;
+    }
+    card.innerHTML = spCardHtml(info.ico, info.name, `${st.rewardMsg ? `<div style="color:#7fff7f;font-weight:bold;margin-bottom:6px;">${st.rewardMsg}</div>` : ''}<b style="font-size:22px;color:#ffe27a;">ラウンド ${st.score + 1}　READY…</b><br>スコア ${st.score * 100}点　ベスト ${Math.max(practiceBest(st.kind), st.score * 100)}点`, false);
+    card.style.display = 'flex';
+    const token = st.token = (st.token || 0) + 1;
+    setTimeout(() => { if (spState === st && st.token === token) practiceStart(); }, 1000);
+}
+function practiceTimeLimit(g, limit) {
+    const lab = spEl('', spApi.stage, { position: 'absolute', right: '6px', top: '4px', zIndex: 4, padding: '1px 8px', fontSize: '13px', fontWeight: 'bold', color: '#fff', background: 'rgba(0,0,0,.55)', border: '1px solid #ffe27a', borderRadius: '8px', pointerEvents: 'none' });
+    let t = limit; const up = g.update;
+    lab.innerText = `⏱ ${Math.ceil(t)}`;
+    g.update = function (dt) {
+        up && up.call(g, dt);
+        if (!spGame) return;
+        t -= dt; lab.innerText = `⏱ ${Math.max(0, Math.ceil(t))}`; if (t < 5) lab.style.color = '#ff8a8a';
+        if (t <= 0) { spApi.flash('時間切れ…', '#ff7777'); spApi.lose(); }
+    };
+}
+function practiceStart() {
+    const st = spState;
+    if (!st || !st.practice || st.over || gameState !== 'SPECIAL' || spGame) return;
+    byId('sp-card').style.display = 'none'; st.waitCard = false; st.rewardMsg = null;
+    const P = practiceParams();
+    spGame = SPG[st.kind](spApi, P);
+    if (P.limit) practiceTimeLimit(spGame, P.limit);
+    spLast = 0;
+    cancelAnimationFrame(spRaf);
+    spRaf = requestAnimationFrame(spTick);
+}
+const _spCardOk301 = spCardOk;
+spCardOk = function () { if (spState && spState.practice) { practiceStart(); return; } return _spCardOk301(); };
+const _spStageEnd301 = spStageEnd;
+spStageEnd = function (win) {
+    if (!spState || !spState.practice) return _spStageEnd301(win);
+    if (!spGame) return;
+    const st = spState;
+    spGame = null; cancelAnimationFrame(spRaf);
+    spApi.flash(win ? 'CLEAR!' : 'GAME OVER', win ? '#ffe27a' : '#ff6666');
+    playSE(win ? 'success' : 'foul');
+    setTimeout(() => {
+        if (spState !== st) return;
+        if (win) { st.score++; practiceRecord(st); practiceReward(st); practiceRound(); } else practiceOver();
+    }, 900);
+};
+function practiceReward(st) {
+    const rw = PRACTICE_REWARDS.find(x => x[0] === st.score);
+    if (!rw) return;
+    playerData.gold = (playerData.gold || 0) + rw[1];
+    st.earned = (st.earned || 0) + rw[1];
+    savePlayerData(); updateMenuUI();
+    st.rewardMsg = `🎁 ${st.score}ラウンド達成！ +${rw[1].toLocaleString()}G`;
+}
+function practiceRecord(st) {
+    const sc = st.score * 100;
+    playerData.spBest = playerData.spBest || {};
+    if (sc > (playerData.spBest[st.kind] || 0)) { playerData.spBest[st.kind] = sc; savePlayerData(); return true; }
+    return false;
+}
+function practiceOver() {
+    const st = spState; if (!st) return;
+    st.over = true;
+    const sc = st.score * 100, newBest = practiceRecord(st) && sc > 0;
+    spClearFlash();
+    const info = SP_INFO[st.kind], card = byId('sp-card');
+    card.innerHTML = spCardHtml(info.ico, info.name, `<b style="font-size:20px;color:#ffe27a;">けっか</b><br>スコア <b style="font-size:26px;color:#fff;">${sc}</b> 点${newBest ? ' <span style="color:#ff8;">🎉 ベスト更新！</span>' : ''}<br>ベスト ${practiceBest(st.kind)} 点（${st.score}ラウンドクリア）${st.earned ? `<br><span style="color:#7fff7f;">🎁 ごほうび +${st.earned.toLocaleString()}G</span>` : ''}`, false)
+        + `<div style="display:flex;gap:10px;margin-top:6px;"><button class="btn" style="padding:9px 18px;font-size:16px;" onclick="practiceAgain()">もう一度</button><button class="btn" style="padding:9px 18px;font-size:16px;" onclick="practiceExit()">もどる</button></div>`;
+    card.style.display = 'flex';
+}
+function practiceAgain() { if (!spState || !spState.practice) return; spState.score = 0; spState.earned = 0; spState.rewardMsg = null; practiceRound(); }
+function practiceExit() {
+    const st = spState;
+    if (st && st.practice) { practiceRecord(st); }
+    spGame = null; cancelAnimationFrame(spRaf);
+    spClearFlash();
+    const L = byId('sp-layer'); if (L) L.style.display = 'none';
+    const q = byId('sp-practice-quit'); if (q) q.style.display = 'none';
+    byId('sp-card').style.display = 'none';
+    gameState = (st && st.prevState) || 'MENU';
+    spState = null;
+    openPracticeList();
 }

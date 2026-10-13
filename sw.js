@@ -1,5 +1,5 @@
-const CACHE_NAME = 'osakana-v3.0.0';
-const ASSETS_TO_CACHE = ['./', './index.html', './style.css', './trivia.js', './fishsize.js', './fishfacing.js', './script.js', './addons.js', './manifest.json', './images/favicon.png', './images/icon.png'];
+const CACHE_NAME = 'osakana-v3.1.0';
+const ASSETS_TO_CACHE = ['./', './index.html', './style.css', './trivia.js', './fishsize.js', './fishfacing.js', './script.js', './addons.js', './events.js', './manifest.json', './images/favicon.png', './images/icon.png'];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
