@@ -2228,7 +2228,7 @@ body.hof #menu-title { color: #ffd700; text-shadow: 0 0 10px #ffd700, 2px 2px 0 
 /* ===================================================
    Ver 3.0.0 (c) UI調整
    =================================================== */
-:root { --css-ver: '30-p'; }
+:root { --css-ver: '30-r'; }
 
 /* ---- メインメニュー：縦1列 ---- */
 .menu-grid { display: flex !important; flex-direction: column; gap: 6px; width: 90%; max-width: 310px; margin-bottom: 8px; }
@@ -2396,3 +2396,31 @@ body.hof #menu-title { color: #ffd700; text-shadow: 0 0 10px #ffd700, 2px 2px 0 
 .title-survey-btn:active { transform: translateY(1px); filter: brightness(1.2); }
 
 #sp-practice-modal { height: auto; justify-content: center; max-height: 82%; box-sizing: border-box; padding: 14px 10px; }
+
+/* V3.1.1 ミニゲーム説明カードのはみ出し対策／設定の隠しコマンド行を1段に */
+#sp-card { overflow-y: auto; box-sizing: border-box; justify-content: flex-start !important; padding: 10px !important; gap: 6px !important; }
+#sp-card > :first-child { margin-top: auto; }
+#sp-card > :last-child { margin-bottom: auto; }
+#sp-card > * { max-width: 100%; box-sizing: border-box; flex-shrink: 0; }
+.cfg-hidden-row { flex-wrap: nowrap; gap: 6px; }
+.cfg-hidden-row > span:first-child { white-space: nowrap; flex-shrink: 0; }
+.cfg-hidden-row > span:last-child { display: flex; flex-wrap: nowrap; gap: 4px; min-width: 0; }
+.cfg-hidden-row .btn { white-space: nowrap; margin: 0 !important; padding: 6px 8px !important; font-size: 12px !important; }
+
+/* V3.1.1 画面いっぱい表示：スマホ幅では高さの上限をなくし、実際の表示領域(--app-h)いっぱいにする */
+html, body { height: 100%; margin: 0; background: #050b14; }
+@media screen and (max-width: 767px) {
+    body { align-items: stretch; min-height: 0; height: 100vh; height: 100dvh; height: var(--app-h, 100dvh); }
+    #game-container { height: 100vh; height: 100dvh; height: var(--app-h, 100dvh); max-height: none; border-left-width: 0; border-right-width: 0; border-top-width: 0; border-bottom-width: 0; box-shadow: none; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+}
+/* 横画面ブロック（スマホ・タブレットを横向きにしたとき） */
+#rotate-guard { display: none; position: fixed; inset: 0; z-index: 2147483647; background: #050b14; color: #fff; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; font-family: 'DotGothic16', sans-serif; touch-action: none; }
+#rotate-guard .rg-ico { font-size: 56px; animation: rgTurn 2s ease-in-out infinite; }
+#rotate-guard .rg-title { font-size: 20px; color: #ffd700; }
+#rotate-guard .rg-text { font-size: 14px; line-height: 1.7; color: #cfe8ff; }
+@keyframes rgTurn { 0%, 30% { transform: rotate(-90deg); } 70%, 100% { transform: rotate(0deg); } }
+@media screen and (orientation: landscape) and (pointer: coarse) and (max-height: 600px) { #rotate-guard { display: flex; } }
+/* 幅のせまい端末（〜350px）で、ボタンが2段にならないように文字と余白を縮める */
+@media screen and (max-width: 350px) {
+    #mode-btn-rod, #mode-btn-net, #shop-tab-rod, #shop-tab-net, #shop-tab-acc, #zukan-tab-normal, #zukan-tab-gacha, #zukan-tab-event, #zukan-area-btn, #zukan-newclear-btn, .zukan-area-btn, .zukan-newclear-btn { font-size: 11px !important; padding-left: 4px !important; padding-right: 4px !important; white-space: nowrap; letter-spacing: -0.5px; min-width: 0; }
+}

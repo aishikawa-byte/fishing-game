@@ -27,6 +27,7 @@
 </script>
 </head>
 <body>
+<div id="rotate-guard"><div class="rg-ico">📱</div><div class="rg-title">画面を縦にしてください</div><div class="rg-text">このゲームは縦画面専用です。<br>スマホを縦向きにすると、つづきから遊べます。</div></div>
 
 <audio id="title-bgm" src="sounds/title.mp3" loop preload="auto"></audio>
 
@@ -44,7 +45,7 @@
 <div id="title-screen">
     <!-- ▼ onclick を追加 ▼ -->
     <div id="main-logo" onclick="onLogoTap()">爆釣一閃！<br>おさかな一本勝負</div>
-    <div class="version-text" id="version-label">Ver 3.1.0</div>
+    <div class="version-text" id="version-label">Ver 3.1.1</div>
     <div class="tagline">すきま時間に、一閃。<br>反射神経 × コレクションの釣りゲーム</div>
     <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
     <a class="title-survey-btn" href="https://forms.cloud.microsoft/r/SZ3viK17xa" target="_blank" rel="noopener noreferrer">📝 アンケートに答える（1分）</a>
@@ -275,7 +276,7 @@
                 <button class="btn" id="config-vibe-btn" style="background:#006644;" onclick="toggleVibration()">バイブ: ON</button>
             </div>
             
-            <div class="config-row" style="border-top: 1px dashed #444; padding-top: 10px; margin-top: 10px;">
+            <div class="config-row cfg-hidden-row" style="border-top: 1px dashed #444; padding-top: 10px; margin-top: 10px;">
                 <span style="color:#ffcc00;">隠しコマンド</span>
                 <span><button class="btn" id="config-notes-btn" style="background:#2a4a6a; font-size:12px; margin-right:4px;" onclick="openBottleNotes()">📜 拾った手紙</button><button class="btn" style="background:#6600cc; font-size:12px;" onclick="openCheatPrompt()">コード入力</button></span>
             </div>
@@ -283,10 +284,20 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 3.1.0)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 3.1.1)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V3.1.1======<br>
+                    <b>🔧 修正</b><br>
+                    ・Androidなどの小さい画面で、ミニゲームの説明文字とボタンが枠からはみ出す問題を修正<br>
+                    ・設定の「隠しコマンド」欄が、アプデ情報を開くと2段になる問題を修正<br>
+                    ・スマホの機種によって画面の上下に余白ができる問題を修正（画面いっぱいに表示）<br>
+                    ・幅のせまい端末で、ボタンや欄が2段になる問題を修正<br>
+                    ・横画面にすると「画面を縦にしてください」と表示し、縦に戻すまで操作できないように<br>
+                    <b>🎍 季節イベント</b><br>
+                    ・季節ミニゲームの専用画像（背景・キャラ）を順次追加予定。追加されるとゲーム画面が変わります<br>
+                    <br>
                     ==V3.1.0======<br>
                     <b>🗑 ゴミと海の宝</b><br>
                     ・ニセのアタリで「ゴミ」が釣れるように。ごくまれに…？<br>

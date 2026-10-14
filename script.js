@@ -2318,8 +2318,8 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.1.0";
-const CSS_VERSION = "30-p";
+const APP_VERSION = "3.1.1";
+const CSS_VERSION = "30-r";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -4026,10 +4026,10 @@ const THING_AREAS = ['ryugu'];
 const isThing = (f) => !!f && (THING_AREAS.includes(f.location) || !!f.thing);
 
 function spCardHtml(ico, name, body, ok) {
-    return `<div style="font-size:54px;line-height:1;">${ico}</div>
-        <div style="font-size:26px;font-weight:bold;color:#ffe9a0;text-shadow:2px 2px 0 #000;">⚓ ${name} ⚓</div>
-        <div style="font-size:16px;line-height:1.7;color:#fff;background:rgba(255,244,214,.12);border:3px solid #d8b66a;border-radius:10px;padding:10px 12px;">${body}</div>
-        ${ok ? '<div style="margin-top:6px;padding:10px 22px;font-size:18px;font-weight:bold;background:#c0392b;border:3px solid #ffd700;border-radius:10px;color:#fff;">タップではじめる</div>' : ''}`;
+    return `<div style="font-size:clamp(36px,12vw,54px);line-height:1;">${ico}</div>
+        <div style="font-size:clamp(17px,5.6vw,26px);font-weight:bold;color:#ffe9a0;text-shadow:2px 2px 0 #000;max-width:100%;word-break:break-word;">⚓ ${name} ⚓</div>
+        <div style="font-size:clamp(12px,3.8vw,16px);line-height:1.6;color:#fff;background:rgba(255,244,214,.12);border:3px solid #d8b66a;border-radius:10px;padding:8px 10px;max-width:100%;box-sizing:border-box;word-break:break-word;overflow-wrap:anywhere;">${body}</div>
+        ${ok ? '<div style="margin-top:4px;padding:8px 16px;font-size:clamp(14px,4.6vw,18px);font-weight:bold;background:#c0392b;border:3px solid #ffd700;border-radius:10px;color:#fff;max-width:100%;box-sizing:border-box;">タップではじめる</div>' : ''}`;
 }
 
 const spApi = {
@@ -5957,7 +5957,7 @@ function practiceOver() {
     spClearFlash();
     const info = SP_INFO[st.kind], card = byId('sp-card');
     card.innerHTML = spCardHtml(info.ico, info.name, `<b style="font-size:20px;color:#ffe27a;">けっか</b><br>スコア <b style="font-size:26px;color:#fff;">${sc}</b> 点${newBest ? ' <span style="color:#ff8;">🎉 ベスト更新！</span>' : ''}<br>ベスト ${practiceBest(st.kind)} 点（${st.score}ラウンドクリア）${st.earned ? `<br><span style="color:#7fff7f;">🎁 ごほうび +${st.earned.toLocaleString()}G</span>` : ''}`, false)
-        + `<div style="display:flex;gap:10px;margin-top:6px;"><button class="btn" style="padding:9px 18px;font-size:16px;" onclick="practiceAgain()">もう一度</button><button class="btn" style="padding:9px 18px;font-size:16px;" onclick="practiceExit()">もどる</button></div>`;
+        + `<div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;justify-content:center;"><button class="btn" style="padding:8px 14px;font-size:15px;" onclick="practiceAgain()">もう一度</button><button class="btn" style="padding:8px 14px;font-size:15px;" onclick="practiceExit()">もどる</button></div>`;
     card.style.display = 'flex';
 }
 function practiceAgain() { if (!spState || !spState.practice) return; spState.score = 0; spState.earned = 0; spState.rewardMsg = null; practiceRound(); }
@@ -5973,3 +5973,21 @@ function practiceExit() {
     spState = null;
     openPracticeList();
 }
+
+
+/* ---- V3.1.1 画面サイズ対応（実際の表示領域に合わせる／縦画面固定） ---- */
+(function () {
+    const fit = () => {
+        const vv = window.visualViewport, h = Math.round((vv && vv.height) || window.innerHeight);
+        document.documentElement.style.setProperty('--app-h', h + 'px');
+    };
+    fit();
+    ['resize', 'orientationchange'].forEach(e => window.addEventListener(e, () => { fit(); setTimeout(fit, 250); }));
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
+    const lock = () => { try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {}); } catch (e) {} };
+    lock(); window.addEventListener('pointerdown', lock, { once: true });
+    // 横向きの間は操作を止める（ガード画面が全面を覆う）。音も一時停止。
+    const mq = window.matchMedia('(orientation: landscape) and (pointer: coarse) and (max-height: 600px)');
+    const onRot = () => { try { if (mq.matches) { if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.suspend) audioCtx.suspend(); } else if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.resume) audioCtx.resume(); } catch (e) {} };
+    if (mq.addEventListener) mq.addEventListener('change', onRot);
+})();
