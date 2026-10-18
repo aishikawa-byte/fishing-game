@@ -547,7 +547,7 @@ function setToolMode(mode) {
     playWaterPlop();
 }
 
-function menuDateText() { const d = new Date(); return (d.getMonth() + 1) + '月' + d.getDate() + '日'; }
+function menuDateText() { const d = new Date(); return (d.getMonth() + 1) + '月' + d.getDate() + '日'; }   // 英語モードは i18n.js が「Oct 15」に変換
 function updateMenuUI() {
     const _md = document.getElementById('menu-date'); if (_md) _md.innerText = menuDateText();
     const curExp = playerData.exp % 100;
@@ -615,7 +615,7 @@ function updateMenuUI() {
     document.getElementById('header-level').innerText = curLevel;
     document.getElementById('header-exp-percent').innerText = percent;
     document.getElementById('header-level-bar-inner').style.width = `${percent}%`;
-    document.getElementById('header-gold').innerText = playerData.gold;
+    document.getElementById('header-gold').innerText = Number(playerData.gold).toLocaleString();
 }
 
 function closeAllModals() {
@@ -764,7 +764,7 @@ function renderGachaListModal() {
 function spinGacha(count) {
     const cost = count === 10 ? 10000 : 1000;
     if (playerData.gold < cost) {
-        alert("ゴールドが足りません！");
+        gameAlert("ゴールドが足りません！");
         return;
     }
 
@@ -960,7 +960,7 @@ let isToastShowing = false;
 function checkAchievements() {
     if (!playerData.achievements) playerData.achievements = [];
 
-    const totalUnlockedFish = Object.keys(caughtFish).filter(id => caughtFish[id] && caughtFish[id].unlocked && !(FISH_DATA.find(f => f.id == id) && zukanCatOf(FISH_DATA.find(f => f.id == id)) === 'event')).length;
+    const totalUnlockedFish = Object.keys(caughtFish).filter(id => caughtFish[id] && caughtFish[id].unlocked && !(FISH_DATA.find(f => f.id == id) && ['event', 'special'].includes(zukanCatOf(FISH_DATA.find(f => f.id == id))))).length;
 
     const rodCatches = playerData.totalCatches || 0;
     const netCatches = playerData.netCatches || 0;
@@ -1008,7 +1008,7 @@ function checkAchievements() {
         { id: "net_master", cond: netCatches >= 100 },
         { id: "net_combo_master", cond: netCombo >= 30 },
 
-        { id: "zukan_master", cond: totalUnlockedFish >= FISH_DATA.filter(f => zukanCatOf(f) !== 'event').length },
+        { id: "zukan_master", cond: totalUnlockedFish >= FISH_DATA.filter(f => !['event', 'special'].includes(zukanCatOf(f))).length },
 
         { id: "miss_master", cond: (playerData.missCount || 0) >= 50 },
         { id: "thousand_catches", cond: grandTotalCatches >= 1000 },
@@ -1066,7 +1066,7 @@ function processAchievementQueue() {
 
 /* 全データ初期化（コンプ100%時の転生対応版） */
 /* 全データ初期化（実績・周回星マークの選択保持対応版） */
-function resetAllData() {
+async function resetAllData() {
     // 通常・ガチャ両方の図鑑コンプリート判定
     const isNormal100 = checkCategoryCompPercent('normal') === 100;
     const isGacha100 = checkCategoryCompPercent('gacha') === 100;
@@ -1078,24 +1078,25 @@ function resetAllData() {
         confirmMsg = "✨【おさかな絵巻 完全コンプリート達成中！】✨\n転生特典として『10,000 G』を所持した状態で2周目をスタートできます！\n本当にデータをリセット（転生）しますか？";
     }
 
-    const c1 = window.confirm(confirmMsg);
+    const c1 = await gameConfirm(confirmMsg, { yes: 'データを削除する', no: 'やめる', danger: true });
     if (!c1) return;
 
-    const c2 = window.confirm("本当によろしいですか？この操作は取り消せません。");
+    const c2 = await gameConfirm("本当によろしいですか？この操作は取り消せません。", { yes: "はい、削除する", no: "やめる", danger: true });
     if (!c2) return;
 
     // ▼ 追加：実績・称号（および周回数・星）を削除するかどうかの確認 ▼
     let deleteAchievements = true;
     if (isFullComp) {
         // コンプ達成時は実績を消すか残すかを選択
-        deleteAchievements = window.confirm(
+        deleteAchievements = await gameConfirm(
             "【実績・称号データの取り扱い】\n\n" +
-            "「OK (はい)」  : 実績・称号データと周回数(★)もリセットします。\n" +
-            "「キャンセル (いいえ)」: 実績・称号データを残し、周回数(★)も加算して引き継ぎます。"
+            "「リセットする」 : 実績・称号データと周回数(★)もリセットします。\n" +
+            "「引き継ぐ」 : 実績・称号データを残し、周回数(★)も加算して引き継ぎます。",
+            { yes: "リセットする", no: "引き継ぐ" }
         );
     } else {
         // 通常のリセット時は確認
-        deleteAchievements = window.confirm("実績・称号データおよびクリア記録(★)も削除しますか？\n（「いいえ」を選ぶと実績と周回数はそのまま残ります）");
+        deleteAchievements = await gameConfirm("実績・称号データおよびクリア記録(★)も削除しますか？\n（「残す」を選ぶと実績と周回数はそのまま残ります）", { yes: "削除する", no: "残す" });
     }
 
     // 既存実績・周回数の引き継ぎ用処理
@@ -1119,12 +1120,24 @@ function resetAllData() {
         nextClearCount = 0; // 周回数・星もリセット
     }
 
+    // 2周目（転生）へ引き継ぐもの（Ver 3.2.0）：拾った手紙・ミニゲーム練習データ・季節イベントの図鑑（特殊エリアの図鑑は消えます）
+    // 完全リセット（図鑑コンプ前のリセット）では、すべて消えます。引き継ぐのは「2周目（転生）」のときだけ
+    const keep = isFullComp
+        ? { bottleNotes: playerData.bottleNotes || [], spSeen: playerData.spSeen || {}, spBest: playerData.spBest || {} }
+        : { bottleNotes: [], spSeen: {}, spBest: {} };
+    const keepZukan = {};
+    if (isFullComp) {
+        FISH_DATA.forEach(f => { if (zukanCatOf(f) === 'event' && caughtFish[f.id]) keepZukan[f.id] = caughtFish[f.id]; });
+        Object.keys(caughtFish).forEach(k => { if (+k >= 500 && +k <= 699 && caughtFish[k]) keepZukan[k] = caughtFish[k]; });
+    }   // 画像がまだ読み込めていない生き物も残す（季節イベント 500〜699）
+
     // ローカルストレージデータの削除
     localStorage.removeItem('retro_fishing_zukan_v4');
     localStorage.removeItem('retro_fishing_player_v1');
     localStorage.removeItem('retro_fishing_ranking_v1');
 
-    caughtFish = {};
+    caughtFish = keepZukan;
+    localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
 
     rankingData = [
         { fishName: "名無し", time: 0.250 },
@@ -1151,7 +1164,8 @@ function resetAllData() {
         easyMode: false,
         vibrationEnabled: true,
         clearCount: nextClearCount, // 選択に応じた周回数（星）
-        isReincarnated: isFullComp
+        isReincarnated: isFullComp,
+        bottleNotes: keep.bottleNotes, spSeen: keep.spSeen, spBest: keep.spBest
     };
 
     savePlayerData();
@@ -1161,9 +1175,9 @@ function resetAllData() {
     if (isFullComp) {
         playSE('levelup');
         const starMsg = deleteAchievements ? "（実績・星はリセットされました）" : `（★周回数: ${nextClearCount} へアップ！）`;
-        alert(`🌟 英雄、転生の時… 🌟\n全図鑑コンプリートの功績により『10,000 G』を所持した状態で新しくゲームを開始しました！\n${starMsg}`);
+        gameAlert(`🌟 英雄、転生の時… 🌟\n全図鑑コンプリートの功績により『10,000 G』を所持した状態で新しくゲームを開始しました！\n${starMsg}`);
     } else {
-        alert("データを初期化しました。");
+        gameAlert("データを初期化しました。");
     }
 }
 
@@ -1237,7 +1251,7 @@ function renderShopList() {
                 btnHtml = `<button class="btn" disabled style="font-size:10px;">ガチャ限定</button>`;
             } else {
                 const canBuy = playerData.gold >= data.price;
-                btnHtml = `<button class="btn" ${canBuy ? '' : 'disabled'} onclick="buyItem('${currentShopTab}', '${key}')">${data.price} G 購入</button>`;
+                btnHtml = `<button class="btn" ${canBuy ? '' : 'disabled'} onclick="buyItem('${currentShopTab}', '${key}')">${Number(data.price).toLocaleString()} G 購入</button>`;
             }
         }
 
@@ -1294,6 +1308,7 @@ function openMapModal() {
     initAudio();
     resetGameStateToReady();
     closeAllModals();
+    mapFilter = (MAP_DATA[currentLocation] && zukanCatOfArea(currentLocation)) || 'normal';     // 今いる場所のタブから開く
     renderMapGrid();
     document.getElementById('map-modal').style.display = "flex";
 }
@@ -1302,42 +1317,69 @@ function closeMapModal() {
     document.getElementById('map-modal').style.display = "none";
 }
 
+/* ---------- 場所移動：フィルター（通常／ガチャ／特殊／イベント）。特殊・イベントは、合言葉で解放するまでタブが出ません ---------- */
+let mapFilter = 'normal';
+const specialTabVisible = () => Object.keys(MAP_DATA).some(k => MAP_DATA[k].special && specialUnlocked(k));
+const eventTabVisible = () => Object.keys(MAP_DATA).some(k => MAP_DATA[k].event && eventUnlocked(k));
+function mapTabsList() {
+    const t = [['normal', '通常'], ['gacha', 'ガチャ']];
+    if (specialTabVisible()) t.push(['special', '特殊']);
+    if (eventTabVisible()) t.push(['event', 'イベント']);
+    return t;
+}
 function renderMapGrid() {
     const grid = document.getElementById('map-grid');
     grid.innerHTML = "";
-
     if (!playerData.unlockedGachaMaps) playerData.unlockedGachaMaps = [];
 
-    Object.keys(MAP_DATA).forEach(locKey => {
-        const map = MAP_DATA[locKey];
-        if (map.event) return;      // イベントエリアは下でまとめて表示
-        let isUnlocked = playerData.level >= map.reqLevel;
-        
-        if (map.gacha) {
-            isUnlocked = isUnlocked && playerData.unlockedGachaMaps.includes(locKey);
-        }
+    const tabs = mapTabsList();
+    if (!tabs.some(t => t[0] === mapFilter)) mapFilter = 'normal';
+    const tb = document.getElementById('map-tabs');
+    if (tb) {
+        tb.innerHTML = '';
+        tb.style.display = 'flex';
+        tabs.forEach(([k, label]) => {
+            const b = document.createElement('button');
+            b.className = 'map-tab mt-' + k + (mapFilter === k ? ' active' : '');
+            b.textContent = label;
+            b.onclick = () => { mapFilter = k; renderMapGrid(); playSE && playSE('tap'); };
+            tb.appendChild(b);
+        });
+    }
 
-        const isCurrent = currentLocation === locKey;
+    if (mapFilter === 'normal' || mapFilter === 'gacha') {
+        Object.keys(MAP_DATA).forEach(locKey => {
+            const map = MAP_DATA[locKey];
+            if (map.event || map.special) return;
+            if (!!map.gacha !== (mapFilter === 'gacha')) return;
+            let isUnlocked = playerData.level >= map.reqLevel;
+            if (map.gacha) isUnlocked = isUnlocked && playerData.unlockedGachaMaps.includes(locKey);
+            const isCurrent = currentLocation === locKey;
+            const btn = document.createElement('button');
+            btn.className = `map-btn ${isCurrent ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
+            if (isUnlocked) {
+                btn.innerText = `${map.name} ${map.gacha ? '(ガチャ)' : '(Lv.' + map.reqLevel + '〜)'}${map.note ? '\n' + map.note : ''}`;
+                btn.onclick = () => selectLocation(locKey);
+            } else {
+                let reqLabel = map.gacha ? `要 Lv.${map.reqLevel}＆ガチャ` : `要 Lv.${map.reqLevel}`;
+                btn.innerText = `🔒 ？？？ (${reqLabel})`;
+            }
+            grid.appendChild(btn);
+        });
+    } else if (mapFilter === 'event') renderEventMapButtons(grid);
+    else if (mapFilter === 'special') renderSpecialMapButtons(grid);
 
-        const btn = document.createElement('button');
-        btn.className = `map-btn ${isCurrent ? 'active' : ''} ${isUnlocked ? '' : 'locked'}`;
-
-        if (isUnlocked) {
-            btn.innerText = `${map.name} ${map.gacha ? '(ガチャ)' : '(Lv.' + map.reqLevel + '〜)'}${map.note ? '\n' + map.note : ''}`;
-            btn.onclick = () => selectLocation(locKey);
-        } else {
-            let reqLabel = map.gacha ? `要 Lv.${map.reqLevel}＆ガチャ` : `要 Lv.${map.reqLevel}`;
-            btn.innerText = `🔒 ？？？ (${reqLabel})`;
-        }
-        grid.appendChild(btn);
-    });
-    renderEventMapButtons(grid);
+    const hint = document.createElement('div');
+    hint.className = 'map-hint';
+    hint.innerText = '🍾 ふしぎなエリアの合言葉は、釣りの最中に見つかる「手紙入りの小瓶」にヒントが…？';
+    grid.appendChild(hint);
 }
 
 function selectLocation(locKey) {
     const map = MAP_DATA[locKey];
     if (!map) return;
     if (map.event && !eventAreaOpen(locKey)) return;     // イベントエリアは「解放済み」かつ「開催期間中」だけ
+    if (map.special && !specialUnlocked(locKey)) return;     // 特殊エリアは「解放済み」ならいつでも
 
     if (map.gacha) {
         if (!playerData.unlockedGachaMaps.includes(locKey)) return;
@@ -1496,7 +1538,7 @@ function playWaterPlop() {
         gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(seOut());
         osc.start();
         osc.stop(audioCtx.currentTime + 0.15);
     } catch(e) {}
@@ -1519,7 +1561,7 @@ function playSplashSE() {
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
         noise.connect(filter);
         filter.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(seOut());
         noise.start();
     } catch(e) {}
 }
@@ -2016,13 +2058,14 @@ function renderRankingList() {
     });
 }
 
-function openCheatPrompt() {
-    const input = window.prompt("合言葉（チートコード）を入力してください:");
+async function openCheatPrompt() {
+    const input = await gamePrompt("合言葉を入力してください", { placeholder: "合言葉", ok: "つかう", cancel: "やめる" });
     if (!input || input.trim() === "") return;
 
     const code = input.trim().toLowerCase();
     let isSuccess = false;
     let message = "";
+    let devRes = null, devAfter = null, devScroll = false;
 
     if (code === "gold100k8239") {
         playerData.gold += 100000;
@@ -2056,11 +2099,21 @@ function openCheatPrompt() {
         message = "🎍 季節イベントを、通常の開催期間だけ遊べる状態にもどしました。";
         isSuccess = true;
     }
-    else if (redeemSecretCode(input.trim())) {     // 小瓶の手紙に書かれた合言葉（Ver 3.0.1）
+    else if (code === "specialarea23742") {
+        if (!playerData.specialAreas) playerData.specialAreas = {};
+        Object.keys(MAP_DATA).filter(k => MAP_DATA[k].special).forEach(k => { playerData.specialAreas[k] = true; });
+        message = "🌌 特殊エリアがすべて解放されました！「場所移動」から行けます。";
+        isSuccess = true;
+    }
+    else if ((devRes = window.runDevCommand ? runDevCommand(code) : null)) {      // 開発者コマンド（devcmd.js）
+        message = devRes.msg; isSuccess = true; devAfter = devRes.after;
+        if (devRes.scroll) devScroll = true;
+    }
+    else if (await redeemSecretCode(input.trim())) {     // 小瓶の手紙に書かれた合言葉（Ver 3.0.1）
         return;
     }
     else {
-        alert("合言葉が違います。");
+        gameAlert("合言葉が違います。");
         return;
     }
 
@@ -2069,7 +2122,8 @@ function openCheatPrompt() {
         updateMenuUI();
         playSE('levelup');
         checkAchievements();
-        alert(message);
+        await gameAlert(message, devScroll ? { scroll: true } : undefined);
+        if (devAfter) devAfter();
     }
 }
 
@@ -2289,7 +2343,7 @@ function onLogoTap() {
         }
 
         setTimeout(() => {
-            alert("✨ 隠しコマンド発動！ ✨\nロゴが虹色に覚醒し、ボーナス 300 G を獲得しました！");
+            gameAlert("✨ 隠しコマンド発動！ ✨\nロゴが虹色に覚醒し、ボーナス 300 G を獲得しました！");
         }, 100);
     }
 }
@@ -2318,8 +2372,8 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.1.1";
-const CSS_VERSION = "30-r";
+const APP_VERSION = "3.2.0";
+const CSS_VERSION = "32-c";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2435,7 +2489,7 @@ function playTone(freq, duration, type = 'square') {
         gain.gain.setValueAtTime(0.12, t0);
         gain.gain.exponentialRampToValueAtTime(0.01, t0 + duration);
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(seOut());
         osc.start(t0);
         osc.stop(t0 + duration + 0.02);
     } catch (e) {}
@@ -2449,7 +2503,29 @@ function playTone(freq, duration, type = 'square') {
     };
 });
 
-const BGM_VOL = 0.02;
+/* 音量（Ver 3.2.0）：BGMとSEを別々に0〜5の6段階。初期値は4（これまでと同じ大きさ） */
+const VOL_STEPS = [0, 0.2, 0.45, 0.7, 1, 1.4];
+function loadVolLevel(key) { try { const v = parseInt(localStorage.getItem(key), 10); return (v >= 0 && v <= 5) ? v : 4; } catch (e) { return 4; } }
+let bgmLevel = loadVolLevel('osakana_vol_bgm'), seLevel = loadVolLevel('osakana_vol_se');
+let seMaster = null;
+function seOut() {
+    if (!seMaster || seMaster.context !== audioCtx) { seMaster = audioCtx.createGain(); seMaster.connect(audioCtx.destination); }
+    seMaster.gain.value = VOL_STEPS[seLevel];
+    return seMaster;
+}
+let BGM_VOL = 0.02 * VOL_STEPS[bgmLevel];
+function setVolLevel(kind, lv) {
+    lv = Math.max(0, Math.min(5, lv | 0));
+    try { localStorage.setItem(kind === 'bgm' ? 'osakana_vol_bgm' : 'osakana_vol_se', String(lv)); } catch (e) {}
+    if (kind === 'bgm') {
+        bgmLevel = lv; BGM_VOL = 0.02 * VOL_STEPS[lv];
+        if (bgmWant && bgmTracks[bgmWant]) { initAudio(); bgmFade(bgmWant, BGM_VOL); }
+    } else {
+        seLevel = lv; if (seMaster) seMaster.gain.value = VOL_STEPS[lv];
+        if (soundEnabled) { initAudio(); playWaterPlop(); }
+    }
+    if (typeof refreshVolUI === 'function') refreshVolUI();
+}
 const bgmTracks = {};
 const bgmFades = {};
 let bgmWant = null;
@@ -2651,7 +2727,7 @@ function weatherIconHtml(w, size) {
     const s = size || 18;
     return `<img class="weather-icon" src="${d.icon}" width="${s}" height="${s}" alt="${d.name}" onerror="this.replaceWith(document.createTextNode('${d.emoji}'))">`;
 }
-const noWeatherArea = (k) => ['underground', 'deepsea', 'shinju'].includes(k) || !!(MAP_DATA[k] && MAP_DATA[k].gacha);
+const noWeatherArea = (k) => ['underground', 'deepsea', 'shinju'].includes(k) || !!(MAP_DATA[k] && (MAP_DATA[k].gacha || MAP_DATA[k].special));
 const weatherMods = () => (noWeatherArea(currentLocation) ? WEATHER.clear : (WEATHER[weather] || WEATHER.clear));
 
 function setWeather(w, announce) {
@@ -2865,7 +2941,12 @@ function finishCatchCore(isSuccess) {
     const r = recentCatches;
     if (r.length === 3 && r[0].id === r[1].id && r[1].id === r[2].id) {
         const sorted = FISH_DATA.filter(f => f.location === currentLocation && (f.toolType || 'rod') === currentToolMode).sort((a, b) => b.price - a.price);
-        forceNextFish = sorted[0] || null;
+        // ピンゾロ：そのエリアの「大物」の中から、確率で1匹が選ばれる（大物がいなければ、いちばん高い生き物）
+        const bigs = sorted.filter(f => f.isBig && !f.isBoss);
+        if (bigs.length) {
+            let t = Math.random() * bigs.reduce((q, f) => q + Math.max(1, f.weight || 1), 0);
+            forceNextFish = bigs.find(f => (t -= Math.max(1, f.weight || 1)) < 0) || bigs[0];
+        } else forceNextFish = sorted[0] || null;
         p.zoromeCount = (p.zoromeCount || 0) + 1;
         bonus.zoromeHit = true;
         recentCatches = [];
@@ -2878,7 +2959,7 @@ function finishCatchCore(isSuccess) {
     if (newLevel > oldLevel) {
         p.level = newLevel;
         let unlocked = "";
-        Object.keys(MAP_DATA).forEach(k => { if (MAP_DATA[k].reqLevel === newLevel && !MAP_DATA[k].gacha) unlocked = MAP_DATA[k].name; });
+        Object.keys(MAP_DATA).forEach(k => { if (MAP_DATA[k].reqLevel === newLevel && !MAP_DATA[k].gacha && !MAP_DATA[k].special && !MAP_DATA[k].event) unlocked = MAP_DATA[k].name; });
         pendingLevelUp = { level: newLevel, unlockedArea: unlocked };
     } else {
         pendingLevelUp = null;
@@ -2929,7 +3010,7 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirs
         title.style.color = "#ffd700";
         byId('result-name').innerText = fish.name;
         byId('result-price').style.display = "block";
-        byId('result-price').innerText = b.practice ? "練習なので ごほうびなし" : `+${earnedGold} G　⭐+${earnedExp}`;
+        byId('result-price').innerText = b.practice ? "練習なので ごほうびなし" : `+${Number(earnedGold).toLocaleString()} G　⭐+${earnedExp}`;
         img.classList.remove('silhouette');
         img.classList.add('clickable-fish');
         timeText.innerText = isNet ? `🎯 ぴったり ${Math.max(0, Math.round((1 - time) * 100))}%` : `⚡ ${time.toFixed(2)}秒`;
@@ -2943,7 +3024,7 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirs
         }
         if (b.frenzy) chips.push(`${fxi('streak_frenzy', 14)}×${BAL.frenzy}`);
         if (b.zorome) chips.push(`${fxi('zorome', 14)}×${BAL.zorome}`);
-        if (b.chest) chips.push(`${fxi('chest', 14)}+${b.chest}G`);
+        if (b.chest) chips.push(`${fxi('chest', 14)}+${Number(b.chest).toLocaleString()}G`);
         if (b.special) chips.push(`${fxi('special_win', 14)}特別な戦いに勝利！`);
         if (b.gm && b.gm > 1.001 && !b.special) chips.push(`${fxi('tool_bonus', 14)}×${b.gm.toFixed(2)}`);
         if (b.complete) chips.push(`${fxi('area_complete', 14)}${b.complete} コンプリート！`);
@@ -2970,6 +3051,7 @@ function showResult(isSuccess, fish, time, earnedGold = 0, earnedExp = 0, isFirs
         failReason = 'late';
     }
     byId('result-modal').style.display = "block";
+    if (window.CreatureMotion) { CreatureMotion.stop(img); if (isSuccess && !isThing(fish)) CreatureMotion.start(img, fish); }      // 入手した生き物が動く（anim32.js）
     const homeBtn = byId('result-home-btn');
     nextBtn.disabled = true;
     if (homeBtn) homeBtn.disabled = true;      // 🏠も、次へと同じ時間だけ押せない（連打での誤操作防止）
@@ -3138,7 +3220,7 @@ function renderMissions() {
         const done = cur >= m.goal, claimed = d.claimed.includes(id);
         const row = document.createElement('div');
         row.className = 'mission-row';
-        row.innerHTML = `<div class="mission-info"><div>${m.name}</div><div class="mission-sub">${cur}/${m.goal}　${missionReward(m)} G</div></div>
+        row.innerHTML = `<div class="mission-info"><div>${m.name}</div><div class="mission-sub">${cur}/${m.goal}　${Number(missionReward(m)).toLocaleString()} G</div></div>
             <button class="btn" ${(!done || claimed) ? 'disabled' : ''} onclick="claimMission('${id}')">${claimed ? '済' : (done ? '受取' : '挑戦中')}</button>`;
         box.appendChild(row);
     });
@@ -3252,10 +3334,25 @@ function bindSecrets() {
         const w = pickOne(Object.keys(WEATHER).filter(k => k !== weather));
         setTimeout(() => setWeather(w, true), first ? 1100 : 0);   // メッセージが重ならないようにずらす
     });
+    // 特殊エリアのイースターエッグ：画面下の「さいきんの3匹」の枠を3秒以内に5回タップ（釣りの操作をじゃませないよう、クリック位置で判定）
+    (() => {
+        let ts = [];
+        document.addEventListener('click', (e) => {
+            const box = byId('catch-slots');
+            if (!box || !window.spEgg || !isSpecialArea(currentLocation)) return;
+            const r = box.getBoundingClientRect();
+            if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+            if (typeof gameState !== 'undefined' && gameState !== 'READY') return;        // 釣りの最中は数えない
+            e.stopPropagation(); e.preventDefault();      // この枠のタップは、ゲーム本体（キャスト）に伝えない
+            const now = Date.now(); ts = ts.filter(t => now - t < 3000); ts.push(now);
+            if (ts.length >= 5) { ts = []; spEgg(currentLocation); }
+        }, true);
+    })();
     bindSecret('header-gold', 10, 4000, () => giveSecret('secret_gold', 0, '💰 お金が大好き！'));
     bindSecret('zukan-detail-title', 7, 4000, (el) => {
         const img = byId('zukan-detail-img');
         img.classList.remove('spin'); void img.offsetWidth; img.classList.add('spin');
+        if (window.CreatureMotion && window._zukanFish) CreatureMotion.start(img, window._zukanFish, { duration: 3200, amp: 1.2 });      // なでなで：生き物が動く
         giveSecret('secret_zukan', 100, '🐟 なでなで〜');
     });
     bindSecret('sound-btn', 10, 5000, () => giveSecret('secret_sound', 0, '🔊 音の探究者！'));
@@ -3274,6 +3371,7 @@ function areaUnlocked(k) {
     const m = MAP_DATA[k];
     if (!m) return false;
     if (m.event) return eventUnlocked(k);
+    if (m.special) return specialUnlocked(k);
     return m.gacha ? !!(playerData.unlockedGachaMaps && playerData.unlockedGachaMaps.includes(k)) : playerData.level >= m.reqLevel;
 }
 
@@ -3285,11 +3383,20 @@ function saveZukanState() {
     savePlayerData();
 }
 
+const zukanHasCaught = (cat) => FISH_DATA.some(f => zukanCatOf(f) === cat && caughtFish[f.id] && caughtFish[f.id].unlocked) || Object.keys(caughtFish).some(k => (cat === 'event' ? (+k >= 500 && +k <= 699) : (+k >= 700 && +k <= 999)) && caughtFish[k]);
+// 特殊エリア・季節イベントのタブは、合言葉でそのエリアを解放するまで（または、その生き物が図鑑に載るまで）出さない
+const zukanTabVisible = (cat) => cat === 'special' ? (specialTabVisible() || zukanHasCaught('special')) : (cat === 'event' ? (eventTabVisible() || zukanHasCaught('event')) : true);
+function updateZukanTabs() {
+    ['special', 'event'].forEach(c => { const b = byId('zukan-tab-' + c); if (b) b.style.display = zukanTabVisible(c) ? '' : 'none'; });
+}
 function switchZukanCategory(cat, keepFilter) {
+    if (!zukanTabVisible(cat)) cat = 'normal';
+    updateZukanTabs();
     currentZukanMainTab = cat;
     if (!keepFilter) currentFilter = 'all';
     byId('zukan-tab-normal').className = `zukan-main-tab ${cat === 'normal' ? 'active' : ''}`;
     byId('zukan-tab-gacha').className = `zukan-main-tab ${cat === 'gacha' ? 'active' : ''}`;
+    byId('zukan-tab-special').className = `zukan-main-tab ${cat === 'special' ? 'active' : ''}`;
     byId('zukan-tab-event').className = `zukan-main-tab ${cat === 'event' ? 'active' : ''}`;
     renderZukanSubFilterUI();
     renderZukanGrid();
@@ -3348,12 +3455,12 @@ const FISH_YOMI = {
     '宝船マンボウ': 'たからぶねまんぼう', 'まつり金魚': 'まつりきんぎょ'
 };
 function addYomi(map) { Object.assign(FISH_YOMI, map); }
-const yomiOf = (f) => (FISH_YOMI[f.name] || f.name).replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/[ー・\s]/g, '');
+const yomiOf = (f) => (window.__LANG === 'en' && window.I18N_EN ? String(window.I18N_EN[f.name] || f.name).toLowerCase() : null) || (FISH_YOMI[f.name] || f.name).replace(/[\u30a1-\u30f6]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60)).replace(/[ー・\s]/g, '');
 function zukanSortList(list, isEvTab) {
     const key = zukanSortKey(), rev = key === 'rareRev' || key === 'kanaRev';
     if (key === 'kana' || key === 'kanaRev') {
-        list.sort((a, b) => yomiOf(a).localeCompare(yomiOf(b), 'ja') || a.id - b.id);
-    } else list.sort(isEvTab ? eventZukanCompare : zukanCompare);
+        list.sort((a, b) => yomiOf(a).localeCompare(yomiOf(b), window.__LANG === 'en' ? 'en' : 'ja') || a.id - b.id);
+    } else list.sort(isEvTab ? eventZukanCompare : (currentZukanMainTab === 'special' ? specialZukanCompare : zukanCompare));
     if (rev) list.reverse();
     return key === 'rare' || key === 'rareRev';      // 月見出しを出すか
 }
@@ -3390,7 +3497,7 @@ function openZukan() {
     closeAllModals();
     updateStageBgm();
     const st = playerData.zukanState || {};
-    switchZukanCategory(['gacha', 'event'].includes(st.tab) ? st.tab : 'normal', false);
+    switchZukanCategory(['gacha', 'special', 'event'].includes(st.tab) && zukanTabVisible(st.tab) ? st.tab : 'normal', false);
     if (st.filter && st.filter !== 'all' && zukanAreaKeys().includes(st.filter)) {
         currentFilter = st.filter;
         renderZukanSubFilterUI();
@@ -3408,12 +3515,14 @@ function openZukanDetail(fish) {
     const isNet = fish.toolType === 'net';
     byId('zukan-detail-title').innerText = `【${fish.name}】`;
     const img = byId('zukan-detail-img');
+    window._zukanFish = fish;
+    if (window.CreatureMotion) CreatureMotion.stop(img);
     img.classList.remove('spin');
     img.src = fish.image;
     img.onerror = () => { img.src = fish.fallbackSvg; };
     const tri = (typeof FISH_TRIVIA !== 'undefined' && FISH_TRIVIA[fish.id]) ? `\n\n💡 豆知識\n${FISH_TRIVIA[fish.id]}` : '';
     byId('zukan-detail-desc').innerText = `[${locName}／${isNet ? '網' : '竿'}]\n${fish.desc.replace('【網限定】', '')}${tri}`;
-    byId('zukan-detail-price').innerText = `買取価格: ${fish.price} G`;
+    byId('zukan-detail-price').innerText = `買取価格: ${Number(fish.price).toLocaleString()} G`;
     const best = caughtFish[fish.id].bestTime;
     byId('zukan-detail-time').innerText = isNet
         ? (best <= 1 ? `ベスト：ぴったり ${Math.round((1 - best) * 100)}%` : '')
@@ -3563,6 +3672,7 @@ function setCm(map) { Object.assign(FISH_CM, map); }
 let shadowToken = 0;
 function prepareShadow(fish, topY) {
     const s = byId('fish-shadow');
+    if (window.CreatureMotion) CreatureMotion.stop(s);
     s.style.display = "none";
     s.style.backgroundColor = "transparent";
     s.style.borderRadius = "0";
@@ -3579,6 +3689,7 @@ function prepareShadow(fish, topY) {
         s.style.height = `${d.h}px`;
         s.style.backgroundImage = `url('${fish.image}')`;
         s.style.display = "block";
+        if (window.CreatureMotion) CreatureMotion.shadow(s, fish);      // 魚影が泳ぐ動き（anim32.js）
         return d;
     });
     return { dir, ready };
@@ -4370,7 +4481,7 @@ function renderNormalGacha() {
 function showNgPrizes() {
     const total = NG_POOL.reduce((s, x) => s + x.w, 0);
     byId('ng-prize-list').innerHTML = NG_POOL.map(x => `<div class="ng-prize-row tier${x.tier}"><span>${fxi(x.fx, 22, x.ico)} ${x.label}</span><small>${(x.w / total * 100).toFixed(0)}%</small></div>`).join('') +
-        `<div class="ng-prize-note">10連は「レア」以上が1つ確定。1回${NG_COST}G／10連${NG_COST * 10}G。毎日1回は無料。<br>ゴールド以外は、ゲームを始めると自動で使われます。</div>`;
+        `<div class="ng-prize-note">10連は「レア」以上が1つ確定。1回${NG_COST.toLocaleString()}G／10連${(NG_COST * 10).toLocaleString()}G。毎日1回は無料。<br>ゴールド以外は、ゲームを始めると自動で使われます。</div>`;
     byId('ng-prize-modal').style.display = 'flex';
 }
 function closeNgPrizes() { byId('ng-prize-modal').style.display = 'none'; }
@@ -4491,7 +4602,7 @@ window.addEventListener('DOMContentLoaded', () => {
     setTimeout(startBackgroundPreload, 1500);
     updateDifficultyUI();
     applyHallOfFame();
-    if (byId('ws-gold')) byId('ws-gold').innerText = playerData.gold;
+    if (byId('ws-gold')) byId('ws-gold').innerText = Number(playerData.gold).toLocaleString();
     const cssVer = getComputedStyle(document.documentElement).getPropertyValue('--css-ver').trim().replace(/['"]/g, '');
     if (cssVer !== CSS_VERSION) {
         document.body.insertAdjacentHTML('afterbegin', '<div style="position:fixed;left:0;right:0;top:0;z-index:99999;background:#a00;color:#fff;padding:8px 12px;font-size:13px;line-height:1.5;">⚠ style.css が古いままです。最新の style.css に入れ替えてください。（表示が崩れる原因になります）</div>');
@@ -4688,7 +4799,7 @@ function spinNormal(mode) {
     const times = mode === 10 ? 10 : 1;
     if (mode === 'free') {
         if (playerData.freeGachaDate === todayStr()) return;
-    } else if (playerData.gold < times * NG_COST) { alert("ゴールドが足りません！"); return; }
+    } else if (playerData.gold < times * NG_COST) { gameAlert("ゴールドが足りません！"); return; }
     ngBusy = true;
     if (mode === 'free') playerData.freeGachaDate = todayStr(); else playerData.gold -= times * NG_COST;
     const total = NG_POOL.reduce((s, x) => s + x.w, 0), out = [];
@@ -4719,7 +4830,7 @@ function spinNormal(mode) {
         fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
         playSE(best >= 3 ? 'levelup' : 'success');
         const grid = out.map((o, i) => `<div class="ng-card tier${o.tier}" style="animation-delay:${i * 0.09}s"><div class="ng-ico">${fxi(o.fx, times === 1 ? 64 : 34, o.ico)}</div><div class="ng-name">${o.label}</div>${o.desc && times === 1 ? `<div class="ng-desc">${o.desc}</div>` : ''}${o.tier >= 2 ? `<div class="ng-rank">${NG_TIER_LABEL[o.tier]}</div>` : ''}</div>`).join('');
-        res.innerHTML = `${best >= 4 ? '<div class="ng-jackpot">✨ 大当たり！ ✨</div>' : ''}${g ? `<div class="ng-total">ゴールド <b>+${g}</b> G</div>` : ''}<div class="ng-grid ${times === 1 ? 'single' : ''}">${grid}</div><button class="btn ng-close" onclick="closeNgResult()">OK</button>`;
+        res.innerHTML = `${best >= 4 ? '<div class="ng-jackpot">✨ 大当たり！ ✨</div>' : ''}${g ? `<div class="ng-total">ゴールド <b>+${Number(g).toLocaleString()}</b> G</div>` : ''}<div class="ng-grid ${times === 1 ? 'single' : ''}">${grid}</div><button class="btn ng-close" onclick="closeNgResult()">OK</button>`;
         res.style.display = 'block';
         res.scrollTop = 0;
         renderNormalGacha();
@@ -4857,7 +4968,7 @@ const _spinGacha = spinGacha;
 window.spinGacha = function (count) {
     if (evBusy) return;
     const cost = count === 10 ? 10000 : 1000;
-    if (playerData.gold < cost) { alert("ゴールドが足りません！"); return; }
+    if (playerData.gold < cost) { gameAlert("ゴールドが足りません！"); return; }
     evBusy = true;
     const scr = byId('gacha-screen'), fl = byId('ev-flash');
     byId('gacha-result-area').style.display = 'none';
@@ -4932,7 +5043,7 @@ function giveSecret(id, gold, msg, opt) {
     savePlayerData();
     updateMenuUI();
     playSE('levelup');
-    floatText(`${msg}${gold ? `　+${gold}G` : ''}`, '#ffd700', true);
+    floatText(`${msg}${gold ? `　+${Number(gold).toLocaleString()}G` : ''}`, '#ffd700', true);
     unlockAch(id);
     return true;
 }
@@ -4944,11 +5055,11 @@ function ensureSpLayer() {
     L.id = 'sp-layer';
     L.style.cssText = 'display:none;position:absolute;left:0;top:0;right:0;bottom:0;z-index:70;background:rgba(2,14,30,.88);align-items:center;justify-content:center;';
     const water = "url('images/minigames/stage_water.png') center/cover no-repeat, radial-gradient(circle at 15% 85%,rgba(255,255,255,.16) 0 5px,transparent 6px), radial-gradient(circle at 82% 68%,rgba(255,255,255,.13) 0 4px,transparent 5px), radial-gradient(circle at 55% 92%,rgba(255,255,255,.13) 0 6px,transparent 7px), linear-gradient(#0f6a8c,#073a58 60%,#04243a)";
-    L.innerHTML = `<div class="sp-box" style="position:relative;width:94%;max-width:380px;background:url('images/minigames/frame_board.png') center/100% 100% no-repeat, repeating-linear-gradient(90deg,#6a4322 0 22px,#5b391c 22px 24px);border:5px solid #2f1c0c;box-shadow:inset 0 0 0 3px #d8b66a,0 0 24px rgba(0,0,0,.8);border-radius:14px;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;overflow:hidden;">
-        <div class="sp-title" id="sp-title" style="font-size:19px;color:#3b2410;text-align:center;font-weight:bold;background:url('images/minigames/title_ribbon.png') center/100% 100% no-repeat, linear-gradient(#f0cf7a,#b88a2c);border:3px solid #6a4a1a;border-radius:8px;padding:3px 8px;text-shadow:0 1px 0 #fff3c4;"></div>
-        <div class="sp-say" id="sp-say" style="font-size:14px;color:#3b2410;text-align:center;min-height:20px;background:rgba(255,244,214,.93);border-radius:6px;padding:3px 6px;font-weight:bold;"></div>
+    L.innerHTML = `<div class="sp-box" style="position:relative;width:96%;max-width:96%;background:url('images/minigames/frame_board.png') center/100% 100% no-repeat, repeating-linear-gradient(90deg,#6a4322 0 22px,#5b391c 22px 24px);border:5px solid #2f1c0c;box-shadow:inset 0 0 0 3px #d8b66a,0 0 24px rgba(0,0,0,.8);border-radius:14px;padding:10px;box-sizing:border-box;display:flex;flex-direction:column;gap:6px;overflow:hidden;">
+        <div class="sp-title" id="sp-title" style="font-size:clamp(19px,5vw,25px);color:#3b2410;text-align:center;font-weight:bold;background:url('images/minigames/title_ribbon.png') center/100% 100% no-repeat, linear-gradient(#f0cf7a,#b88a2c);border:3px solid #6a4a1a;border-radius:8px;padding:3px 8px;text-shadow:0 1px 0 #fff3c4;"></div>
+        <div class="sp-say" id="sp-say" style="font-size:clamp(14px,3.8vw,18px);color:#3b2410;text-align:center;min-height:20px;background:rgba(255,244,214,.93);border-radius:6px;padding:3px 6px;font-weight:bold;"></div>
         <div style="position:relative;">
-            <div class="sp-stage" id="sp-stage" style="position:relative;width:100%;height:250px;background:${water};border:3px solid #d8b66a;border-radius:10px;overflow:hidden;touch-action:none;user-select:none;"></div>
+            <div class="sp-stage" id="sp-stage" style="position:relative;width:100%;height:clamp(250px,calc(var(--app-h,100dvh) - 270px),440px);background:${water};border:3px solid #d8b66a;border-radius:10px;overflow:hidden;touch-action:none;user-select:none;"></div>
         </div>
         <div class="sp-foot" style="display:flex;align-items:center;gap:8px;min-height:22px;"><div class="sp-hearts" id="sp-hearts" style="min-width:60px;font-size:13px;color:#ffe9b0;white-space:nowrap;text-shadow:1px 1px 0 #000;"></div><div class="sp-prog" style="flex:1;height:14px;background:#0b2a40;border:3px solid #d8b66a;border-radius:8px;overflow:hidden;"><div id="sp-prog-in" style="height:100%;width:0;background:linear-gradient(90deg,#2ec4b6,#ffd27a);"></div></div></div>
         <div class="sp-card" id="sp-card" style="display:none;position:absolute;left:0;top:0;right:0;bottom:0;z-index:5;background:linear-gradient(#0b3a58,#041a2c);flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;"></div>
@@ -5295,9 +5406,9 @@ document.addEventListener('error', (e) => {
    デイリーミッションの引き直し（100,000G・何度でも）
    =================================================== */
 const REROLL_COST = 100000;
-function rerollMissions() {
-    if (playerData.gold < REROLL_COST) { alert('ゴールドが足りません（100,000G）'); return; }
-    if (!confirm('100,000Gを払って、ミッションを引き直しますか？\n（いまの進み具合はリセットされます）')) return;
+async function rerollMissions() {
+    if (playerData.gold < REROLL_COST) { gameAlert('ゴールドが足りません（100,000G）'); return; }
+    if (!(await gameConfirm('100,000Gを払って、ミッションを引き直しますか？\n（いまの進み具合はリセットされます）', { yes: '引き直す', no: 'やめる' }))) return;
     playerData.gold -= REROLL_COST;
     const before = (playerData.daily && playerData.daily.list || []).join();
     let ids;
@@ -5429,7 +5540,7 @@ function showFind(o) {
     byId('result-rank').innerHTML = '';
     byId('result-bonus').innerHTML = o.chips || '';
     byId('result-name').innerText = o.name;
-    const pr = byId('result-price'); pr.style.display = 'block'; pr.innerText = o.line;
+    const pr = byId('result-price'); pr.style.display = 'block'; if (o.lineHtml) pr.innerHTML = o.lineHtml; else pr.innerText = o.line;
     byId('result-time').innerText = o.sub || '';
     byId('result-new-badge').style.display = 'none';
     byId('result-hint').style.display = 'none';
@@ -5440,10 +5551,11 @@ function showFind(o) {
 /* ---------- 手紙入りの小瓶 ---------- */
 function pickBottleCode() {
     if (typeof BOTTLE_CODES === 'undefined') return null;
-    const p = playerData, used = p.usedCodes || {}, ev = p.eventAreas || {}, now = eventMonthNow();
-    const pool = BOTTLE_CODES.filter(c => c.area ? (MAP_DATA[c.area] && !ev[c.area]) : !used[c.code]);
+    const p = playerData, used = p.usedCodes || {}, ev = p.eventAreas || {}, sp = p.specialAreas || {}, now = eventMonthNow(), got = p.bottleNotes || [];
+    // 手紙は重複しない：すでに拾った手紙・解放ずみのエリアの手紙は出ない（Ver 3.2.0）
+    const pool = BOTTLE_CODES.filter(c => !got.includes(c.code) && (c.area ? (MAP_DATA[c.area] && !ev[c.area] && !sp[c.area]) : !used[c.code]));
     if (!pool.length) return null;
-    const w = (c) => c.area ? (MAP_DATA[c.area].months.includes(now) ? 6 : 1) : 2;     // いま開催中のエリアの手紙は出やすい
+    const w = (c) => c.area ? (MAP_DATA[c.area].special ? 2 : (MAP_DATA[c.area].months.includes(now) ? 6 : 1)) : 2;     // いま開催中のエリアの手紙は出やすい
     let r = Math.random() * pool.reduce((s, c) => s + w(c), 0);
     for (const c of pool) { r -= w(c); if (r < 0) return c; }
     return pool[0];
@@ -5451,11 +5563,11 @@ function pickBottleCode() {
 function openBottle() {
     const p = playerData, e = pickBottleCode();
     if (!p.bottleNotes) p.bottleNotes = [];
-    let line, sub;
+    let line, sub, lineHtml = '';
     if (e) {
         if (!p.bottleNotes.includes(e.code)) p.bottleNotes.push(e.code);
-        if (p.bottleNotes.length > 40) p.bottleNotes.shift();
         line = `中には「${e.code}」と書かれていた…`;
+        lineHtml = `中には「<span style="color:${noteColor(e)};font-weight:bold;">${e.code}</span>」と書かれていた…`;
         sub = '（どこかで使えるかもしれない…）';
     } else {
         p.gold += 5000;
@@ -5464,12 +5576,19 @@ function openBottle() {
         updateMenuUI();
     }
     savePlayerData();
-    showFind({ title: '📜 手紙入りの小瓶！', img: BOTTLE_IMG, emoji: '🍾', name: '手紙入りの小瓶', line, sub, wait: 3 });
+    showFind({ title: '📜 手紙入りの小瓶！', img: BOTTLE_IMG, emoji: '🍾', name: '手紙入りの小瓶', line, lineHtml, sub, wait: 3 });
 }
 // 設定の「拾った手紙」：いままで拾った言葉を読み返せる
+// 手紙の言葉の色：特殊エリアは紫、イベントエリアはオレンジ（それ以外はそのまま）
+function noteColor(e) {
+    const m = e && e.area && MAP_DATA[e.area];
+    return m && m.special ? '#c9a8ff' : (m ? '#ffb347' : '#ffffff');
+}
 function openBottleNotes() {
     const n = playerData.bottleNotes || [];
-    alert(n.length ? '📜 拾った手紙\n\n' + n.map(c => `・${c}`).join('\n') : 'まだ手紙を拾っていません。');
+    const colorOf = (c) => noteColor((typeof BOTTLE_CODES !== 'undefined' && BOTTLE_CODES.find(x => x.code === c)) || null);
+    const esc = (t) => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+    gameAlert(n.length ? '📜 拾った手紙<br><br>' + n.map(c => `・<span style="color:${colorOf(c)};font-weight:bold;">${esc(c)}</span>`).join('<br>') : 'まだ手紙を拾っていません。', { scroll: true, html: true });
 }
 
 /* ---------- 宝箱 ---------- */
@@ -5507,22 +5626,30 @@ function redeemSecretCode(raw) {
     if (e.area) {
         const m = MAP_DATA[e.area];
         if (!m) return false;
+        if (m.special) {
+            if (!p.specialAreas) p.specialAreas = {};
+            if (p.specialAreas[e.area]) { gameAlert(`「${m.name}」は、すでに解放済みです。`); return true; }
+            p.specialAreas[e.area] = true;
+            savePlayerData(); updateMenuUI(); playSE('levelup');
+            gameAlert(`${m.emoji || '🌌'} 特殊エリア「${m.name}」が解放されました！\n季節に関係なく、いつでも遊べます。\n釣りレベルが Lv.${m.reqLevel} 以上になったら「場所移動」の「特殊」から行けます。\n図鑑にも「特殊エリア」のタブが増えました。`);
+            return true;
+        }
         if (!p.eventAreas) p.eventAreas = {};
         const per = `毎年${m.months[0]}〜${m.months[1]}月`;
-        if (p.eventAreas[e.area]) { alert(`「${m.name}」は、すでに解放済みです。（${per}）`); return true; }
+        if (p.eventAreas[e.area]) { gameAlert(`「${m.name}」は、すでに解放済みです。（${per}）`); return true; }
         p.eventAreas[e.area] = true;
         savePlayerData(); updateMenuUI(); playSE('levelup');
-        alert(`${m.emoji || '🎉'} イベントエリア「${m.name}」が解放されました！\n開催期間：${per}\n${m.months.includes(eventMonthNow()) ? 'いまが開催中！「場所移動」から行けます。' : '開催期間になったら遊べます。'}`);
+        gameAlert(`${m.emoji || '🎉'} イベントエリア「${m.name}」が解放されました！\n開催期間：${per}\n${m.months.includes(eventMonthNow()) ? 'いまが開催中！「場所移動」から行けます。' : '開催期間になったら遊べます。'}\n図鑑にも「イベントエリア」のタブが増えました。`);
         return true;
     }
     if (!p.usedCodes) p.usedCodes = {};
-    if (p.usedCodes[e.code]) { alert('この合言葉は、もう使われています。'); return true; }
+    if (p.usedCodes[e.code]) { gameAlert('この合言葉は、もう使われています。'); return true; }
     p.usedCodes[e.code] = true;
     if (e.gold) p.gold += e.gold;
     if (e.item) addItem(e.item, e.n || 1);
     if (e.buff) addBuff(e.buff, e.min || 10);
     savePlayerData(); updateMenuUI(); updateHud(); playSE('levelup');
-    alert(`🎁 ${e.label || 'アイテムを手に入れた'}！`);
+    gameAlert(`🎁 ${e.label || 'アイテムを手に入れた'}！`);
     return true;
 }
 
@@ -5539,7 +5666,10 @@ const isEventArea = (k) => !!(MAP_DATA[k] && MAP_DATA[k].event);
 const eventUnlocked = (k) => !!(playerData.eventAllOpen || (playerData.eventAreas && playerData.eventAreas[k]));   // eventAllOpen：開発者コマンド EventAll092365
 const eventInSeason = (k) => !!(MAP_DATA[k] && MAP_DATA[k].months && (playerData.eventAllOpen || MAP_DATA[k].months.includes(eventMonthNow())));
 const eventAreaOpen = (k) => isEventArea(k) && eventUnlocked(k) && eventInSeason(k);
-const zukanCatOfArea = (k) => { const m = MAP_DATA[k]; return m && m.event ? 'event' : (m && m.gacha ? 'gacha' : 'normal'); };
+/* ---- 特殊エリア（Ver 3.2.0）：小瓶の合言葉で解放。期間に関係なく、いつでも遊べる ---- */
+const isSpecialArea = (k) => !!(MAP_DATA[k] && MAP_DATA[k].special);
+const specialUnlocked = (k) => !!(playerData.specialAreas && playerData.specialAreas[k]);
+const zukanCatOfArea = (k) => { const m = MAP_DATA[k]; return m && m.event ? 'event' : (m && m.special ? 'special' : (m && m.gacha ? 'gacha' : 'normal')); };
 const zukanCatOf = (f) => zukanCatOfArea(f.location);
 function eventMonthLabel(m) { return (typeof EVENT_MONTH_NAMES !== 'undefined' && EVENT_MONTH_NAMES[m]) || `${m}月`; }
 function eventZukanCompare(a, b) {
@@ -5550,6 +5680,25 @@ function eventZukanCompare(a, b) {
     const ia = keys.indexOf(a.location), ib = keys.indexOf(b.location);
     if (ia !== ib) return ia - ib;
     return (a.ord || 0) - (b.ord || 0) || zukanScore(a) - zukanScore(b) || a.id - b.id;   // レア度順（めずらしいほど後ろ）
+}
+function specialZukanCompare(a, b) {
+    const keys = Object.keys(MAP_DATA);
+    const ia = keys.indexOf(a.location), ib = keys.indexOf(b.location);
+    if (ia !== ib) return ia - ib;
+    const ta = (a.toolType === 'net') ? 1 : 0, tb = (b.toolType === 'net') ? 1 : 0;
+    if (ta !== tb) return ta - tb;                      // 竿 → 網
+    return (a.ord || 0) - (b.ord || 0) || a.id - b.id;   // 番号順（大きいほどレア）
+}
+function renderSpecialMapButtons(grid) {
+    Object.keys(MAP_DATA).filter(k => MAP_DATA[k].special && specialUnlocked(k)).forEach(k => {
+        const m = MAP_DATA[k];
+        const btn = document.createElement('button');
+        const ok = playerData.level >= m.reqLevel;
+        btn.className = `map-btn special ${currentLocation === k ? 'active' : ''} ${ok ? '' : 'locked'}`;
+        if (ok) { btn.innerText = `${m.emoji || '✨'} ${m.name}\n(特殊エリア Lv.${m.reqLevel}〜)`; btn.onclick = () => selectLocation(k); }
+        else btn.innerText = `🔒 ${m.emoji || '✨'} ${m.name}\n(要 Lv.${m.reqLevel})`;
+        grid.appendChild(btn);
+    });
 }
 function renderEventMapButtons(grid) {
     Object.keys(MAP_DATA).filter(k => MAP_DATA[k].event && eventUnlocked(k)).forEach(k => {
@@ -5565,8 +5714,9 @@ function renderEventMapButtons(grid) {
 // 期間が終わったイベントエリアにいたら、さざ波の海へ戻す／魚がまだ居ないエリアは遊べない
 const _handleAction301 = window.handleAction;
 window.handleAction = function () {
-    if (gameState === 'READY' && isEventArea(currentLocation)) {
-        if (!eventAreaOpen(currentLocation)) { floatText('イベントは終了しました。さざ波の海へ戻ります', '#ffd700', true); selectLocation('sea'); return; }
+    if (gameState === 'READY' && (isEventArea(currentLocation) || isSpecialArea(currentLocation))) {
+        if (isSpecialArea(currentLocation) && (!specialUnlocked(currentLocation) || playerData.level < MAP_DATA[currentLocation].reqLevel)) { selectLocation('sea'); return; }
+        if (isEventArea(currentLocation) && !eventAreaOpen(currentLocation)) { floatText('イベントは終了しました。さざ波の海へ戻ります', '#ffd700', true); selectLocation('sea'); return; }
         if (!FISH_DATA.some(f => f.location === currentLocation && (f.toolType || 'rod') === currentToolMode)) {
             playSE('foul'); setStatus(currentToolMode === 'rod' ? '竿で釣れる生き物は、準備中です' : '網で捕れる生き物は、準備中です', '#ff9'); return;
         }
@@ -5588,7 +5738,7 @@ Object.assign(ACHIEVEMENT_DATA, {
    画像は images/minigames/ev_*.png（無くても絵文字で遊べます。追加素材リスト.md を参照）
    =================================================== */
 function evBg(a, grad, imgName) {
-    return spEl('', a.stage, { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, background: `url(images/minigames/${imgName}.png) center/cover no-repeat, ${grad}`, pointerEvents: 'none' });
+    return spEl('', a.stage, { position: 'absolute', left: 0, top: 0, right: 0, bottom: 0, background: `url(images/minigames/mini_bg/${imgName}.png) center/cover no-repeat, ${grad}`, pointerEvents: 'none' });
 }
 function evSp(a, name, emoji, size, x, y) {
     const e = spEl('', a.stage, { position: 'absolute', width: size + 'px', height: size + 'px', fontSize: Math.round(size * 0.8) + 'px', lineHeight: size + 'px', textAlign: 'center', marginLeft: (-size / 2) + 'px', marginTop: (-size / 2) + 'px', pointerEvents: 'none', left: x + 'px', top: y + 'px' });
@@ -5824,30 +5974,59 @@ const PRACTICE_NOTE = {
     shell: '練習では、シャッフルがどんどん速く・多くなります。', sort: '練習では<b>制限時間</b>あり。進むと石板が増えます。', odd: '練習では、進むとカードが増えます。', stars: '練習では、数ラウンドごとに星の数が増えます。'
 };
 const practiceBest = (k) => ((playerData.spBest || {})[k]) || 0;
-function openPracticeList() {
-    closeAllModals();
+/* ---------- ミニゲーム練習：図鑑のように横にならぶ一覧 → タップで「タイトル・記録・ゲーム開始」画面 → 開始で遊び方 ---------- */
+function practiceIcon(k, px) {      // アイコンは、各ミニゲームにもともと設定されている絵文字を使う
+    const emoji = (SP_INFO[k] && SP_INFO[k].ico) || '🎮';
+    return `<span style="display:inline-block;font-size:${Math.round(px * 0.8)}px;line-height:${px}px;height:${px}px;">${emoji}</span>`;
+}
+function practiceAreaText(k) {
+    const names = Object.entries(SP_AREA_KIND).filter(([a, kk]) => kk === k && MAP_DATA[a]).map(([a]) => MAP_DATA[a].name);
+    return names.length ? names.join('・') : 'いろいろなエリア';
+}
+function practiceModal() {
     let m = byId('sp-practice-modal');
     if (!m) { m = spEl('modal', byId('game-container')); m.id = 'sp-practice-modal'; byId('game-container').appendChild(m); }
+    return m;
+}
+function openPracticeList() {
+    closeAllModals();
+    const m = practiceModal();
     const ks = practiceAllKinds();
     m.innerHTML = `<div style="font-size:20px;color:#ffd700;font-weight:bold;margin-bottom:6px;">🎮 ミニゲーム練習</div>
-        <div style="font-size:12px;color:#cfe8ff;margin-bottom:8px;text-align:center;line-height:1.6;">遊んだことのあるミニゲームが遊べます。<br>クリアするたびに難しくなる、スコアチャレンジ！<br><span style="color:#7fff7f;">🎁 10ラウンドで3,000G ／ 20ラウンドで10,000G</span><br><span style="color:#ffe27a;">🎍 季節のミニゲームは、その時期だけ遊べます</span></div>
-        <div id="sp-practice-list" style="display:flex;flex-direction:column;gap:8px;width:88%;max-width:340px;max-height:52%;overflow-y:auto;"></div>
+        <div style="font-size:12px;color:#cfe8ff;margin-bottom:8px;text-align:center;line-height:1.6;">遊んだことのあるミニゲームが遊べます。<br>タップすると、記録とスタートボタンが出ます。<br><small>🎍 季節イベントのミニゲームは、その季節だけ遊べます</small></div>
+        <div id="sp-practice-list" class="pg-grid"></div>
         <button class="btn" style="margin-top:12px;padding:8px 25px;font-size:15px;" onclick="closePracticeList(true)">もどる</button>`;
     const list = m.querySelector('#sp-practice-list');
     ks.forEach(k => {
         const b = document.createElement('button');
-        b.className = 'btn';
-        b.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;font-size:15px;text-align:left;';
+        b.className = 'pg-card';
         if (practiceOpen(k)) {
-            b.innerHTML = `<span>${SP_INFO[k].ico} ${SP_INFO[k].name}${PRACTICE_EV_KIND[k] ? ' 🎍' : ''}</span><small style="color:#ffe27a;white-space:nowrap;">ベスト ${practiceBest(k)}点</small>`;
-            b.onclick = () => startPractice(k);
+            b.innerHTML = `<span class="pg-ico">${practiceIcon(k, 44)}</span><span class="pg-name">${SP_INFO[k].name}</span><small class="pg-best">${practiceBest(k) ? 'ベスト ' + practiceBest(k) + '点' : 'きろくなし'}</small>${PRACTICE_EV_KIND[k] ? '<i class="pg-tag">🎍</i>' : ''}`;
+            b.onclick = () => openPracticeDetail(k);
         } else {
-            b.innerHTML = `<span>❔ ？？？</span><small style="color:#aaa;">???</small>`;
-            b.disabled = true; b.style.opacity = '.55'; b.style.filter = 'grayscale(.6)';
+            b.className += ' locked';
+            b.innerHTML = `<span class="pg-ico">❔</span><span class="pg-name">？？？</span><small class="pg-best">???</small>`;
+            b.disabled = true;
         }
         list.appendChild(b);
     });
     m.style.display = 'flex';
+}
+function openPracticeDetail(k) {
+    if (!SPG[k] || !practiceOpen(k)) return;
+    const m = practiceModal();
+    const info = SP_INFO[k];
+    const best = practiceBest(k);
+    m.innerHTML = `<div class="pg-detail">
+        <div class="pg-d-ico">${practiceIcon(k, 84)}</div>
+        <div class="pg-d-title">${info.name}</div>
+        <div class="pg-d-area">${PRACTICE_EV_KIND[k] ? '🎍 季節イベント　' : '📍 '}${practiceAreaText(k)}</div>
+        <div class="pg-d-rec"><span>🏆 ベストスコア</span><b>${best ? best + ' 点' : 'まだ記録なし'}</b></div>
+        <button class="btn pg-d-start" onclick="startPractice('${k}')">▶ ゲーム開始</button>
+        <button class="btn pg-d-back" onclick="openPracticeList()">もどる</button>
+    </div>`;
+    m.style.display = 'flex';
+    playSE && playSE('tap');
 }
 function closePracticeList(toHowTo) {
     const m = byId('sp-practice-modal'); if (m) m.style.display = 'none';

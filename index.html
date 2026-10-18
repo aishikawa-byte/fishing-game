@@ -263,6 +263,19 @@
             </div>
 
             <div class="config-row">
+                <span>言語 / Language</span>
+                <div class="vol-seg" id="lang-seg"></div>
+            </div>
+            <div class="config-row">
+                <span>BGM音量</span>
+                <div class="vol-seg" id="vol-bgm"></div>
+            </div>
+            <div class="config-row">
+                <span>SE音量</span>
+                <div class="vol-seg" id="vol-se"></div>
+            </div>
+
+            <div class="config-row">
                 <span>ゲーム難易度</span>
                 <div class="diff-seg">
                     <button id="cfg-diff-easy" onclick="setDifficulty('easy')">簡単</button>
@@ -284,10 +297,41 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 3.1.1)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 3.2.0)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V3.2.0======<br>
+                    <b>🌌 特殊エリア</b><br>
+                    ・特殊エリア6つ（サイバーシー／ミクロの海／理科実験室／妖怪の川／回転ずしレーン／海賊の入り江）を追加。季節に関係なくいつでも遊べます<br>
+                    ・新しい生き物を300種追加（全員に豆知識つき）。エリアごとの新ミニゲームも6種<br>
+                    ・解放は、季節イベントと同じ「手紙入りの小瓶」の合言葉。ヒントは釣りの中に…？<br>
+                    ・図鑑に「特殊エリア」タブを追加（図鑑コンプ・実績の対象外）<br>
+                    ・特殊エリアに必要レベルを設定（サイバーシー Lv.120／ミクロの海 140／理科実験室 160／妖怪の川 180／回転ずしレーン 200／海賊の入り江 220）<br>
+                    ・特殊エリアに、ちょっとしたひみつの仕掛けを追加…？<br>
+                    ・場所移動に、フィルター（通常／ガチャ／特殊／イベント）を追加<br>
+                    ・はじめは、特殊エリア・季節イベントの図鑑タブと場所は表示されません。合言葉でエリアを解放すると、図鑑のタブと場所移動のタブが増えます<br>
+                    <b>🌐 言語・サウンド</b><br>
+                    ・設定から「日本語／English」を切り替えられるように<br>
+                    ・BGMとSEの音量を、別々に6段階で調整できるように<br>
+                    <b>🔧 その他</b><br>
+                    ・日付をタップすると、いま開催中の季節イベントを表示<br>
+                    ・コード入力・データ削除などを、ゲーム内の画面に変更（実績音が途切れない）<br>
+                    ・小瓶の手紙が重複しないように。ヒントを「遊び方」と「場所移動」に追加<br>
+                    ・データ削除は、すべて消える「完全リセット」に。図鑑コンプ後の「2周目（転生）」のときだけ、拾った手紙・ミニゲーム練習記録・季節イベントの図鑑が残る<br>
+                    ・レアガチャの「景品をみる」ボタンを見やすく修正<br>
+                    ・ゲーム内の文章の誤字脱字を修正<br>
+                    ・ミニゲーム練習の一覧を、図鑑のように横に並べる形に変更。タップすると、タイトル・記録・ゲーム開始ボタンの画面が出る<br>
+                    ・隠しコマンドを追加（開発者用コマンドを大幅に追加）<br>
+                    ・色混ぜの色を絵の具のように修正（黄＋青＝緑）／ミクロの海は、ぐるっと1周なぞるだけで囲めるように。画面ぜんぶを囲むのはNG／回転ずしのお皿が重ならないよう修正<br>
+                    ・特殊エリアのひみつは、画面下の「さいきんの3匹」を3秒以内に5回タップ。「とじる」ボタンでキャラごと消える<br>
+                    ・回転ずしのレーンを2本に戻した（お皿は重ならない）<br>
+                    ・生き物の説明から、いらない「、」「。」を削除<br>
+                    ・生き物を入手した時／魚影が来た時／図鑑の「なでなで」で、生き物が泳ぐように動く（図鑑を見ているだけの時は動きません）<br>
+                    ・金額にコンマを表示／ピンゾロの超大物は、そのエリアの大物から確率で選ばれる／ゴミを拾った時の文字を大きく<br>
+                    ・手紙の言葉は、特殊エリアは紫・イベントエリアはオレンジの色で表示<br>
+                    ・スマホによって画面が小さくなる問題を修正（ミニゲームの画面を大きく表示）／特殊エリアのひみつを発動中に、後ろで釣りが進んでしまう問題を修正<br>
+                    <br>
                     ==V3.1.1======<br>
                     <b>🔧 修正</b><br>
                     ・Androidなどの小さい画面で、ミニゲームの説明文字とボタンが枠からはみ出す問題を修正<br>
@@ -360,38 +404,6 @@
                     ・ゴールドのバランスを調整（ボーナス上限×1.8、ショップ約1.5倍）<br>
                     ・天気は、結果画面を閉じるたびに判定。ガチャエリア・神獣界・地底湖・深海では発生しません<br>
                     <br>
-                    ==V2.3.0======<br>
-                    ・新しい実績を追加しました。<br>
-                    ・タイトル画面が時刻によって変更するようになりました。<br>
-                    ・メインメニューに装備画面を追加しました。<br>
-                    ・特殊な２つのエリアで伝説の竿の使用ができなくなりました。<br>
-                    ・設定にバイブレーション機能を追加しました。<br>
-                    ・メインメニューにランキング機能を追加しました。<br>
-                    ・設定に隠しコマンド機能を追加しました。<br>
-                    ==V2.2.20=====<br>
-                    ・ガチャ画面に注意書きボタンを追加しました。<br>
-                    ==V2.2.19=====<br>
-                    ・釣りゲーム中に音声がオフにできない問題を修正しました。<br>
-                    ==V2.2.18=====<br>
-                    ・ガチャ関連のUIを改良しました。<br>
-                    ==V2.2.17=====<br>
-                    ・アプリアイコンを追加しました。<br>
-                    ・音の有無アイコンを追加し、変更しました。<br>
-                    ・絵巻図鑑の背景を追加しました。<br>
-                    ・メインメニューにプレイ時間表示を追加しました。<br>
-                    ・メインメニューに何匹捕まえたかの表示を追加しました。<br>
-                    ・初めて捕まえた生き物には「NEW」が表示されるようになりました。<br>
-                    ・アップデート、追記載の欄にアコーディオン機能を追加しました。<br>
-                    ・「釣りを始める」ボタンの高さを調整しました。<br>
-                    ・遊び方に追記文章を追加しました。<br>
-                    ・２つ実績を解除した際、重複する不具合を修正しました。<br>
-                    ・設定のUIを調整しました。<br>
-                    ・データが初期状態（リセット）のとき、「遊び方」のボタンが目立つように改良しました。<br>
-                    ・未開放エリアを「？」で表示するようにしました。<br>
-                    ・「易しめ」モードが設定から選択できるようになりました。<br>
-                    ・新しいエリアを２つ追加しました。<br>
-                    ・新しいアイテムを１つ追加しました。<br>
-                    ・新しい実績を５つ追加しました。
                 </div>
             </div>
 
@@ -485,6 +497,18 @@
     </div>
 
     <!-- 遊び方 modal -->
+    <!-- 日付タップ：開催中の季節イベント -->
+    <div id="evnews-modal" class="modal" onclick="if(event.target===this)closeEventNews()">
+        <div class="evnews-card">
+            <div class="evnews-bunting"></div>
+            <div class="evnews-small">🎍 EVENT INFORMATION 🎍</div>
+            <div class="evnews-head" id="evnews-head"></div>
+            <div class="evnews-list" id="evnews-list"></div>
+            <div class="evnews-hint" id="evnews-hint"></div>
+            <button class="btn" onclick="closeEventNews()">とじる</button>
+        </div>
+    </div>
+
     <div id="howto-modal" class="modal">
         <div class="howto-title">遊び方</div>
         <div class="howto-body">
@@ -492,6 +516,7 @@
             <div class="howto-step"><b>🥅 網</b>泳ぐ生き物が<em>輪の中</em>に来た瞬間にタップ。大物は赤い輪で<em>2回</em>タップ！</div>
             <div class="howto-step"><b>✨ 特別な生き物</b>各エリアで一番めずらしい生き物は、ミニゲームで勝負！ 説明が出るので落ち着いて。</div>
             <div class="howto-step"><b>💰 お金</b>つかまえてお金をため、ショップ・ガチャ・工房へ。</div>
+            <div class="howto-step"><b>🍾 ヒント</b>釣りをしていると<em>手紙入りの小瓶</em>が見つかることも。書かれた言葉は、設定の「コード入力」で使えます。ふしぎなエリアや季節のイベントエリアが、ひらくかも…？ 日付をタップすると、いま開催中のイベントがわかります。</div>
             <div class="howto-step"><b>🏠 戻る</b>画面上の「🏠」ボタン。（PCは X / Esc）</div>
             <div class="howto-step small">PC：↑↓←→で選ぶ ／ Zで決定 ／ Xで戻る</div>
         </div>
@@ -511,6 +536,7 @@
     <!-- マップ選択 modal -->
     <div id="map-modal" class="modal">
         <div style="font-family: 'Reggae One', cursive; font-size: 20px; color: #ffd700; margin-bottom: 12px; flex-shrink: 0;">釣り場を選択</div>
+        <div class="map-tabs" id="map-tabs"></div>
         <div class="map-grid" id="map-grid"></div>
         <button class="btn" style="margin-top: 12px; padding: 6px 20px; flex-shrink: 0;" onclick="closeMapModal()">閉じる</button>
     </div>
@@ -546,6 +572,7 @@
         <div class="zukan-main-tabs">
             <button class="zukan-main-tab active" id="zukan-tab-normal" onclick="switchZukanCategory('normal')">通常エリア</button>
             <button class="zukan-main-tab" id="zukan-tab-gacha" onclick="switchZukanCategory('gacha')">ガチャエリア</button>
+            <button class="zukan-main-tab" id="zukan-tab-special" onclick="switchZukanCategory('special')">特殊エリア</button>
             <button class="zukan-main-tab" id="zukan-tab-event" onclick="switchZukanCategory('event')">イベントエリア</button>
         </div>
 
@@ -702,8 +729,15 @@
 <script src="fishsize.js"></script>
 <script src="fishfacing.js"></script>
 <script src="script.js"></script>
+<script src="minigames32.js"></script>
 <script src="addons.js"></script>
 <script src="events.js"></script>
+<script src="special.js"></script>
+<script src="ui32.js"></script>
+<script src="anim32.js"></script>
+<script src="egg32.js"></script>
+<script src="devcmd.js"></script>
+<script src="i18n.js"></script>
 <script>
   // ファイルの取り違え対策：script.js が正しく読み込めていない時に知らせる
   window.addEventListener('DOMContentLoaded', function () {
