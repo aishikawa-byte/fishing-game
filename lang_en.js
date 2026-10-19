@@ -3634,7 +3634,10 @@ window.I18N_EN={"海":"Sea",
 "・コンプリート演出を、ウィンドウ全体に出るように。音もやわらかい鐘の音に作り直し":"・Completion shows now fill the whole window, and the sound was remade as soft bells",
 "・メインメニューに「エリア制覇メダル」を追加。殿堂入りでメニューが金色にかがやくように":"・Added \"Area Medals\" to the main menu; the menu glows gold after the Hall of Fame",
 "・図鑑で、制覇したエリアの生き物カードが金色に。全部そろった図鑑は、進行バーがにじ色に":"・In the Zukan, cards from cleared areas turn gold, and a fully completed Zukan gets a rainbow progress bar",
-"📢 アプデ情報 (Ver 3.2.2)":"📢 Update Info (Ver 3.2.2)"};
+"📢 アプデ情報 (Ver 3.2.2)":"📢 Update Info (Ver 3.2.2)",
+"📢 アプデ情報 (Ver 3.2.3)":"📢 Update Info (Ver 3.2.3)",
+"🛠 修正":"🛠 Fixes",
+"・データリセット後、「遊び方」の案内が優先されて、ダイアログの「OK」ボタンが押せない問題を修正":"・Fixed the dialog \"OK\" button being unclickable after a data reset because the How to Play guide took priority"};
 window.I18N_RX=[["^の間は止まる（間欠泉が噴き出す）。赤で走るとミス。ミス(.+?)回で失敗。（PC：Zキー長押し）$",
 " you must stop (geysers erupt). Running on red is a miss. Fail after %1 misses. (PC: hold Z)"],
 ["^シャッフルが止まったら、真珠のある貝殻をタップ。3回当てればクリア。ミス(.+?)回で失敗。$",

@@ -2374,7 +2374,7 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.2.2";
+const APP_VERSION = "3.2.3";
 const CSS_VERSION = "32-k";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
@@ -3287,7 +3287,8 @@ function guideTick() {
     ensureGuide();
     const menu = byId('menu-screen');
     const ctx = kbCtx();
-    const on = !playerData.hasSeenHowTo && menu.style.display === 'flex' && ctx && ctx.id === 'menu-screen';
+    const dlgOpen = !!document.querySelector('#gd-overlay.show');      // ダイアログが出ている間は、誘導をいったん消す
+    const on = !dlgOpen && !playerData.hasSeenHowTo && menu.style.display === 'flex' && ctx && ctx.id === 'menu-screen';
     const layer = byId('guide-layer');
     if (on !== guideOn) { guideOn = on; layer.style.display = on ? 'block' : 'none'; }
     if (!on) return;
@@ -3303,7 +3304,7 @@ function guideTick() {
 }
 setInterval(guideTick, 300);
 document.addEventListener('click', (e) => {
-    if (!guideOn || e.target.closest('#btn-howto')) return;
+    if (!guideOn || e.target.closest('#btn-howto, #gd-overlay')) return;     // ゲーム内ダイアログ（OKボタン）は、誘導中でも押せる
     e.stopPropagation();
     e.preventDefault();
     const h = byId('guide-hole');

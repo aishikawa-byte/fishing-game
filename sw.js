@@ -1,4 +1,4 @@
-const CACHE_NAME = 'osakana-v3.2.2';
+const CACHE_NAME = 'osakana-v3.2.3';
 const ASSETS_TO_CACHE = ['./', './index.html', './style.css', './trivia.js', './fishsize.js', './fishfacing.js', './script.js', './addons.js', './events.js', './special.js', './minigames32.js', './ui32.js', './anim32.js', './settings32.js', './qol321.js', './celebrate32.js', './egg32.js', './devcmd.js', './i18n.js', './lang_en.js', './manifest.json', './images/favicon.png', './images/icon.png'];
 
 self.addEventListener('install', (event) => {
