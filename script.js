@@ -2374,8 +2374,8 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.2.1";
-const CSS_VERSION = "32-h";
+const APP_VERSION = "3.2.2";
+const CSS_VERSION = "32-k";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
