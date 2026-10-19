@@ -1,5 +1,5 @@
 /* ===================================================
-   Ver 3.2.3  コンプリート演出（celebrate32.js）
+   Ver 3.2.4  コンプリート演出（celebrate32.js）
    ---------------------------------------------------
    ① エリアコンプリート演出   … 図鑑のエリアを全部そろえた瞬間に出る、全画面の豪華演出
         areaCelebrate(エリアのキー, エリア名)  ※ script.js の「エリアコンプリート判定」から呼ばれます
@@ -96,7 +96,7 @@
                 ps.push({ x: cx, y: cy, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 0, max: rnd(.9, 1.6), hue: hue + rnd(-12, 12), sz: rnd(1.6, 3.2) });
             }
             ps.push({ ring: true, x: cx, y: cy, life: 0, max: .5, hue });
-            if (!opts.silent) pop();
+            if (opts.sound === true) pop();        // 花火の音は鳴らしません（opts.sound を true にすると鳴ります）
         }
         function frame(t) {
             if (!alive) return;

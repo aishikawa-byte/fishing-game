@@ -3637,7 +3637,9 @@ window.I18N_EN={"海":"Sea",
 "📢 アプデ情報 (Ver 3.2.2)":"📢 Update Info (Ver 3.2.2)",
 "📢 アプデ情報 (Ver 3.2.3)":"📢 Update Info (Ver 3.2.3)",
 "🛠 修正":"🛠 Fixes",
-"・データリセット後、「遊び方」の案内が優先されて、ダイアログの「OK」ボタンが押せない問題を修正":"・Fixed the dialog \"OK\" button being unclickable after a data reset because the How to Play guide took priority"};
+"・データリセット後、「遊び方」の案内が優先されて、ダイアログの「OK」ボタンが押せない問題を修正":"・Fixed the dialog \"OK\" button being unclickable after a data reset because the How to Play guide took priority",
+"📢 アプデ情報 (Ver 3.2.4)":"📢 Update Info (Ver 3.2.4)",
+"・図鑑のエリアをコンプリートした時の、花火の音を消した":"・Removed the fireworks sound when completing a Zukan area"};
 window.I18N_RX=[["^の間は止まる（間欠泉が噴き出す）。赤で走るとミス。ミス(.+?)回で失敗。（PC：Zキー長押し）$",
 " you must stop (geysers erupt). Running on red is a miss. Fail after %1 misses. (PC: hold Z)"],
 ["^シャッフルが止まったら、真珠のある貝殻をタップ。3回当てればクリア。ミス(.+?)回で失敗。$",
