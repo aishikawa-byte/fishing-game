@@ -1447,6 +1447,7 @@ function renderZukanGrid() {
 
     document.getElementById('zukan-progress-num').innerText = `${percent}% (${unlockedCount}/${totalFish})`;
     document.getElementById('zukan-progress-bar-inner').style.width = `${percent}%`;
+    { const pc = document.querySelector('.zukan-progress-container'); if (pc) pc.classList.toggle('full', totalFish > 0 && unlockedCount >= totalFish); }
 
     const gridContainer = document.getElementById('zukan-grid');
     gridContainer.innerHTML = "";
@@ -1470,7 +1471,7 @@ function renderZukanGrid() {
         const fishRecord = caughtFish[fish.id];
         const isUnlocked = fishRecord && fishRecord.unlocked;
         const card = document.createElement('div');
-        card.className = `zukan-card ${isUnlocked ? 'discovered' : ''}`;
+        card.className = `zukan-card ${isUnlocked ? 'discovered' : ''} ${isUnlocked && window.zukanAreaDoneC && zukanAreaDoneC(fish.location) ? 'area-done' : ''}`;
         
         if (isUnlocked && fishRecord.isNew) {
             const badge = document.createElement('span');
@@ -1497,6 +1498,7 @@ function renderZukanGrid() {
         } else {
             const isNet = fish.toolType === 'net';
             name.innerText = isNet ? "？(網で捕獲可能)" : "？(竿で捕獲可能)";
+            card.style.cursor = 'pointer'; card.onclick = () => { if (window.zukanHint) zukanHint(fish); };
             name.style.color = isNet ? "#ff99ff" : "#aaa";
         }
 
@@ -2372,8 +2374,8 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.2.0";
-const CSS_VERSION = "32-c";
+const APP_VERSION = "3.2.1";
+const CSS_VERSION = "32-h";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -2977,7 +2979,7 @@ function finishCatchCore(isSuccess) {
     }
     localStorage.setItem('retro_fishing_zukan_v4', JSON.stringify(caughtFish));
 
-    if (!_wasDone && areaDone(_loc)) { bonus.complete = MAP_DATA[_loc] ? MAP_DATA[_loc].name : ''; setTimeout(() => { floatText('🏅 ' + bonus.complete + ' コンプリート！', '#ffd700', true); playSE('levelup'); }, 500); }
+    if (!_wasDone && areaDone(_loc)) { bonus.complete = MAP_DATA[_loc] ? MAP_DATA[_loc].name : ''; setTimeout(() => { if (window.areaCelebrate) areaCelebrate(_loc, bonus.complete); else { floatText('🏅 ' + bonus.complete + ' コンプリート！', '#ffd700', true); playSE('levelup'); } }, 900); }
     lastBonus = bonus;
     if (!isNet) checkAndRegisterRanking(reactionTime, fish);
     checkAchievements();
@@ -3408,11 +3410,14 @@ function renderZukanSubFilterUI() {
     box.innerHTML = "";
     const b = document.createElement('button');
     b.className = 'zukan-area-btn';
-    b.innerHTML = `📍 エリア：<b>${currentFilter === 'all' ? 'すべて' : areaLabel(currentFilter)}${currentFilter !== 'all' && areaDone(currentFilter) ? ' ✅' : ''}</b> ▼`;
+    b.innerHTML = `📍 エリア：<b>${currentFilter === 'all' ? 'すべて' : areaLabel(currentFilter)}${currentFilter !== 'all' && areaDone(currentFilter) ? ' ✅' : ''}</b>${(() => { const n = FISH_DATA.filter(f => zukanCatOf(f) === currentZukanMainTab && (currentFilter === 'all' || f.location === currentFilter) && !(caughtFish[f.id] && caughtFish[f.id].unlocked)).length; return n ? `　<small>あと${n}匹</small>` : ''; })()} ▼`;
     b.onclick = openZukanAreaModal;
+    const _done = currentFilter !== 'all' && areaDone(currentFilter);
+    if (_done) b.classList.add('done');
     box.style.display = 'flex'; box.style.gap = '6px';
     b.style.flex = '1';
     box.appendChild(b);
+    if (_done && window.areaCelebrate) { const rp = document.createElement('button'); rp.className = 'zukan-replay-btn'; rp.innerHTML = '🎆'; rp.title = '制覇の演出をもう一度'; rp.onclick = () => areaCelebrate(currentFilter, areaLabel(currentFilter)); box.appendChild(rp); }
     const n = Object.keys(caughtFish).filter(k => caughtFish[k] && caughtFish[k].isNew).length;
     const c = document.createElement('button');
     c.className = 'zukan-newclear-btn';
@@ -3474,7 +3479,7 @@ function openZukanAreaModal() {
         const got = fl.filter(f => caughtFish[f.id] && caughtFish[f.id].unlocked).length;
         const row = document.createElement('button');
         row.className = `zukan-area-row ${currentFilter === k ? 'active' : ''}`;
-        row.innerHTML = `<span>${areaLabel(k)}${k !== 'all' && fl.length && got >= fl.length ? ' ✅' : ''}</span><small>${got}/${fl.length}</small>`;
+        row.innerHTML = `<span>${areaLabel(k)}${k !== 'all' && fl.length && got >= fl.length ? ' 🏅' : ''}</span><small>${got}/${fl.length}</small>`;
         if (k !== 'all' && fl.length && got >= fl.length) row.classList.add('done');
         row.onclick = () => {
             currentFilter = k;
@@ -5584,11 +5589,21 @@ function noteColor(e) {
     const m = e && e.area && MAP_DATA[e.area];
     return m && m.special ? '#c9a8ff' : (m ? '#ffb347' : '#ffffff');
 }
+// 手紙の言葉を、もう入力したか？（エリアの手紙＝解放ずみか／アイテムの手紙＝使用ずみか）
+function noteUsed(e) {
+    const p = playerData;
+    if (!e) return false;
+    if (e.area) { const m = MAP_DATA[e.area]; return !!(m && (m.special ? (p.specialAreas || {})[e.area] : (p.eventAreas || {})[e.area])); }
+    return !!(p.usedCodes || {})[e.code];
+}
+// 拾った手紙の一覧：白文字（アイテム）→ 特殊エリア → イベントエリア の順。入力ずみは ✅、まだは ⬜
 function openBottleNotes() {
     const n = playerData.bottleNotes || [];
-    const colorOf = (c) => noteColor((typeof BOTTLE_CODES !== 'undefined' && BOTTLE_CODES.find(x => x.code === c)) || null);
     const esc = (t) => String(t).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
-    gameAlert(n.length ? '📜 拾った手紙<br><br>' + n.map(c => `・<span style="color:${colorOf(c)};font-weight:bold;">${esc(c)}</span>`).join('<br>') : 'まだ手紙を拾っていません。', { scroll: true, html: true });
+    const rank = (e) => { const m = e && e.area && MAP_DATA[e.area]; return m ? (m.special ? 1 : 2) : 0; };
+    const list = n.map((c, i) => { const e = (typeof BOTTLE_CODES !== 'undefined' && BOTTLE_CODES.find(x => x.code === c)) || null; return { c, e, i }; })
+        .sort((a, b) => rank(a.e) - rank(b.e) || a.i - b.i);
+    gameAlert(list.length ? '📜 拾った手紙<br>✅ 入力ずみ　⬜ まだ入力していない<br><br>' + list.map(o => `${noteUsed(o.e) ? '✅' : '⬜'} <span style="color:${noteColor(o.e)};font-weight:bold;">${esc(o.c)}</span>`).join('<br>') : 'まだ手紙を拾っていません。', { scroll: true, html: true });
 }
 
 /* ---------- 宝箱 ---------- */

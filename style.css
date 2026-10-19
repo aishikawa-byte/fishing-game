@@ -2228,7 +2228,7 @@ body.hof #menu-title { color: #ffd700; text-shadow: 0 0 10px #ffd700, 2px 2px 0 
 /* ===================================================
    Ver 3.0.0 (c) UI調整
    =================================================== */
-:root { --css-ver: '32-c'; }
+:root { --css-ver: '32-h'; }
 
 /* ---- メインメニュー：縦1列 ---- */
 .menu-grid { display: flex !important; flex-direction: column; gap: 6px; width: 90%; max-width: 310px; margin-bottom: 8px; }
@@ -2392,8 +2392,9 @@ body.hof #menu-title { color: #ffd700; text-shadow: 0 0 10px #ffd700, 2px 2px 0 
 .zukan-sort-btn b { color: #7a1a00; }
 
 /* ===== Ver 3.1.0 タイトル画面：アンケートへのリンク ===== */
-.title-survey-btn { display: inline-block; margin-top: 12px; padding: 8px 16px; font-size: 14px; font-weight: bold; color: #fff; text-decoration: none; background: rgba(5, 12, 28, .85); border: 2px solid #ffd76a; border-radius: 10px; text-shadow: 1px 1px 0 #000; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
-.title-survey-btn:active { transform: translateY(1px); filter: brightness(1.2); }
+.title-survey-btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 6px 12px 8px; padding-right: max(6px, env(safe-area-inset-right)); font-size: 13px; font-weight: bold; color: #fff; text-decoration: none; background: rgba(5, 12, 28, .88); border: 2px solid #ffd76a; border-right: none; border-radius: 12px 0 0 12px; text-shadow: 1px 1px 0 #000; box-shadow: 0 2px 6px rgba(0,0,0,.5); }
+.title-survey-btn span { font-size: 12px; line-height: 1.2; text-align: center; width: 3.1em; word-break: break-all; }
+.title-survey-btn:active { transform: translateY(-50%) translateX(-1px); filter: brightness(1.2); }
 
 #sp-practice-modal { height: auto; justify-content: center; max-height: 82%; box-sizing: border-box; padding: 14px 10px; }
 
@@ -2530,3 +2531,115 @@ html, body { height: 100%; margin: 0; background: #050b14; }
 /* 生き物のアニメーション（anim32.js）：動かしている間は、元の画像を透明にして、キャンバスに置きかえる */
 .cm-hide { opacity: 0 !important; }
 #fish-shadow.cm-on { background-image: none !important; }
+
+/* ---- 詳しい設定（settings32.js） ---- */
+.adv-row { padding: 8px 4px 8px 10px; font-size: 13px; }
+.adv-seg button { min-width: 0; padding: 6px 9px; white-space: nowrap; }
+.adv-note { width: 100%; box-sizing: border-box; padding: 0 6px 6px 10px; font-size: 11px; color: #9fb0c8; line-height: 1.5; border-bottom: 1px dotted #334455; }
+#adv-content { background: rgba(0,0,0,.22); border-radius: 6px; margin-bottom: 6px; }
+/* ドットの見え方：なめらか＝すべて補間／じどう＝縮んで見える絵・魚影・動く生き物だけ補間 */
+body.px-smooth *, body.px-smooth *::before, body.px-smooth *::after { image-rendering: auto !important; }
+body.px-auto img.px-down, body.px-auto #fish-shadow, body.px-auto .cm-canvas { image-rendering: auto !important; }
+body.no-weather #weather-layer { display: none !important; }
+.adv-row { flex-wrap: wrap; gap: 6px; }
+.adv-row > .adv-seg { margin-left: auto; max-width: 100%; }
+.adv-seg button { padding: 6px 7px; }
+
+/* V3.2.1 qol */
+#first-setup { position: absolute; inset: 0; z-index: 9500; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; }
+#first-setup .fs-card { width: 88%; max-width: 380px; background: #0c1f38; border: 3px solid #ffd76a; border-radius: 14px; padding: 16px 12px; color: #fff; text-align: center; }
+#first-setup .fs-title { font-size: 20px; font-weight: bold; color: #ffd76a; }
+#first-setup .fs-sub { font-size: 12px; opacity: .8; margin: 6px 0 10px; }
+#first-setup .fs-row { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; font-size: 14px; }
+#first-setup .fs-ok { margin-top: 12px; font-size: 18px; padding: 10px 24px; }
+#result-share-btn { font-size: 14px; padding: 8px 12px; margin-left: 6px; }
+
+/* V3.2.1 コンプリート演出（celebrate32.js） */
+#area-celebrate { position: fixed; inset: 0; z-index: 9100; overflow: hidden; display: flex; align-items: center; justify-content: center; text-align: center; animation: celIn .35s ease-out; }
+@keyframes celIn { from { opacity: 0 } to { opacity: 1 } }
+.cel-dim { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, rgba(0,0,0,.8), rgba(0,0,0,.97)); }
+.cel-rays { position: absolute; left: 50%; top: 42%; width: 220vmax; height: 220vmax; margin: -110vmax 0 0 -110vmax; pointer-events: none;
+    background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c, #ffd700) 38%, transparent) 0 7deg, transparent 7deg 18deg);
+    -webkit-mask: radial-gradient(circle, #000 0, transparent 22%); mask: radial-gradient(circle, #000 0, transparent 22%); animation: celSpin 14s linear infinite; }
+@keyframes celSpin { to { transform: rotate(360deg) } }
+.cel-glow { position: absolute; left: 50%; top: 42%; width: 70vmin; height: 70vmin; margin: -35vmin 0 0 -35vmin; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--c, #ffd700) 55%, transparent), transparent 70%); animation: celPulse 1.4s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes celPulse { from { transform: scale(.85); opacity: .7 } to { transform: scale(1.1); opacity: 1 } }
+.cel-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.cel-fishring { position: absolute; left: 50%; top: 42%; width: 0; height: 0; z-index: 2; animation: celSpin 26s linear infinite; }
+.cel-fishring img { position: absolute; width: 15vmin; max-width: 62px; height: auto; left: -7.5vmin; top: -7.5vmin; transform: rotate(var(--a)) translateY(-31vmin) rotate(calc(-1 * var(--a))); opacity: 0; animation: celFishIn .5s ease-out forwards; filter: drop-shadow(0 0 6px var(--c, #ffd700)); image-rendering: auto; }
+@keyframes celFishIn { from { opacity: 0; transform: rotate(var(--a)) translateY(0) rotate(calc(-1 * var(--a))) scale(.2) } to { opacity: 1; transform: rotate(var(--a)) translateY(-31vmin) rotate(calc(-1 * var(--a))) scale(1) } }
+.cel-center { position: relative; z-index: 4; margin-top: -16vh; padding: 0 12px; }
+.cel-small { font-family: 'Reggae One', cursive; font-size: 18px; letter-spacing: 3px; color: #fff; text-shadow: 0 0 10px var(--c, #ffd700), 2px 2px 0 #000; animation: celDrop .5s .2s backwards; }
+.cel-name { font-family: 'Reggae One', cursive; font-size: 38px; line-height: 1.15; color: #fff; text-shadow: 0 0 14px var(--c, #ffd700), 0 0 30px var(--c, #ffd700), 3px 3px 0 #000; margin: 6px 0; animation: celZoom .6s .35s cubic-bezier(.2,1.6,.4,1) backwards; }
+.cel-count { font-size: 14px; color: #fff; background: rgba(0,0,0,.6); border: 2px solid var(--c, #ffd700); border-radius: 999px; padding: 4px 14px; display: inline-block; animation: celDrop .5s .8s backwards; }
+.cel-stamp { margin: 14px auto 0; width: 92px; height: 92px; line-height: 88px; border: 6px solid #ff3b3b; color: #ff3b3b; border-radius: 12px; font-family: 'Reggae One', cursive; font-size: 40px; transform: rotate(-12deg); background: rgba(255,255,255,.12); text-shadow: 0 0 8px rgba(255,60,60,.8); animation: celStamp .35s .65s cubic-bezier(.3,0,.2,1.8) backwards; }
+@keyframes celStamp { from { transform: rotate(-30deg) scale(3.2); opacity: 0 } to { transform: rotate(-12deg) scale(1); opacity: 1 } }
+@keyframes celDrop { from { transform: translateY(-22px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes celZoom { from { transform: scale(.2); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+.cel-tap { position: absolute; bottom: 14px; left: 0; right: 0; z-index: 4; font-size: 12px; color: #fff; opacity: .7; animation: celBlink 1.2s 1.8s infinite alternate backwards; }
+@keyframes celBlink { from { opacity: .2 } to { opacity: .8 } }
+
+/* 殿堂入り（豪華版） */
+#clear-modal { justify-content: flex-start; padding-top: 7vh; }
+#clear-modal { position: fixed !important; inset: 0 !important; top: 0 !important; left: 0 !important; z-index: 9100 !important; width: 100vw !important; max-width: none !important; height: 100vh !important; height: 100dvh !important; max-height: none !important; padding-left: 0 !important; padding-right: 0 !important; border-radius: 0 !important; border: none !important; margin: 0 !important; transform: none !important; box-sizing: border-box; }
+#clear-modal > :not(.hof-bg):not(.cel-rays):not(.hof-pillar):not(.hof-ring):not(.cel-canvas) { position: relative; z-index: 4; }
+#clear-modal .hof-bg { position: absolute; inset: 0; z-index: 0; background: radial-gradient(circle at 50% 30%, #3a2a00, #0a0520 70%); animation: celIn 1s; }
+#clear-modal .hof-rays { z-index: 1; top: 26%; --c: #ffd700; opacity: .9; }
+#clear-modal .hof-pillar { position: absolute; z-index: 1; left: 50%; top: 0; width: 34vmin; height: 70%; margin-left: -17vmin; background: linear-gradient(to bottom, rgba(255,230,120,.75), rgba(255,230,120,0)); filter: blur(6px); animation: hofPillar 1.2s ease-out backwards; }
+@keyframes hofPillar { from { opacity: 0; transform: scaleY(0); transform-origin: top } to { opacity: 1; transform: none } }
+#clear-modal .hof-ring { position: absolute; z-index: 2; left: 50%; top: 26%; width: 0; height: 0; animation: celSpin 30s linear infinite; }
+#clear-modal .hof-ring img { position: absolute; width: 13vmin; max-width: 54px; left: -6.5vmin; top: -6.5vmin; transform: rotate(var(--a)) translateY(-34vmin) rotate(calc(-1 * var(--a))); filter: drop-shadow(0 0 8px #ffd700); opacity: 0; animation: hofTro .6s 2s ease-out forwards; }
+@keyframes hofTro { to { opacity: .55 } }
+.hof-crown { font-size: 76px; line-height: 1; filter: drop-shadow(0 0 18px #ffd700); animation: hofCrown .9s .1s cubic-bezier(.3,0,.2,1.6) backwards; }
+@keyframes hofCrown { from { transform: translateY(-60vh) rotate(-40deg) scale(2); opacity: 0 } to { transform: none; opacity: 1 } }
+.hof-title span { display: inline-block; animation: celZoom .5s backwards; }
+.hof-title { animation: none !important; font-size: 40px; }
+.hof-sub { animation: celDrop .6s 2.2s backwards; text-shadow: 0 0 10px #ffd700; }
+.hof-credits { min-height: 160px; display: flex; flex-direction: column; gap: 6px; margin-top: 6vh; }
+.hof-credits div { min-height: 22px; font-size: 14px; color: #fff; text-shadow: 1px 1px 0 #000, 0 0 8px rgba(255,215,0,.6); opacity: 0; }
+.hof-credits div.on { animation: celDrop .6s forwards; }
+.hof-reward, .hof-close { opacity: 0; pointer-events: none; transition: opacity .6s; }
+.hof-reward.on, .hof-close.on { opacity: 1; pointer-events: auto; }
+
+/* ===== V3.2.1 メインメニュー／図鑑のデザイン強化 ===== */
+/* エリア制覇メダル */
+#menu-medals { margin-top: 5px; padding-top: 5px; border-top: 1px dotted #555; font-size: 11px; }
+#menu-medals .mm-head { color: #ffe9a0; } #menu-medals .mm-head b { color: #ffd700; }
+#menu-medals .mm-dots { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+#menu-medals .mm-dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #555; background: #1a1a1a; display: inline-block; }
+#menu-medals .mm-dots i.on { border-color: #fff; background: radial-gradient(circle at 35% 30%, #fff, var(--c) 55%, #000); box-shadow: 0 0 7px var(--c), 0 0 2px #fff; animation: mmTw 2.4s ease-in-out infinite alternate; }
+#menu-medals .mm-dots i.on:nth-child(3n) { animation-delay: .6s; } #menu-medals .mm-dots i.on:nth-child(3n+1) { animation-delay: 1.2s; }
+@keyframes mmTw { from { filter: brightness(.9) } to { filter: brightness(1.4) } }
+#menu-medals.all .mm-head { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
+/* 殿堂入り：メニュー全体を金色に */
+body.hof .menu-status-box { position: relative; border-color: #ffd700; background: linear-gradient(160deg, rgba(60,40,0,.92), rgba(10,6,0,.92) 60%); box-shadow: 0 0 14px rgba(255,215,0,.55), inset 0 0 18px rgba(255,215,0,.18); overflow: hidden; }
+body.hof .menu-status-box::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; background: linear-gradient(100deg, transparent, rgba(255,240,170,.28), transparent); animation: hofSheen 4.5s ease-in-out infinite; pointer-events: none; }
+@keyframes hofSheen { 0%, 55% { left: -60% } 100% { left: 130% } }
+body.hof #menu-title { background: linear-gradient(90deg, #3a2500, #7a5200, #3a2500); animation: hofGlow 2.2s ease-in-out infinite alternate; }
+@keyframes hofGlow { from { box-shadow: 0 0 6px rgba(255,215,0,.4) } to { box-shadow: 0 0 20px rgba(255,215,0,.95) } }
+body.hof #menu-screen .menu-btn { border-color: #ffd700 !important; box-shadow: 0 0 6px rgba(255,215,0,.35), inset 0 0 8px rgba(255,215,0,.15); }
+body.hof #menu-screen .menu-btn.menu-main { background: linear-gradient(180deg, #b8860b, #6b4a00) !important; color: #fff6c8 !important; text-shadow: 0 0 6px #ffd700, 1px 1px 0 #000; }
+body.hof #menu-screen::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .55;
+    background: radial-gradient(2px 2px at 12% 20%, #ffe9a0, transparent), radial-gradient(2px 2px at 80% 12%, #fff, transparent), radial-gradient(1.5px 1.5px at 30% 70%, #ffd700, transparent), radial-gradient(2px 2px at 90% 60%, #ffe9a0, transparent), radial-gradient(1.5px 1.5px at 55% 40%, #fff, transparent), radial-gradient(2px 2px at 8% 88%, #ffd700, transparent);
+    animation: hofTwinkle 3s ease-in-out infinite alternate; }
+@keyframes hofTwinkle { from { opacity: .15 } to { opacity: .75 } }
+/* 図鑑：制覇したエリア */
+.zukan-card.area-done { border-color: #ffd700; background: linear-gradient(160deg, rgba(60,45,5,.95), rgba(15,35,20,.95)); box-shadow: 0 0 8px rgba(255,215,0,.55), inset 0 0 8px rgba(255,215,0,.15); overflow: hidden; }
+.zukan-card.area-done::after { content: ''; position: absolute; top: 0; bottom: 0; width: 45%; left: -70%; background: linear-gradient(100deg, transparent, rgba(255,245,180,.4), transparent); animation: hofSheen 3.8s ease-in-out infinite; pointer-events: none; }
+.zukan-card.area-done:nth-child(2n)::after { animation-delay: .9s; } .zukan-card.area-done:nth-child(3n)::after { animation-delay: 1.7s; }
+.zukan-area-btn.done { background: linear-gradient(180deg, #8a6200, #4a3200); border-color: #ffe27a; box-shadow: 0 0 10px rgba(255,215,0,.6); }
+.zukan-replay-btn { flex: 0 0 auto; padding: 0 12px; font-size: 18px; background: #4a3200; border: 2px solid #ffd700; border-radius: 6px; cursor: pointer; }
+.zukan-area-row.done { background: linear-gradient(90deg, #5a4200, #2b1d0c); box-shadow: 0 0 8px rgba(255,215,0,.35); }
+.zukan-progress-container.full { border-color: #ffd700; box-shadow: 0 0 12px rgba(255,215,0,.7), inset 0 0 6px #000; }
+.zukan-progress-container.full .zukan-progress-bar-inner { background: linear-gradient(90deg, #ff6a6a, #ffd700, #6aff9a, #6ab8ff, #c26aff, #ff6a6a); background-size: 200% 100%; animation: zkRainbow 3s linear infinite; }
+.zukan-progress-container.full .zukan-progress-text { text-shadow: 0 0 8px #ffd700; }
+@keyframes zkRainbow { to { background-position: 200% 0 } }
+html.lang-en /* 大きい画面では、演出の文字も大きく */
+.hof-credits div { font-size: clamp(14px, 2.5vmin, 24px); }
+.hof-title { font-size: clamp(40px, 9vmin, 84px) !important; }
+.hof-sub { font-size: clamp(20px, 4vmin, 36px) !important; }
+.hof-crown { font-size: clamp(76px, 14vmin, 140px); }
+.cel-name { font-size: clamp(38px, 9vmin, 80px); }
+.cel-small { font-size: clamp(18px, 3vmin, 30px); }
+.cel-count { font-size: clamp(14px, 2.4vmin, 22px); }
+.zukan-area-btn { line-height: 1.25; }

@@ -247,12 +247,18 @@ SPG.mix = function (a, P) {
     const cnt = lbl('', W / 2 - 38, 130, { fontSize: '12px', color: '#d8ecff' });
     const sw2 = spEl('', a.stage, { position: 'absolute', left: (W - 98) + 'px', top: '44px', width: '74px', height: '74px', borderRadius: '10px', border: '4px dashed #fff', background: '#eee', pointerEvents: 'none' });
     lbl('いまの色', W - 98, 122, { fontSize: '12px' });
+    // 色の見分けをたすける（設定「色混ぜの色名表示」）：色の名前を文字でも出す
+    const help = !!(window.advGet && window.advGet('colorHelp'));
+    const PAL = [['赤', [230, 40, 50]], ['オレンジ', [240, 130, 30]], ['黄', [255, 225, 20]], ['黄緑', [150, 210, 40]], ['緑', [40, 160, 70]], ['水色', [90, 190, 235]], ['青', [25, 80, 230]], ['むらさき', [130, 50, 190]], ['ピンク', [240, 120, 170]], ['茶色', [130, 80, 50]], ['白', [255, 255, 255]], ['灰色', [150, 150, 150]], ['こげ茶', [70, 40, 30]], ['くろ', [30, 30, 30]]];
+    const colName = (v) => { let b = PAL[0], bd = 1e9; PAL.forEach(p => { const d = dist(p[1], v); if (d < bd) { bd = d; b = p; } }); return b[0]; };
+    const tName = help ? lbl('', 18, 116, { fontSize: '12px' }) : null, mName = help ? lbl('', W - 102, 140, { fontSize: '12px' }) : null;
+    const nameRefresh = () => { if (!help) return; tName.innerText = colName(tgt); mName.innerText = drops() ? colName(mixOf(mine)) : '—'; };
     // ボタン（座標で判定）
     const btns = []; const bw = 46, bh = 46, by = H - 58, keys = useW ? ['r', 'y', 'b', 'w'] : ['r', 'y', 'b'];
     const total = keys.length + 2, gap = 6, bx0 = (W - (total * bw + (total - 1) * gap)) / 2;
     keys.forEach((k, i) => {
         const e = spEl('', a.stage, { position: 'absolute', left: (bx0 + i * (bw + gap)) + 'px', top: by + 'px', width: bw + 'px', height: bh + 'px', borderRadius: '50%', border: '3px solid #fff', background: rgb(COL[k]), boxShadow: 'inset 0 -6px 8px rgba(0,0,0,.25),0 2px 0 #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 'bold', color: k === 'w' || k === 'y' ? '#333' : '#fff', pointerEvents: 'none' });
-        e.innerHTML = mgImg('sp_drop_' + k, '💧', 30) ; e.title = NAME[k]; btns.push({ e, fn: () => add(k) });
+        e.innerHTML = mgImg('sp_drop_' + k, '💧', 30) + (window.advGet && window.advGet('colorHelp') ? `<span style="position:absolute;left:0;right:0;bottom:-17px;text-align:center;font-size:12px;color:#fff;text-shadow:1px 1px 0 #000">${NAME[k]}</span>` : ''); e.title = NAME[k]; btns.push({ e, fn: () => add(k) });
     });
     const mkBtn = (txt, i, bg, fn) => { const e = spEl('', a.stage, { position: 'absolute', left: (bx0 + i * (bw + gap)) + 'px', top: by + 'px', width: bw + 'px', height: bh + 'px', borderRadius: '10px', border: '3px solid #ffe9a0', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 'bold', color: '#fff', textAlign: 'center', lineHeight: '1.1', pointerEvents: 'none' }); e.innerHTML = txt; btns.push({ e, fn }); };
     mkBtn('🗑<br>すてる', keys.length, '#6a3a3a', () => { mine = {}; refresh(); playSE('tap'); });
@@ -261,7 +267,7 @@ SPG.mix = function (a, P) {
     function refresh() {
         const n = drops(), col = mixOf(mine);
         liquid.style.height = (n / MAXD * 100) + '%'; liquid.style.background = n ? rgb(col) : '#eee'; sw2.style.background = n ? rgb(col) : '#eee';
-        cnt.innerText = `しずく ${n}/${MAXD}`; starLbl.innerText = `★ ${stars}/${needStars}　(${round + 1}/3)`;
+        cnt.innerText = `しずく ${n}/${MAXD}`; nameRefresh(); starLbl.innerText = `★ ${stars}/${needStars}　(${round + 1}/3)`;
         btns.forEach((b, i) => { b.e.style.outline = (g._kb && i === cur) ? '4px solid #fff' : 'none'; });
     }
     function add(k) { if (busy > 0) return; if (drops() >= MAXD) { a.flash('いっぱい！', '#ffd27a'); return; } mine[k] = (mine[k] || 0) + 1; playSE('tap'); refresh(); }

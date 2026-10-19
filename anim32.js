@@ -115,6 +115,7 @@
        CreatureMotion.stop(エレメント)                                                      */
     const CM = window.CreatureMotion = {
         enabled: true,
+        smooth: true,      // false = ドットをくっきり（詳しい設定の「ドットの見え方」で切りかえ）
         kindOf,
         stop(el) { if (el && el._cm) el._cm.stop(); },
         start(img, fish, opt) {
@@ -127,7 +128,7 @@
             cv.className = 'cm-canvas';
             cv.style.cssText = 'position:absolute;pointer-events:none;image-rendering:pixelated;z-index:1;';
             host.appendChild(cv);
-            const ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
+            const ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = CM.smooth !== false; ctx.imageSmoothingQuality = 'high';
             const kind = opts.kind || kindOf(fish), head = facingOf(fish);
             const imSrc = img.src;
             const T0 = performance.now(), dur = opts.duration || 0, amp = opts.amp || 1;
@@ -142,7 +143,7 @@
                 const w = img.offsetWidth, h = img.offsetHeight;
                 cv.style.left = img.offsetLeft + 'px'; cv.style.top = img.offsetTop + 'px'; cv.style.width = w + 'px'; cv.style.height = h + 'px';
                 const pw = Math.max(1, Math.round(w * dpr)), ph = Math.max(1, Math.round(h * dpr));
-                if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; ctx.imageSmoothingEnabled = false; }
+                if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; ctx.imageSmoothingEnabled = CM.smooth !== false; ctx.imageSmoothingQuality = 'high'; }
                 return { pw, ph };
             };
             const loop = (now) => {
@@ -173,7 +174,7 @@
             const cv = document.createElement('canvas');
             cv.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated;';
             el.appendChild(cv);
-            const ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
+            const ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = CM.smooth !== false; ctx.imageSmoothingQuality = 'high';
             const T0 = performance.now(); let raf = 0, alive = true;
             const src = fish.image;
             const im = new Image();
@@ -186,7 +187,7 @@
                     if (!alive) return;
                     if (el.style.display === 'none' || !el.isConnected) { stop(); return; }
                     const w = Math.max(1, el.offsetWidth), h = Math.max(1, el.offsetHeight);
-                    if (cv.width !== w * 2 || cv.height !== h * 2) { cv.width = w * 2; cv.height = h * 2; ctx.imageSmoothingEnabled = false; }
+                    if (cv.width !== w * 2 || cv.height !== h * 2) { cv.width = w * 2; cv.height = h * 2; ctx.imageSmoothingEnabled = CM.smooth !== false; ctx.imageSmoothingQuality = 'high'; }
                     drawFrame(ctx, im, cv.width, cv.height, { x: 0, y: 0, w: cv.width, h: cv.height }, kind, head, (now - T0) / 1000, 1);
                     raf = requestAnimationFrame(loop);
                 };

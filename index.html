@@ -48,7 +48,7 @@
     <div class="version-text" id="version-label">Ver 3.1.1</div>
     <div class="tagline">すきま時間に、一閃。<br>反射神経 × コレクションの釣りゲーム</div>
     <button class="btn title-btn" onclick="goToMenu()">叩いて進む</button>
-    <a class="title-survey-btn" href="https://forms.cloud.microsoft/r/SZ3viK17xa" target="_blank" rel="noopener noreferrer">📝 アンケートに答える（1分）</a>
+    <a class="title-survey-btn" href="https://forms.cloud.microsoft/r/SZ3viK17xa" target="_blank" rel="noopener noreferrer" title="アンケート・お問い合わせ・不具合報告">📝<span>アンケート</span></a>
 </div>
 
     <!-- メインメニュー画面 -->
@@ -289,6 +289,31 @@
                 <button class="btn" id="config-vibe-btn" style="background:#006644;" onclick="toggleVibration()">バイブ: ON</button>
             </div>
             
+            <div class="config-row adv-head" onclick="toggleAdvSettings()" style="cursor:pointer;">
+                <span>⚙ 詳しい設定</span>
+                <button id="adv-toggle-btn" class="update-toggle-btn" type="button">＋</button>
+            </div>
+            <div id="adv-content" style="display:none; width:100%;">
+                <div class="config-row adv-row"><span>文字の大きさ</span><div class="vol-seg adv-seg" id="adv-seg-ts"></div></div>
+                <div class="config-row adv-row"><span>ドットの見え方</span><div class="vol-seg adv-seg" id="adv-seg-px"></div></div>
+                <div class="adv-note">ドット絵のあらさが気になる時は「なめらか」。縮んで見える絵のギザギザは「じどう」で自動的にやわらぎます。</div>
+                <div class="config-row adv-row"><span>生き物の動き</span><div class="vol-seg adv-seg" id="adv-seg-anim"></div></div>
+                <div class="adv-note">入手した時・魚影・図鑑のなでなでで、生き物が動きます。</div>
+                <div class="config-row adv-row"><span>画面のゆれ</span><div class="vol-seg adv-seg" id="adv-seg-shake"></div></div>
+                <div class="config-row adv-row"><span>天気エフェクト</span><div class="vol-seg adv-seg" id="adv-seg-weather"></div></div>
+                <div class="adv-note">雨・雪・霧などの演出。OFFにすると軽くなります。</div>
+                <div class="config-row adv-row" style="flex-wrap:wrap; gap:6px;">
+                    <span>バックアップ</span>
+                    <span><button class="btn" style="background:#2a4a6a; font-size:12px; margin-right:4px;" onclick="advBackupCopy()">📋 コードをコピー</button><button class="btn" style="background:#4a2a6a; font-size:12px;" onclick="advBackupRestore()">📥 コードから復元</button></span>
+                </div>
+                <div class="adv-note">セーブデータをコードにしてコピーできます。機種変更や、念のための保管に。</div>
+                <div class="config-row adv-row"><span>省電力モード<br><small style="opacity:.7">動き・ゆれ・天気をまとめてOFF</small></span><button class="btn" id="adv-saver-btn" style="font-size:12px;" onclick="advSaverToggle()">省電力モード: OFF</button></div>
+                <div class="config-row adv-row"><span>あそんだ記録</span><button class="btn" style="background:#2a5a4a; font-size:12px;" onclick="openStats()">📊 統計を見る</button></div>
+                <div class="config-row adv-row"><span>不具合の報告<br><small style="opacity:.7">情報をコピー → タイトルの「アンケート」へ</small></span><button class="btn" style="background:#5a4a2a; font-size:12px;" onclick="advBugReport()">🐞 情報をコピー</button></div>
+                <div class="config-row adv-row"><span id="adv-backup-info" style="font-size:12px;opacity:.8">前回: -</span></div>
+                <div class="config-row adv-row"><span>詳しい設定を初期化</span><button class="btn" style="background:#6a3a3a; font-size:12px;" onclick="advReset()">もとにもどす</button></div>
+            </div>
+
             <div class="config-row cfg-hidden-row" style="border-top: 1px dashed #444; padding-top: 10px; margin-top: 10px;">
                 <span style="color:#ffcc00;">隠しコマンド</span>
                 <span><button class="btn" id="config-notes-btn" style="background:#2a4a6a; font-size:12px; margin-right:4px;" onclick="openBottleNotes()">📜 拾った手紙</button><button class="btn" style="background:#6600cc; font-size:12px;" onclick="openCheatPrompt()">コード入力</button></span>
@@ -297,10 +322,40 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 3.2.0)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 3.2.1)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V3.2.1======<br>
+                    <b>⚙ 詳しい設定</b><br>
+                    ・設定に「⚙ 詳しい設定」（＋ボタンで開く）を追加<br>
+                    ・文字の大きさ（小／ふつう／大／特大）を変えられるように<br>
+                    ・ドットの見え方（じどう／くっきり／なめらか）を追加。ドット絵のあらさ対策として、縮んで見える絵は初期設定「じどう」でなめらかに表示<br>
+                    ・生き物の動き／画面のゆれ／天気エフェクトを、ON・OFFできるように<br>
+                    ・セーブデータのバックアップ（コードをコピー／コードから復元）を追加<br>
+                    <b>📜 手紙</b><br>
+                    ・「拾った手紙」に、入力ずみ（✅）かまだ（⬜）かを表示<br>
+                    ・手紙は、白文字（アイテム）→ 特殊エリア → イベントエリアの順に、自動で並びかわる<br>
+                    <br>
+                    <b>🌟 あそびやすさ</b><br>
+                    ・はじめて遊ぶとき、「かんたん設定」（文字の大きさ・音・むずかしさ）が出るように<br>
+                    ・バックアップのおすすめ（7日に1回、そっと声をかけます）と、前回のバックアップ日の表示を追加<br>
+                    ・新しいバージョンがあるとき、再読み込みをすすめるおしらせを追加<br>
+                    ・「釣りの操作補助」（判定をゆるくする）を追加。むずかしさとは別に選べます<br>
+                    ・ミニゲームに3回続けて失敗すると、次のバトルが少しやさしくなるように<br>
+                    ・色混ぜゲームに、色の名前を表示する設定を追加<br>
+                    ・10,000G以上の買い物の前に確認が出るように（設定でOFF可）<br>
+                    ・図鑑のエリアボタンに「あと◯匹」を表示。未入手のカードをタップするとヒントが出る<br>
+                    ・連続ログインボーナスを追加。ミッションに、天気・ミニゲーム・ゴミのお題を追加<br>
+                    ・結果画面に「📷」ボタンを追加。釣った生き物の画像を保存・共有できる<br>
+                    ・「あそんだ記録」（統計）、不具合報告用の情報コピー、省電力モードを追加<br>
+                    ・タイトル画面の「アンケート」ボタンを、画面のはしに移動。ご意見・不具合の報告もここから<br>
+                    ・図鑑のエリアを全部そろえると、エリアごとの豪華なコンプリート演出が出るように<br>
+                    ・全実績達成の「殿堂入り」演出を、花火・王冠・トロフィー・メッセージつきの豪華版に<br>
+                    ・コンプリート演出を、ウィンドウ全体に出るように。音もやわらかい鐘の音に作り直し<br>
+                    ・メインメニューに「エリア制覇メダル」を追加。殿堂入りでメニューが金色にかがやくように<br>
+                    ・図鑑で、制覇したエリアの生き物カードが金色に。全部そろった図鑑は、進行バーがにじ色に<br>
+                    <br>
                     ==V3.2.0======<br>
                     <b>🌌 特殊エリア</b><br>
                     ・特殊エリア6つ（サイバーシー／ミクロの海／理科実験室／妖怪の川／回転ずしレーン／海賊の入り江）を追加。季節に関係なくいつでも遊べます<br>
@@ -330,6 +385,7 @@
                     ・生き物を入手した時／魚影が来た時／図鑑の「なでなで」で、生き物が泳ぐように動く（図鑑を見ているだけの時は動きません）<br>
                     ・金額にコンマを表示／ピンゾロの超大物は、そのエリアの大物から確率で選ばれる／ゴミを拾った時の文字を大きく<br>
                     ・手紙の言葉は、特殊エリアは紫・イベントエリアはオレンジの色で表示<br>
+                    ・「拾った手紙」に、入力ずみ（✅）／まだ（⬜）のチェックを表示。並びは「アイテムなど→特殊エリア→イベントエリア」の順に自動で整列<br>
                     ・スマホによって画面が小さくなる問題を修正（ミニゲームの画面を大きく表示）／特殊エリアのひみつを発動中に、後ろで釣りが進んでしまう問題を修正<br>
                     <br>
                     ==V3.1.1======<br>
@@ -735,6 +791,9 @@
 <script src="special.js"></script>
 <script src="ui32.js"></script>
 <script src="anim32.js"></script>
+<script src="settings32.js"></script>
+<script src="qol321.js"></script>
+<script src="celebrate32.js"></script>
 <script src="egg32.js"></script>
 <script src="devcmd.js"></script>
 <script src="i18n.js"></script>
