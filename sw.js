@@ -1,5 +1,5 @@
-const CACHE_NAME = 'osakana-v3.2.4';
-const ASSETS_TO_CACHE = ['./', './index.html', './style.css', './trivia.js', './fishsize.js', './fishfacing.js', './script.js', './addons.js', './events.js', './special.js', './minigames32.js', './ui32.js', './anim32.js', './settings32.js', './qol321.js', './celebrate32.js', './egg32.js', './devcmd.js', './i18n.js', './lang_en.js', './manifest.json', './images/favicon.png', './images/icon.png'];
+const CACHE_NAME = 'osakana-v3.2.5b';
+const ASSETS_TO_CACHE = ['./', './index.html', './style.css', './trivia.js', './fishsize.js', './fishfacing.js', './script.js', './addons.js', './events.js', './special.js', './minigames32.js', './ui32.js', './anim32.js', './settings32.js', './qol321.js', './celebrate32.js', './egg32.js', './devcmd.js', './i18n.js', './lang_en.js', './manifest.json', './images/favicon.png', './images/icon.png', './images/icon-180.png', './images/icon-192.png', './images/icon-512.png'];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

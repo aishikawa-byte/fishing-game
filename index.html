@@ -10,7 +10,11 @@
     <!-- ファビコン（ブラウザアイコン）の設定 -->
     <link rel="icon" href="images/favicon.png" type="image/x-icon">
     <!-- スマホでWebアプリとして追加した時のアイコン -->
-    <link rel="apple-touch-icon" href="images/icon.png">
+    <link rel="apple-touch-icon" href="images/icon-180.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="おさかな一本勝負">
     <!-- 外部スタイルシートの読み込み -->
     <link rel="stylesheet" href="style.css">
 <script>
@@ -322,10 +326,23 @@
             <!-- アコーディオン対応のアプデ情報枠 -->
             <div class="update-box">
                 <div class="update-box-header" onclick="toggleUpdateBox()">
-                    <span class="update-box-title">📢 アプデ情報 (Ver 3.2.4)</span>
+                    <span class="update-box-title">📢 アプデ情報 (Ver 3.2.5)</span>
                     <button id="update-toggle-btn" class="update-toggle-btn">＋</button>
                 </div>
                 <div id="update-content" class="update-content" style="display: none;">
+                    ==V3.2.5======<br>
+                    <b>🛠 修正</b><br>
+                    ・最後のエリアをコンプリートした時、エリアの演出と殿堂入りが同時に出てタップできなくなる問題を修正（エリアの演出のあと、数秒たってから殿堂入り）<br>
+                    <br>
+                    ==V3.2.5======<br>
+                    <b>🛠 修正・変更</b><br>
+                    ・最後のエリアを図鑑コンプリートした時、エリアの演出が終わって数秒後に、殿堂入りの演出が出るように（同時に出て、タップできなくなる問題を修正）<br>
+                    ・データをリセットしても、「ごみを釣った回数」は変わらないように<br>
+                    ・2周目（転生）のスタート時の所持金を、100,000Gに変更<br>
+                    ・Chrome／Edge／Safari／Firefoxで動くかを確認し、ホーム画面に追加する時のアイコンと設定（iPhone／Android）を整えた<br>
+                    ・はじめて遊ぶときの「かんたん設定」が、「遊び方」の案内に邪魔されて、タップできない問題を修正<br>
+                    ・タップできる場所を、全画面・複数の画面サイズでもう一度確認<br>
+                    <br>
                     ==V3.2.4======<br>
                     <b>🛠 修正</b><br>
                     ・図鑑のエリアをコンプリートした時の、花火の音を消した<br>

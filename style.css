@@ -2228,7 +2228,7 @@ body.hof #menu-title { color: #ffd700; text-shadow: 0 0 10px #ffd700, 2px 2px 0 
 /* ===================================================
    Ver 3.0.0 (c) UI調整
    =================================================== */
-:root { --css-ver: '32-k'; }
+:root { --css-ver: '32-l'; }
 
 /* ---- メインメニュー：縦1列 ---- */
 .menu-grid { display: flex !important; flex-direction: column; gap: 6px; width: 90%; max-width: 310px; margin-bottom: 8px; }
@@ -2559,10 +2559,11 @@ body.no-weather #weather-layer { display: none !important; }
 @keyframes celIn { from { opacity: 0 } to { opacity: 1 } }
 .cel-dim { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, rgba(0,0,0,.8), rgba(0,0,0,.97)); }
 .cel-rays { position: absolute; left: 50%; top: 42%; width: 220vmax; height: 220vmax; margin: -110vmax 0 0 -110vmax; pointer-events: none;
+    background: repeating-conic-gradient(from 0deg, rgba(255, 215, 0, .38) 0 7deg, transparent 7deg 18deg);
     background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--c, #ffd700) 38%, transparent) 0 7deg, transparent 7deg 18deg);
     -webkit-mask: radial-gradient(circle, #000 0, transparent 22%); mask: radial-gradient(circle, #000 0, transparent 22%); animation: celSpin 14s linear infinite; }
 @keyframes celSpin { to { transform: rotate(360deg) } }
-.cel-glow { position: absolute; left: 50%; top: 42%; width: 70vmin; height: 70vmin; margin: -35vmin 0 0 -35vmin; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--c, #ffd700) 55%, transparent), transparent 70%); animation: celPulse 1.4s ease-in-out infinite alternate; pointer-events: none; }
+.cel-glow { position: absolute; left: 50%; top: 42%; width: 70vmin; height: 70vmin; margin: -35vmin 0 0 -35vmin; border-radius: 50%; background: radial-gradient(circle, rgba(255, 215, 0, .55), transparent 70%); background: radial-gradient(circle, color-mix(in srgb, var(--c, #ffd700) 55%, transparent), transparent 70%); animation: celPulse 1.4s ease-in-out infinite alternate; pointer-events: none; }
 @keyframes celPulse { from { transform: scale(.85); opacity: .7 } to { transform: scale(1.1); opacity: 1 } }
 .cel-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
 .cel-fishring { position: absolute; left: 50%; top: 42%; width: 0; height: 0; z-index: 2; animation: celSpin 26s linear infinite; }

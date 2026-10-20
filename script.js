@@ -1075,7 +1075,7 @@ async function resetAllData() {
     let confirmMsg = "本当にすべてのデータを削除しますか？\n（レベル、ゴールド、購入した竿・網、図鑑記録、実績、プレイ時間、ランキングが全消去されます）";
     
     if (isFullComp) {
-        confirmMsg = "✨【おさかな絵巻 完全コンプリート達成中！】✨\n転生特典として『10,000 G』を所持した状態で2周目をスタートできます！\n本当にデータをリセット（転生）しますか？";
+        confirmMsg = "✨【おさかな絵巻 完全コンプリート達成中！】✨\n転生特典として『100,000 G』を所持した状態で2周目をスタートできます！\n本当にデータをリセット（転生）しますか？";
     }
 
     const c1 = await gameConfirm(confirmMsg, { yes: 'データを削除する', no: 'やめる', danger: true });
@@ -1123,8 +1123,8 @@ async function resetAllData() {
     // 2周目（転生）へ引き継ぐもの（Ver 3.2.0）：拾った手紙・ミニゲーム練習データ・季節イベントの図鑑（特殊エリアの図鑑は消えます）
     // 完全リセット（図鑑コンプ前のリセット）では、すべて消えます。引き継ぐのは「2周目（転生）」のときだけ
     const keep = isFullComp
-        ? { bottleNotes: playerData.bottleNotes || [], spSeen: playerData.spSeen || {}, spBest: playerData.spBest || {} }
-        : { bottleNotes: [], spSeen: {}, spBest: {} };
+        ? { bottleNotes: playerData.bottleNotes || [], spSeen: playerData.spSeen || {}, spBest: playerData.spBest || {}, trashCount: playerData.trashCount || 0 }
+        : { bottleNotes: [], spSeen: {}, spBest: {}, trashCount: playerData.trashCount || 0 };
     const keepZukan = {};
     if (isFullComp) {
         FISH_DATA.forEach(f => { if (zukanCatOf(f) === 'event' && caughtFish[f.id]) keepZukan[f.id] = caughtFish[f.id]; });
@@ -1145,11 +1145,11 @@ async function resetAllData() {
         { fishName: "名無し", time: 0.320 }
     ];
 
-    // 新規プレイヤーデータ生成（コンプ100%転生時は 10,000 G スタート）
+    // 新規プレイヤーデータ生成（コンプ100%転生時は 100,000 G スタート）
     playerData = {
         level: 1, 
         exp: 0, 
-        gold: isFullComp ? 10000 : 0, // ★ 10,000 G スタート
+        gold: isFullComp ? 100000 : 0, // ★ 2周目は 100,000 G スタート
         equippedRod: "wood", ownedRods: ["wood"],
         equippedNet: "bug_net", ownedNets: ["bug_net"],
         equippedRodAcc: null, equippedBait: null,
@@ -1165,7 +1165,8 @@ async function resetAllData() {
         vibrationEnabled: true,
         clearCount: nextClearCount, // 選択に応じた周回数（星）
         isReincarnated: isFullComp,
-        bottleNotes: keep.bottleNotes, spSeen: keep.spSeen, spBest: keep.spBest
+        bottleNotes: keep.bottleNotes, spSeen: keep.spSeen, spBest: keep.spBest,
+        trashCount: keep.trashCount      // ごみを釣った回数は、リセットしても変わらない
     };
 
     savePlayerData();
@@ -1175,7 +1176,7 @@ async function resetAllData() {
     if (isFullComp) {
         playSE('levelup');
         const starMsg = deleteAchievements ? "（実績・星はリセットされました）" : `（★周回数: ${nextClearCount} へアップ！）`;
-        gameAlert(`🌟 英雄、転生の時… 🌟\n全図鑑コンプリートの功績により『10,000 G』を所持した状態で新しくゲームを開始しました！\n${starMsg}`);
+        gameAlert(`🌟 英雄、転生の時… 🌟\n全図鑑コンプリートの功績により『100,000 G』を所持した状態で新しくゲームを開始しました！\n${starMsg}`);
     } else {
         gameAlert("データを初期化しました。");
     }
@@ -2374,8 +2375,8 @@ function updateTitleBackground() {
    ---------------------------------------------------
    ・新ステージ／生き物／道具の追加は addons.js を編集してください
    =================================================== */
-const APP_VERSION = "3.2.4";
-const CSS_VERSION = "32-k";
+const APP_VERSION = "3.2.5";
+const CSS_VERSION = "32-l";
 const byId = (id) => document.getElementById(id);
 const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
 const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -3287,7 +3288,7 @@ function guideTick() {
     ensureGuide();
     const menu = byId('menu-screen');
     const ctx = kbCtx();
-    const dlgOpen = !!document.querySelector('#gd-overlay.show');      // ダイアログが出ている間は、誘導をいったん消す
+    const dlgOpen = !!document.querySelector('#gd-overlay.show, #first-setup');      // ダイアログが出ている間は、誘導をいったん消す
     const on = !dlgOpen && !playerData.hasSeenHowTo && menu.style.display === 'flex' && ctx && ctx.id === 'menu-screen';
     const layer = byId('guide-layer');
     if (on !== guideOn) { guideOn = on; layer.style.display = on ? 'block' : 'none'; }
@@ -3304,7 +3305,7 @@ function guideTick() {
 }
 setInterval(guideTick, 300);
 document.addEventListener('click', (e) => {
-    if (!guideOn || e.target.closest('#btn-howto, #gd-overlay')) return;     // ゲーム内ダイアログ（OKボタン）は、誘導中でも押せる
+    if (!guideOn || e.target.closest('#btn-howto, #gd-overlay, #first-setup')) return;     // ゲーム内ダイアログ（OKボタン）は、誘導中でも押せる
     e.stopPropagation();
     e.preventDefault();
     const h = byId('guide-hole');

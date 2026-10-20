@@ -1,5 +1,5 @@
 /* ===================================================
-   Ver 3.2.4  コンプリート演出（celebrate32.js）
+   Ver 3.2.5  コンプリート演出（celebrate32.js）
    ---------------------------------------------------
    ① エリアコンプリート演出   … 図鑑のエリアを全部そろえた瞬間に出る、全画面の豪華演出
         areaCelebrate(エリアのキー, エリア名)  ※ script.js の「エリアコンプリート判定」から呼ばれます
@@ -124,13 +124,14 @@
     }
 
     /* ---------- ① エリアコンプリート ---------- */
-    let areaFx = null, areaBusy = false;
+    let areaFx = null, areaBusy = false, hofWait = false;
     const areaQueue = [];
     function closeArea() {
         const o = byId('area-celebrate'); if (o) o.remove();
         clearTimers(); if (areaFx) { areaFx.stop(); areaFx = null; }
         areaBusy = false;
         if (areaQueue.length) { const n = areaQueue.shift(); later(() => window.areaCelebrate(n[0], n[1]), 350); }
+        else if (hofWait) { hofWait = false; later(() => window.showClearModal(false), 3000); }      // 最後のエリアの演出が終わって数秒後に、殿堂入り
     }
     window.areaCelebrate = function (key, name) {
         if (areaBusy) { areaQueue.push([key, name]); return; }
@@ -209,6 +210,12 @@
             lines.forEach((t, i) => { cr[i].textContent = t; cr[i].className = 'on'; }); showEnd();
         };
         m.querySelector('.hof-close').onclick = (e) => { e.stopPropagation(); closeClearModal(); };
+    };
+    // 最後のエリアのコンプリート演出と殿堂入りが同時に起きると、タップできなくなるので、エリア演出のあとに順番に出す
+    const _showHof = window.showClearModal;
+    window.showClearModal = function (again) {
+        if (!again && (areaBusy || areaQueue.length)) { hofWait = true; return; }
+        return _showHof.apply(this, arguments);
     };
     if (typeof window.closeClearModal === 'function') {
         const _c = window.closeClearModal;
